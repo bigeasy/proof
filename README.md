@@ -10,14 +10,15 @@ An Ace unit test is a program. It does not need a runner to run. A program emits
 minimal `Perl` `Test::Harness` output. Failed assertions appear as comments in
 the file output.
 
-You write your quick and dirty diagnostics to standard error. The test runner
-will hide it from you. If there is a test failure you can run the test program
-directly for the error spew.
+**You write your quick and dirty diagnostics to standard error.** The test
+runner will hide it from you during normal test runs. If there is a test failure
+you can run the test program directly for the error spew.
 
 The Ace test runner executes the test programs.  If a test fails, even
-catastrophically, the test runner tests on.  The test runner does not load
+catastrophically, the test runner tests on. The test runner does not load
 tests, set them up, tear them down, etc. Why have the test runner load programs,
-manage memory, file handles and sockets?  Let the operating system do that.
+manage memory, file handles and sockets?  **Let the operating system do set up and
+tear down.**
 
 You are encouraged to **be a slob** in your test code. Each test is a short
 lived process, so feel free to suck up memory, leave file handles open, and
@@ -26,8 +27,8 @@ program exits. It won't affect the test runner, or test performance.
 
 Ace is convention over configuration until configuration is zero. Programs are
 organized into directories, which acts as suites. The test runner will run
-suites in parallel. You don't have to think about parallel to get parallel. Your
-operating system does parallel just fine.
+suites in parallel. **You don't have to think about parallel to get parallel.**
+Your operating system does parallel just fine.
 
 ## Overview.
 
