@@ -61,9 +61,9 @@ for name, assertion of require("assert")
       @_actual++
       try
         assertion.apply @, splat
-        process.stdout.write "ok #{@_actual} - #{splat[splat.length - 1]}\n"
+        process.stdout.write "ok #{@_actual} #{splat[splat.length - 1]}\n"
       catch e
-        process.stdout.write "not ok #{@_actual} - #{e.message}\n"
+        process.stdout.write "not ok #{@_actual} #{e.message}\n"
         if assertion.length is 3
           inspect = { EXPECTED: splat[1], GOT: splat[0] }
           inspect = require("util").inspect inspect, null, Math.MAX_VALUE
@@ -71,7 +71,7 @@ for name, assertion of require("assert")
 
 async = new Object
 module.exports = harness = (splat...) ->
-  if splat.length is 1 and typeof splat[0] is "object"
+  if splat.length is 1
     [ context ] = splat
     (expected, callback) ->
       try
