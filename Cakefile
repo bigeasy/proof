@@ -1,6 +1,7 @@
 {Twinkie}       = require "./vendor/twinkie/lib/twinkie"
 
 twinkie = new Twinkie
+twinkie.ignore  "bin", "lib"
 twinkie.master "javascript"
 twinkie.coffee  "src/bin", "bin"
 twinkie.shebang "#!/usr/bin/env node", "bin/ace.js"
