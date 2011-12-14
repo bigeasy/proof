@@ -1,0 +1,7 @@
+{   "name":             "ace.is.aces.in.my.book"
+,   "version":          "0.0.1"
+,   "author":           "Alan Gutierrez"
+,   "directories":      { "lib" : "./lib" }
+,   "main":             "./lib/ace"
+,   "bin":              { "ace": "./bin/ace" }
+}
