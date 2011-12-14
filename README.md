@@ -30,7 +30,7 @@ organized into directories, which acts as suites. The test runner will run
 suites in parallel. **You don't have to think about parallel to get parallel.**
 Your operating system does parallel just fine.
 
-## Overview.
+### Every Test is a Program
 
 Every test is a program. Add a shebang line and make the file executable. 
 
@@ -60,7 +60,10 @@ test 2, ->
 You can see that the second argument to `test` is your program. All of the
 assertions in `require("assert")` are bound to `this`.
 
-Minimal streamlined unit test.
+### Streamline Auto-Detected
+
+Minimal streamlined unit test. Simply add a callback parameter to your callback
+and your test is called asynchronously.
 
 ```
 #!/usr/bin/env coffee-streamline
@@ -76,6 +79,74 @@ test 1, (_) ->
 When you give a test a callback with a single parameter, it calls that function
 with a `function (error) {}`. This is the callback function is required by
 Streamline.js. 
+
+### Create More Tests More Frequently With Harnesses
+
+With an Ace harness you can start a test in as little as two lines and in as
+many as three.
+
+Write a harness that does the setup for a test.  It will load the libraries
+necessary to write a test against the a subsystem of your project.
+
+You add a shebang line here, not to run this harness program, but to give a hint
+to the test generator. See the test generattion section below.
+
+```
+#!/usr/bin/env coffee
+context = {}
+context.example = { firstName: "Alan", lastName: "Gutierrez" }
+context.model = require("../../lib/model")
+module.exports = require("ace.is.aces.in.my.book") context
+```
+
+Now you can write a test with a mere two lines of preamble.
+
+```
+#!/usr/bin/env coffee
+require("./harness") 2, ({ example, model }) ->
+  @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
+  @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
+```
+
+### Auto-Generate Test Skeletons From Harnesses
+
+Once you have a harness, you can use `ace create` to generate tests based on
+your harness.
+
+```
+$ ace --generate t/model/formats.t.coffee model example
+$
+```
+
+You'll have a new test harness. The execute bit is set. It is ready to go.
+
+```
+#!/usr/bin/env coffee
+require("./harness") 0, ({ example, model }) ->
+```
+
+Now you can write your test.
+
+You might decide to have different name or path for your harness, or you might
+want to use streamline, or specify a starting number of tests. Just type it out
+and ace will figure it out.
+
+```
+$ ace --generate t/model/formats.t.coffee 2 db ./db-harness _
+$
+```
+
+Would generate.
+
+```
+#!/usr/bin/env coffee-streamline
+return if not require("streamline/module")(module)
+require("./harness") 0, ({ db }, _) ->
+```
+
+Check the docs for details.
+
+### Piplined Tests
 
 A test is a program. Because it is a program it will have its own program state.
 
@@ -155,38 +226,6 @@ context.model = require("../../lib/model")
 module.exports = require("ace.is.aces.in.my.book") context
 ```
 
-Now you can generate a harness. There is no type checking to make sure that
-the parameters are correct, but you can fix a goof like that in your editor.
-
-```
-$ ace --generate t/model/formats.t.coffee model example
-$
-```
-
-You'll have a new test harness. The execute bit is set. It is ready to go.
-
-```
-#!/usr/bin/env coffee
-require("./harness") 0, ({ example, model }) ->
-```
-
-Now you can write your test.
-
-```
-#!/usr/bin/env coffee
-require("./harness") 2, ({ example, model }) ->
-  @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
-  @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
-```
-
-You might decide to have different name or path for your harness, or you might
-want to use streamline, or specify a starting number of tests. Just type it out
-and ace will figure it out. Check the docs for details.
-
-```
-$ ace --generate t/model/formats.t.coffee 2 db ./db-harness _
-$
-```
 
 Running in parallel.
 
