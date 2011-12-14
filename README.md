@@ -1,4 +1,4 @@
-# ACE
+# Ace
 
 A test non-framework for CoffeeScript and Streamlined CoffeeScript.
 
