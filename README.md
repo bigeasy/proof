@@ -2,56 +2,32 @@
 
 A test non-framework for CoffeeScript and Streamlined CoffeeScript.
 
-## Why I Wrote My Own Framework
-
-Specifically, I ran into a problem where Streamline's magic must be in a
-function that provides a `function (error, result) {}` callback. Frameworks want
-you to write your tests in a function that they specify. If you program with
-Streamline, then you realize you're always going to have a certain amount extra
-cruft to get a test going. I find that the more cruft there is, the less likely it
-is that I'll write a test. I'm more likely to write a one liner program. This made
-we want a test framework that worked with one (or two, three, seven) liner programs.
-It made me want to use a test harness that gave me a blank slate.
-
-This is my test framework. There are many like it, but this one is mine.
-
-There is a lot of extra stuff your grarden variety test frameworks. Folks put a
-lot of thought into testing, which is an area that invites over-engineering. The
-prefect bicycle shed.
-
-I don't want to pay for those features; compatability with CI frameworks I don't
-use, compatability with IDEs I don't use, histograms that I'll never look at.
-I've never thought to myself, boy, if only I could see my test results in XML,
-JSON, RDF and YAML, then I'd really get to the bottom of this pesky bug.
-
-I don't want to depend on a test runner to run my tests.  The test runner here
-runs tests, it does not load them, set them up and tear them down. It just runs
-them and reports on how they ran.
-
-I don't want to have fiddle with a test runner to run a specific test. I want a
-each test to be a a program. I want to group my tests into suites by grouping my
-test programs into directories. When I want to run a specific test, I'll just
-run the test program directly.
-
-I'm happy to pay the extra millis to spawn a process per test, because it is so
-much easier to write a test program, with a clean program state, and not have to
-worry about teardown. I don't want my test runner to manage memory, file handles
-and sockets. Let the operating system to do that.
-
-I do want pretty green check marks. Those are *very* important to me. You'll see
-that my check marks are green and they use UNICODE check marks. I splurged on
-the check marks. They make me happy.
-
 ## Philosophy
 
-Ace is convention over configuration until configuration is zero.
+Ace is a UNIX way test non-framework for the mightily lazy programmer.
 
-A unit test is a program. It does not need a runner to run. A program emits
-minimal `Test::Harness` output. The Ace runner runs the test programs and pretty
-prints their progress, but it is not 
+An Ace unit test is a program. It does not need a runner to run. A program emits
+minimal `Perl` `Test::Harness` output. Failed assertions appear as comments in
+the file output.
 
-Ace provides a runner to run tests in parallel and pretty print output
-summaries. Colors and check marks gamify development.
+You write your quick and dirty diagnostics to standard error. The test runner
+will hide it from you. If there is a test failure you can run the test program
+directly for the error spew.
+
+The Ace test runner executes the test programs.  If a test fails, even
+catastrophically, the test runner tests on.  The test runner does not load
+tests, set them up, tear them down, etc. Why have the test runner load programs,
+manage memory, file handles and sockets?  Let the operating system do that.
+
+You are encouraged to **be a slob** in your test code. Each test is a short
+lived process, so feel free to suck up memory, leave file handles open, and
+leave sockets open. The operating system knows how to close them when your
+program exits. It won't affect the test runner, or test performance. 
+
+Ace is convention over configuration until configuration is zero. Programs are
+organized into directories, which acts as suites. The test runner will run
+suites in parallel. You don't have to think about parallel to get parallel. Your
+operating system does parallel just fine.
 
 ## Overview.
 
@@ -399,3 +375,43 @@ That's done then.
 Progress is only shown when we're piping, but that can only go in with a switch.
 
 Much easier to test when it emits structure.
+
+## Why I Wrote My Own Framework
+
+Specifically, I ran into a problem where Streamline's magic must be in a
+function that provides a `function (error, result) {}` callback. Frameworks want
+you to write your tests in a function that they specify. If you program with
+Streamline, then you realize you're always going to have a certain amount extra
+cruft to get a test going. I find that the more cruft there is, the less likely it
+is that I'll write a test. I'm more likely to write a one liner program. This made
+we want a test framework that worked with one (or two, three, seven) liner programs.
+It made me want to use a test harness that gave me a blank slate.
+
+This is my test framework. There are many like it, but this one is mine.
+
+There is a lot of extra stuff your grarden variety test frameworks. Folks put a
+lot of thought into testing, which is an area that invites over-engineering. The
+prefect bicycle shed.
+
+I don't want to pay for those features; compatability with CI frameworks I don't
+use, compatability with IDEs I don't use, histograms that I'll never look at.
+I've never thought to myself, boy, if only I could see my test results in XML,
+JSON, RDF and YAML, then I'd really get to the bottom of this pesky bug.
+
+I don't want to depend on a test runner to run my tests.  The test runner here
+runs tests, it does not load them, set them up and tear them down. It just runs
+them and reports on how they ran.
+
+I don't want to have fiddle with a test runner to run a specific test. I want a
+each test to be a a program. I want to group my tests into suites by grouping my
+test programs into directories. When I want to run a specific test, I'll just
+run the test program directly.
+
+I'm happy to pay the extra millis to spawn a process per test, because it is so
+much easier to write a test program, with a clean program state, and not have to
+worry about teardown. I don't want my test runner to manage memory, file handles
+and sockets. Let the operating system to do that.
+
+I do want pretty green check marks. Those are *very* important to me. You'll see
+that my check marks are green and they use UNICODE check marks. I splurged on
+the check marks. They make me happy.
