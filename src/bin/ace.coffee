@@ -307,7 +307,7 @@ create = ->
   harness = "./harness"
   for argument in options.arguments
     if argument is "_"
-      async = " _"
+      async = ", _"
     else if /^t(?:est)?\//.test argument
       name = argument
     else if /^\./.test argument
@@ -362,7 +362,7 @@ create = ->
       """
     fs.writeFileSync name, """
       #{shebang}
-      require("#{harness}") #{plan}, ({ #{signature.join(", ")} },#{async}) ->
+      require("#{harness}") #{plan}, ({ #{signature.join(", ")} }#{async}) ->
 
         # Here be dragons.\n
     """, "utf8"
