@@ -487,7 +487,7 @@ Progress is only shown when we're piping, but that can only go in with a switch.
 
 Much easier to test when it emits structure.
 
-## Why I Wrote My Own Framework
+## Why I Wrote My Own (Non-)Framework
 
 This is my test framework. There are many like it, but this one is mine.
 
