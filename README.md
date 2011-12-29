@@ -26,9 +26,9 @@ leave sockets open. The operating system knows how to close them when your
 program exits. It won't affect the test runner, or test performance. 
 
 Ace is convention over configuration until configuration is zero. Programs are
-organized into directories, which acts as suites. The test runner will run
-suites in parallel. **You don't have to think about parallel to get parallel.**
-Your operating system does parallel just fine.
+organized into directories, which act as suites. The test runner will run suites
+in parallel. **You don't have to think about parallel to get parallel.** Your
+operating system does parallel just fine.
 
 ### Every Test is a Program
 
@@ -108,6 +108,25 @@ require("./harness") 2, ({ example, model }) ->
   @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
 ```
 
+### Specify a Teardown
+
+You can specify a teardown method and Ace will do its best to run it in those
+final moments before all goes dark.
+
+```
+#!/usr/bin/env coffee
+require("./harness") 1, ({ connection }, _) ->
+  @teardown -> connection.close()
+
+  results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
+  @equal 12, results[0].num, "employee count"
+```
+
+As noted elsewhere, each test is a program. Most of the libraries you use, or
+connections you create, will do the right thing at program shutdown. Clean up
+after yourself like a good programmer, sure, but if things go awry, tests can
+keep running.
+
 ### Auto-Generate Test Skeletons From Harnesses
 
 Once you have a harness, you can use `ace create` to generate tests based on
@@ -142,32 +161,15 @@ Would generate.
 #!/usr/bin/env coffee-streamline
 return if not require("streamline/module")(module)
 require("./harness") 0, ({ db }, _) ->
+
+  # Here be dragons.
 ```
 
 Check the docs for details.
 
-### Piplined Tests
+### Running Tests
 
-A test is a program. Because it is a program it will have its own program state.
-
-When the test is over, the program exits, so you don't have to sweat test
-teardown. Yes it is good to clean up after yourself, but if you trigger a
-catastrophic error, the operating system will clean up after you, and the test
-runner can keep on running.
-
-A test is a program. A test contains assertions. Tests are grouped into directories.
-The directories act as test suites. Ace convention dicates that tests are placed
-in your project in a directory named `t`. In the `t` directory, there is a directory
-for each test suite. In the suite directories are your tests.
-
-```
-$ find t
-t/logic/minimal.t
-t/regex/minimal.t
-$
-```
-
-Running a minimal test.
+A test is a program. You can run a test to see its output.
 
 ```
 $ t/logic/minimal.t
@@ -177,7 +179,20 @@ ok 2 - test arithmetic
 $
 ```
 
-Using the test runner.
+By immutable convention, tests are grouped together by directory. The tests
+within a directory are considered a suite of tests. Test suites are generally
+kept in a directory `t` off the root of the project.
+
+```
+$ find t
+t/logic/minimal.t
+t/regex/minimal.t
+t/regex/complex.t
+$
+```
+
+You can run a test with the ace test runner to get gaudy console output with
+colors and non-ASCII characters (approximated below).
 
 ```
 $ ace t/logic/minimal.t.coffee
@@ -185,51 +200,124 @@ $ ace t/logic/minimal.t.coffee
 $
 ```
 
-Running multiple tests with the test runner.
+Each test you pass to the test runner is will be run by the test runner. Tests
+in separate suites are run in parallel.
 
 ```
 $ ace t/logic/minimal.t.coffee t/regex/minimal.t.coffee
  x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
- x t/minimal/minimal.t.coffee .... (2/2)  .230 Success
+ x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
 $
 ```
 
-Running all the tests in your project.
+Run all the tests in your project with a glob.
 
 ```
 $ ace t/*/*.t.coffee
  x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
- x t/minimal/minimal.t.coffee .... (2/2)  .230 Success
+ x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
+ x t/regex/complex.t.coffee ...... (2/2) 1.045 Success
 $
 ```
 
-The easier it is to get a test started, the more and better tests you're going
-to write. The minimal Ace tests above require that you type out the the same
-requires to pull in the libraries you need. You might even start to wish you
-had a test framework that let you group all your tests in one file.
+### Tests Run in Parallel
 
-With an Ace harness you can start a test in as little as two lines and in as
-many as three.
+As above.
 
-Write a harness that does the setup for a test. Usually you create a harness per
-suite directory. It will load the libraries necessary to write a test against
-the a subsystem of your project.
+```
+$ ace t/*/*.t.coffee
+ x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
+ x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
+ x t/regex/complex.t.coffee ...... (2/2) 1.045 Success
+$
+```
 
-You add a shebang line here, not to run this harness program, but to tell the
-generator what to use for a shebang line.
+Because each test is a program, parallelism is simply a matter of running more
+than one test program at once. The default mode of the ace runner is to run four
+test programs a time.
+
+The runner will run a test program from each suite, for up to four programs
+running at once. When a suite it complete, it moves onto the next one.
+
+Tests within suites are run one after another, in the order in which they were
+specified on the command line.
+
+If order matters you are doing it wrong. You should be able to run tests in
+isolation. But, should is pedants. I don't want to be one of those. You do
+what's right for you. Whatever makes you happy.
+
+Suites run in parallel. You can group your tests however you like, by feature,
+subsystem, stages of workflow.
+
+Make sure they can run in parallel though. You may have a single MySQL database
+to use for testing. You'll have to  group all your MySQL tests in a suite, you
+can be sure that they won't stomp on each other. If your application supports
+either MySQL or PostgreSQL, you could run those tests in parallel.
+
+If every test expects to hit a MySQL database, then create a separate MySQL
+database for each suite. Not a big deal, really, and then you have your tests
+running in parallel.
+
+### Asynchronous Harnesses
+
+Some setup will require asynchronous calls. Database connections require it. You
+can create asynchrous harnesses by providing a callback function instead of an
+object to the require method in your harness.
+
+The callback function will itself get a callback that is used to return an
+object that is given to the test program.
+
+You'll note that, if you add a member to the object named `$teardown` that has a
+function value, that function will be called at teardown time.
 
 ```
 #!/usr/bin/env coffee
-context = {}
-context.example = { firstName: "Alan", lastName: "Gutierrez" }
-context.model = require("../../lib/model")
-module.exports = require("ace.is.aces.in.my.book") context
+mysql   = require "mysql"
+fs      = require "fs"
+module exports = require("ace.is.aces.in.my.book") (callback) ->
+  fs.readFile "./configuration.json", "utf8", (error, file) ->
+    if error
+      callback error
+    else
+      mysql = new mysql.Database(JSON.stringify file)
+      mysql.connect (error, connection) ->
+        if error
+          callback error
+        else
+          $teardown = -> connection.close()
+          callback null, { connection, $teardown }
 ```
 
+Or streamlined.
 
-Running in parallel.
+```
+#!/usr/bin/env coffee-streamline
+return if not require("streamline/module")(module)
+mysql   = require "mysql"
+fs      = require "fs"
+module exports = require("ace.is.aces.in.my.book") (_) ->
+  file = fs.readFile "./configuration.json", "utf8", _
+  mysql = new mysql.Database(JSON.stringify file)
+  conneciton = mysql.connect _
+  $teardown = -> connection.close()
+  { connection, $teardown }
+```
 
-Ace follows the following conventions.
+As seen above, but with the teardown already specified.
+
+```
+#!/usr/bin/env coffee
+require("./harness") 1, ({ connection }, _) ->
+  results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
+  @equal 12, results[0].num, "employee count"
+```
+
+## Un-Filtered Blather
+
+*On the other side of the blather* you will find *motivations*.
+
+Stuff I wrote, 1st draft. Being culled for real documentation.
+
 Here are the conventions.
 
  * A test is a program.
@@ -355,33 +443,12 @@ require("./harness") 2, ({ example, model }) ->
 require("./harness") 4, ({ example }) ->
 ```
 
-Using this organization, setup and teardown looks like this.
 
-```
-fs = require "mysql"
-module exports = require("ace.is.aces.in.my.book") (callback) ->
-  fs.readFile "./configuration.json", "utf8", (error, file) ->
-    if error
-      callback error
-    else
-      mysql = new mysql.Database(JSON.stringify file)
-      mysql.connect (error) ->
-        if error
-          callback error
-        else
-          $teardown = ->
-          callback null, { mysql, $teardown }
-```
+### Notes:
 
-```
-require("./harness") 2, ({ mysql }) ->
-{ test, db, teardown } = require("./common")
-test 2, ->
-    @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
-    @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
-```
+Really junky stuff. *Don't read this.* Just what I was thinking as thought.
 
-Notes:
+You're reading it aren't you?
 
 Using inspect to display failures when comparing objects. It seems like one
 could switch to JSON and be one step closer to creating a testing API, but there
@@ -398,6 +465,8 @@ If it starts to emit non-printable characters, if it has zeros or bells, and
 stuff, we ignore it, or hey, we let that test run be ruined.
 
 The default ace runner is going to spawn and pipe itself to a pretty printer.
+
+Stop reading this!
 
 Raw output would stream raw output, but you would be able to pipe it to some
 place else, or it could pretty print and pipe, or you could interleave the
@@ -418,23 +487,26 @@ Much easier to test when it emits structure.
 
 ## Why I Wrote My Own Framework
 
-Specifically, I ran into a problem where Streamline's magic must be in a
-function that provides a `function (error, result) {}` callback. Frameworks want
-you to write your tests in a function that they specify. If you program with
-Streamline, then you realize you're always going to have a certain amount extra
-cruft to get a test going. I find that the more cruft there is, the less likely it
-is that I'll write a test. I'm more likely to write a one liner program. This made
-we want a test framework that worked with one (or two, three, seven) liner programs.
-It made me want to use a test harness that gave me a blank slate.
-
 This is my test framework. There are many like it, but this one is mine.
 
+The catalyist was Streamline.js. The frameworks that exist generally group tests
+into a object or the functional programming equavalent. Each test is a function.
+A suite is a class or other grouping of functions.
+
+The function may provide a callback, but the callback isn't in the `function
+(error, result) {}` format that works with Streamline.js.
+
+Of course, once I was done writing this, it occured to me that callback
+signature differences are easily shimmed, but it was too late by then.
+
 There is a lot of extra stuff your grarden variety test frameworks. Folks put a
-lot of thought into testing, which is an area that invites over-engineering. The
-prefect bicycle shed.
+lot of thought into testing, which is an area that invites over-thinking.
+
+The prefect bicycle shed.
 
 I don't want to pay for those features; compatability with CI frameworks I don't
 use, compatability with IDEs I don't use, histograms that I'll never look at.
+
 I've never thought to myself, boy, if only I could see my test results in XML,
 JSON, RDF and YAML, then I'd really get to the bottom of this pesky bug.
 

@@ -26,6 +26,7 @@
 class Test
   constructor: (@_expected) ->
     @_actual = 0
+    @_teardowns = []
     @_timeout()
     process.stdout.write "1..#{@_expected}\n"
   _indent: (start, prefix, string) ->
@@ -37,6 +38,8 @@ class Test
   _timeout: ->
     clearTimeout @_timer if @_timer
     setTimeout (=> @bailout("Timeout!")), 30000
+  teardown: (method) ->
+    @_teardowns.push method
   bailout: (error) ->
     clearTimeout @_timer if @_timer
     if typeof error is "object"
