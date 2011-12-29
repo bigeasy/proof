@@ -162,7 +162,7 @@ Would generate.
 ```
 #!/usr/bin/env coffee-streamline
 return if not require("streamline/module")(module)
-require("./harness") 0, ({ db }, _) ->
+require("./harness") 2, ({ db }, _) ->
 
   # Here be dragons.
 ```
