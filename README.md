@@ -142,6 +142,8 @@ You'll have a new test harness. The execute bit is set. It is ready to go.
 ```
 #!/usr/bin/env coffee
 require("./harness") 0, ({ example, model }) ->
+
+  # Here be dragons.
 ```
 
 Now you can write your test.
