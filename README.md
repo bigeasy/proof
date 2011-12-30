@@ -201,6 +201,9 @@ require("./harness") 1, ({ connection }, _) ->
 
 Hmm...
 
+*Please skip to next section for more useful documentation. Housekeeping is
+working fine, but this documentation is in awful shape.*
+
 Dumping a lot here, because most frameworks have a test runner process, and
 tests are loaded by the test runner process, so they have to have a lot of
 robust setup and teardown, to keep from killing the test runner process.
