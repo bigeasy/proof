@@ -1,4 +1,4 @@
-# &#9824; Ace
+# Ace &#9824;
 
 A test non-framework for CoffeeScript and Streamlined CoffeeScript.
 
@@ -452,6 +452,44 @@ either MySQL or PostgreSQL, you could run those tests in parallel.
 If every test expects to hit a MySQL database, then create a separate MySQL
 database for each suite. Not a big deal, really, and then you have your tests
 running in parallel.
+
+## Shorter
+
+The Shame of Programming... Probably a good title for a blog post. Java:
+Programming Made Shameful. Or Programing Java Considered Shameful. But, yet, I
+write a lot of stuff, or think hard, about what is expected. (Need to put this
+somewhere else. It is a shame to have it here. A crying shame.)
+
+That above is from sumbling on the word shame below...
+
+We write tests because we know that static analysis is not enough to ensure
+quality.  We write tests to exercise the demons from our software. We should not
+be surprised when our tests fail in ways that we cannot imagine. We should not
+feel ashamed that we could never imagine the failure states that our tests
+uncover. We should be humble before the complexity of software. We should accept
+that it is more than we can hold in our head at once.
+
+To think otherwise is to expect oneself to be omnicient.
+
+Moreover, why do you need a plan to turn off every light switch on your way out
+the door when the house is burning down? Dont' worry. The fire will take care of
+it for you.
+
+Uh, not shorter. Try...
+
+Ace uses the operating system as the fail-safe for resource management, so that
+you are unlikely to reach a point where you cannot run your tests because Ace is
+resource starved. In your tests you can show discipline and release resources
+when they are no longer needed, but you don't have plan for every contingency
+with deeply nested try/catch blocks. You shouldn't. Testing is supposed to
+reveal the error states you can't begin to imagine, so how do you plan for
+those?  It's not a good use of your time to devise a resource management
+strategy for the closing millis in the quarter-second life of a test program
+that has raised an exception.
+
+If you feel strongly that punting cleanup to the operating system is shameful,
+I'm probably going to argue that you're repeating something you've read a lot
+but don't really understand.
 
 ## Why I Wrote My Own (Non-)Framework
 
