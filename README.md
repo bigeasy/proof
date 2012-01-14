@@ -197,6 +197,9 @@ require("./harness") 1, ({ connection }, _) ->
   connection.close()
 ```
 
+Note that, you can use asynchronous harnesses with synchronous tests, and create
+asynchronous tests from synchronous harnesses.
+
 ### Housekeeping
 
 Hmm...
