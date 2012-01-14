@@ -133,37 +133,9 @@ for name, assertion of require("assert")
           inspect = require("util").inspect inspect, null, Math.MAX_VALUE
           @_comment(inspect)
 
-    
-# We only export one method to both define harnesses and run tests.
-module.exports = harness = (splat...) ->
+execution = (test, splat...) ->
   if splat.length is 1
-    [ context ] = splat
-    (expected, callback) ->
-      if typeof context is "function"
-        try
-          context (error, _context) ->
-            if error
-              callback error
-            else
-              harness(_context)(expected, callback)
-        catch error
-          callback error
-      else
-        try
-          harness expected, (_callback) ->
-            if teardown = context.$teardown
-              delete context.$teardown
-              @_teardown = teardown
-            if callback.length is 1
-              callback.call @, context, _callback
-            else
-              callback.call @, context
-              _callback()
-        catch error
-          callback error
-  else
-    [ expected, callback ] = splat
-    test = new Test(expected)
+    [ callback ] = splat
     try
       if callback.length is 1
         callback.call test, (error) ->
@@ -176,3 +148,37 @@ module.exports = harness = (splat...) ->
         test._end()
     catch error
       test.bailout error
+  else
+    [ context, callback ] = splat
+    if typeof context is "function"
+      try
+        context (error, _context) ->
+          if error
+            test.bailout error
+          else
+            execution test, _context, callback
+      catch error
+        test.bailout error
+    else
+      try
+        execution test, (_callback) ->
+          if teardown = context.$teardown
+            delete context.$teardown
+            @_teardown = teardown
+          if callback.length is 2
+            callback.call @, context, _callback
+          else
+            callback.call @, context
+            _callback()
+      catch error
+        test.bailout error
+    
+# We only export one method to both define harnesses and run tests.
+module.exports = harness = (splat...) ->
+  if splat.length is 1
+    [ context ] = splat
+    (expected, callback) ->
+      execution(new Test(expected), context, callback)
+  else
+    [ expected, callback ] = splat
+    execution(new Test(expected), callback)
