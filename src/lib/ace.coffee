@@ -2,6 +2,7 @@
 #
 # And instance of this class is bound to the test method. It provides assertions
 # and tracks the progress of the test.
+util = require "util"
 
 # `class Test`
 class Test
@@ -92,6 +93,9 @@ class Test
       @_comment(detail)
     process.exit 1
 
+  say: (object) ->
+    inspection = util.inspect.call util.inspect, object, false, 1024
+    @_comment(inspection)
 
   # A healthy end to our test program. Call any teardown hooks set by the test
   # harness and then exit reflecting the pass/fail state of the program.
