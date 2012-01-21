@@ -74,9 +74,9 @@ progress = ->
   durations = {}
   displayed = null
   programs = {}
-  styling = ({ time, file, start, passed, actual, expected }) ->
-    if passed < actual
-      programs[file] =
+  styling = ({ time, file, start, passed, actual, bailed, expected }) ->
+    if passed < actual or bailed
+      extend programs[file],
         status: "Failure"
         color: red
         icon: "\u2718"
@@ -93,22 +93,62 @@ progress = ->
     switch type
       when "run"
         displayed or= file
-        programs[file] =
+        programs[file] or=
           status: "Success"
           color: green
+          start: Number.MAX_VALUE
+          time: 0
+          actual: 0
+          passed: 0
+          expected: program.expected
           icon: "\u2713"
-    if type isnt "eof"
+    if type is "eof"
+      actual = 0
+      passed = 0
+      expected = 0
+      time = 0
+      start = Number.MAX_VALUE
+      count = 0
+      for file, program of programs
+        count++
+        actual += program.actual or 0
+        passed += program.passed or 0
+        expected += program.expected or 0
+        continue if not program.time
+        start = program.start if program.start < start
+        time = program.time if program.time > time
+      if passed is expected
+        icon = "\u2713"
+        status = "Success"
+        color = green
+      else
+        color = red
+        icon = "\u2718"
+        status = "Failure"
+      file = "Total tests: #{count}"
+      time = "#{time - start}"
+      time = "00#{time}".slice(-3) if time.length < 3
+      time = "     #{time}".replace(/(\d{3})$/, ".$1").slice(-5)
+      summary = "(#{passed}/#{expected}) #{time}"
+      summary = "(#{passed}/#{expected}) #{time}"
+      dots = Array(Math.max(66 - file.length - summary.length, 0)).join "."
+      process.stdout.write Array(79).join("_") + "\n"
+      process.stdout.write " #{color icon} #{file} #{dots} #{summary} #{color(status)}\n"
+    else
       programs[file].duration = time - start
     switch type
       when "test"
         if file is displayed
           process.stdout.write styling(program)
+      when "bail"
+        programs[file].bailed = true
       when "exit"
+        programs[file] = extend programs[file], program
         process.stdout.write styling(program)
         process.stdout.write "\n"
         if program.code isnt 0
           failed.push program
-        delete programs[file]
+        #delete programs[file]
         candidates = (v for k, v of programs)
         candidates.sort (a, b) -> a.duration - b.duration
         displayed = candidates.pop()?.file
@@ -122,7 +162,10 @@ parser =
   plan: (plan) ->
     if match = /^1..(\d+)$/.exec plan
       { expected: parseInt(match[1], 10) }
-  bailout: ->
+  bailout: (bailout) ->
+    if match = /^Bail out!(?:\s+(.*))?$/.exec bailout
+      message = match[1]
+      { message }
   assertion: (assert) ->
     if match = /^(not\s+)?ok\s+\d+\s*(.*?)\s*$/.exec assert
       [ failed, message ] = match.slice(1)
@@ -185,6 +228,11 @@ parse = (stream, callback) ->
           program.expected = record.expected
           extend record, program, { time, file, type }
           callback record
+        when "bail"
+          record = parser.bailout rest
+          program.bailed = true
+          extend record, program, { time, file, type }
+          callback record
         when "exit"
           code = parseInt rest, 10
           if isNaN code
@@ -219,6 +267,7 @@ run = ->
   execute = (program, index) ->
     emit(program, "run")
     test = spawn program
+    bailed = false
 
     err = ""
     test.stderr.setEncoding "utf8"
@@ -236,7 +285,9 @@ run = ->
       lines = out.split /\n/
       out   = lines.pop()
       for line in lines
-        if parser.assertion(line)
+        if bailed
+          emit program, "out", line
+        else if parser.assertion(line)
           emit program, "test", line
         else if parser.plan(line)
           emit program, "plan", line
