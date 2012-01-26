@@ -1,0 +1,8 @@
+${ "layout.stencil" }:
+${ head }:
+<title>Hello, World!</title>
+${ end }
+${ body }:
+-{ @page[0].docco }
+${ end }
+${ end }

@@ -1,0 +1,13 @@
+%{ console.log "called" }
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/stylesheets/edify.css">
+  @{ head }
+</head>
+<body>
+<div class="container">
+  @{ body }
+</div>
+</body>
+</html>

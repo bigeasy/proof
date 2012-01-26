@@ -1,0 +1,607 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/stylesheets/edify.css"><title>Hello, World!</title>
+</head>
+<body>
+<div class="container"><h1>Ace &#9824;</h1>
+
+<p>A test non-framework for CoffeeScript and Streamlined CoffeeScript.</p>
+
+<h2>Philosophy</h2>
+
+<p>Ace is a UNIX way test non-framework for the mightily lazy programmer.</p>
+
+<p>In Ace, <strong>a unit test is a program</strong>. It does not need a runner to run. A
+program emits minimal <code>Perl</code> <code>Test::Harness</code> output. Failed assertions appear as
+comments in the file output.</p>
+
+<p><strong>You write your quick and dirty diagnostics to standard error.</strong> The test
+runner will hide it from you during normal test runs. If there is a test failure
+you can run the test program directly to see the error spew.</p>
+
+<p>The Ace test runner execute test programs as child processes. <strong>If a test fails,
+even catastrophically, the test runner tests on.</strong></p>
+
+<p>The test runner does not load or evaluate JavaScript, set tests up up or tear
+tests down. Why have the test runner load programs, manage memory, file handles
+and sockets? Why count on what amounts to a fragile program loader, when you've
+got a full blown operating system at your disposal? <strong>Let the operating system
+do set up and tear down.</strong> When a test process exits, even when it fails
+catastrohically, resources are freed for the next test process.</p>
+
+<p>When there is housekeeping to be done, databases to be reset, temporary files to
+be deleted, we still don't clean up after ourselves. <strong>We clean up before
+oursleves.</strong> You use Ace harneses to clean up after the last test process at the
+start of the next test process, when everything is stable.</p>
+
+<p>With this in place, you are encouraged to <strong>be a slob</strong> in your test code.  Each
+test is a short lived process, so feel free to suck up memory, leave file
+handles open, and leave sockets open. The operating system knows how to close
+them when your program exits. It won't affect the test runner, or test
+performance. </p>
+
+<p>Well, you should always close your file handles, and you will. You don't have to
+write deeply nested try/catch blocks, however. You don't have to worry if your
+cleanup is missed. You can assume the best, because we have a universal plan for
+the worst. More below. (I'll tighten this up.)</p>
+
+<p>Ace is convention over configuration until configuration is zero. Programs are
+organized into directories, which act as suites. The test runner will run suites
+in parallel. <strong>You don't have to think about parallel to get parallel.</strong> Your
+operating system does parallel just fine.</p>
+
+<h3>Install</h3>
+
+<p>NPM repository install will come after release. For now you can install using
+<a href="https://github.com/isaacs/npm/blob/master/doc/cli/link.md">npm link</a>.</p>
+
+<p>Get a copy of the source.</p>
+
+<p><code>
+$ git clone git://github.com/bigeasy/ace.git
+$ cd ace
+$ cake compile
+$ npm link
+</code></p>
+
+<p>In any directory outside of the source tree, use <code>npm link</code> to link globally.</p>
+
+<p><code>
+$ npm link ace
+</code></p>
+
+<h3>Every Test is a Program</h3>
+
+<p>Every test is a program. Add a shebang line and make the file executable. </p>
+
+<p>Minimal unit test.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee</h1>
+
+<p>test = require "ace.is.aces.in.my.book"</p>
+
+<p>test 1, -> @ok true, "true is true"
+```</p>
+
+<p>The first argument to test is the number of tests to expect. If to many
+or too few tests are run, the test runner will detect it and report it.</p>
+
+<p>Here's a test with two assertions.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee</h1>
+
+<p>test = require "ace.is.aces.in.my.book"</p>
+
+<p>test 2, ->
+  @ok true, "true is true"
+  @equal 2 + 2, 4, "test addition"
+```</p>
+
+<p>You can see that the second argument to <code>test</code> is your program. All of the
+assertions in <code>require("assert")</code> are bound to <code>this</code>.</p>
+
+<h3>Streamline Auto-Detected</h3>
+
+<p>Minimal streamlined unit test. Simply add a callback parameter to your callback
+and your test is called asynchronously.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee-streamline</h1>
+
+<p>return if not require("streamline/module")(module)
+test = require "ace.is.aces.in.my.book"
+fs   = require "fs"</p>
+
+<p>test 1, (<em>) ->
+    found = /test/.test(fs.readFile(</em>_filename, "utf8", _))
+    @ok found, "found the word test"
+```</p>
+
+<p>When you give a test a callback with a single parameter, it calls that function
+with a <code>function (error) {}</code>. This is the callback function is required by
+Streamline.js. </p>
+
+<h3>Create More Tests More Frequently With Harnesses</h3>
+
+<p>With an Ace harness you can start a test in as little as two lines and in as
+many as three.</p>
+
+<p>Write a harness that does the setup for a test.  It will load the libraries
+necessary to write a test against the a subsystem of your project.</p>
+
+<p>You add a shebang line here, not to run this harness program, but to give a hint
+to the test generator. See the test generattion section below.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee</h1>
+
+<p>context = {}
+context.example = { firstName: "Alan", lastName: "Gutierrez" }
+context.model = require("../../lib/model")
+module.exports = require("ace.is.aces.in.my.book") context
+```</p>
+
+<p>Now you can write a test with a mere two lines of preamble.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee</h1>
+
+<p>require("./harness") 2, ({ example, model }) ->
+  @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
+  @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
+```</p>
+
+<h3>Asynchronous Harnesses</h3>
+
+<p>Some setup will require asynchronous calls. Database connections require it. You
+can create asynchrous harnesses by providing a callback function instead of an
+object to the require method in your harness.</p>
+
+<p>The callback function will itself get a callback that is used to return an
+object that is given to the test program.</p>
+
+<p>You'll note that, if you add a member to the object named <code>$teardown</code> that has a
+function value, that function will be called at teardown time.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee</h1>
+
+<p>mysql   = require "mysql"
+fs      = require "fs"
+module exports = require("ace.is.aces.in.my.book") (callback) ->
+  fs.readFile "./configuration.json", "utf8", (error, file) ->
+    if error
+      callback error
+    else
+      mysql = new mysql.Database(JSON.stringify file)
+      mysql.connect (error, connection) ->
+        if error
+          callback error
+        else
+          callback null, { connection }
+```</p>
+
+<p>Or streamlined.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee-streamline</h1>
+
+<p>return if not require("streamline/module")(module)
+mysql   = require "mysql"
+fs      = require "fs"
+module exports = require("ace.is.aces.in.my.book") (_) ->
+  file = fs.readFile "./configuration.json", "utf8", _
+  mysql = new mysql.Database(JSON.stringify file)
+  conneciton = mysql.connect _
+  { connection }
+```</p>
+
+<p>The test itself is no more complicated.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee-streamline</h1>
+
+<p>return if not require("streamline/module")(module)
+require("./harness") 1, ({ connection }, _) ->
+  results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
+  @equal 12, results[0].num, "employee count"
+  connection.close()
+```</p>
+
+<p>Note that, you can use asynchronous harnesses with synchronous tests, and create
+asynchronous tests from synchronous harnesses.</p>
+
+<h3>Housekeeping</h3>
+
+<p>Hmm...</p>
+
+<p><em>Please skip to next section for more useful documentation. Housekeeping is
+working fine, but this documentation is in awful shape.</em></p>
+
+<p>Dumping a lot here, because most frameworks have a test runner process, and
+tests are loaded by the test runner process, so they have to have a lot of
+robust setup and teardown, to keep from killing the test runner process.</p>
+
+<p>I want to keep a novice programmer (or programming pedant) from freaking out on
+me when I talk about being a slob, letting the program exit, and letting the
+operating system cleanup.</p>
+
+<p>I'm not saying you shouldn't close your handles. I'm saying it is stupid to
+imagine that a test process that is crashing is supposed to have the same level
+error handling as a production process. I might have to tone down the notion of
+being a slob, which amuses me, but might fan flames.</p>
+
+<p>Tests are meant to exercise the demons in our software. We're not surprised when
+they fail catastrohpically. Why do we try to register last minute callbacks to
+do housekeeping in a process that might have just decided to kill itself rather
+than go on? Why do try to run test after test in a single long-running test
+runner process, when we know full well that the failure states of code in
+development are unimaginable?</p>
+
+<p>We set up our tests to fail. But then, why do we try to clean up after a test,
+within a process that we know might fail?</p>
+
+<p>The Ace way is to cleanup after the last test at the start of the next test.</p>
+
+<p>We do this by using harnesses. You create a harness that cleans up after the
+last test, and gets things ready for the current test, at the start of a new
+process when everything is stable. With harnesses and 2 to 4 lines of
+boilerplate, you can wrap your test logic in housekeeping and resource
+management. </p>
+
+<p>Tests will require housekeeping.
+The Ace way is to cleanup after the last test in the next test.
+After a test is set up and running, it is supposed to
+exericse demons.</p>
+
+<p><code>
+TK: Example that maybe cleans out a working directory.
+</code></p>
+
+<p>If it fails catastrophically, Ace lets the operating system to hard work of
+releasing system resources, such as memory, sockets and file handles. When a
+test is healthy, it is healthy for the test to release resources. However, we
+don't count on in-process cleanup handlers that are supposed to be run at the
+last minute, even if the test process is so unstable it cannot proceed with
+testing normally.</p>
+
+<p>Close your file handles, for example.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee-streamline</h1>
+
+<p>return if not require("streamline/module")(module)
+require("./harness") 1, ({ fs }, <em>) ->
+  fd = fs.open(</em>_filename, "r", _)</p>
+
+<p>buffer = new Buffer(2)
+  fs.read(fd, buffer, 0, buffer.length, 0, _)
+  @equal buffer.readInt16BE(0), 0x2321, "shebang magic number"</p>
+
+<p>fs.close(fd, _)
+```</p>
+
+<p>Let's say that in the code above, the <code>Buffer</code> cannot be allocated because the
+system is out of memory. What happens? An exception is thrown, the process
+exits, and the operating system closes the file handle.</p>
+
+<p>The test does the right thing when it is healthy, but it doesn't bother with
+some sort of fail-safe cleanup code that runs at exit. Tests are supposed to
+exercise demons and encounter catastrophic errors that you could never imagine
+in a million years of static analysis. If something so horrible happens in this
+test that it cannot reach the last line, how is it going to be able to run last
+minute teardown callbacks?</p>
+
+<p>Instead of reling on a on a terminal, unstable process for housekeeping,
+housekeeping should be done at test startup.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee</h1>
+
+<p>mysql   = require "mysql"
+fs      = require "fs"
+module exports = require("ace.is.aces.in.my.book") (callback) ->
+  fs.readFile "./configuration.json", "utf8", (error, file) ->
+    if error
+      callback error
+    else
+      mysql = new mysql.Database(JSON.stringify file)
+      mysql.connect (error, connection) ->
+        if error
+          callback error
+        else
+          callback null, { connection }
+```</p>
+
+<p>Or streamlined.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee-streamline</h1>
+
+<p>return if not require("streamline/module")(module)
+mysql   = require "mysql"
+fs      = require "fs"
+module exports = require("ace.is.aces.in.my.book") (_) ->
+  file = fs.readFile "./configuration.json", "utf8", _
+  mysql = new mysql.Database(JSON.stringify file)
+  conneciton = mysql.connect _
+  { connection }
+```</p>
+
+<p>The test itself is no more complicated.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee-streamline</h1>
+
+<p>return if not require("streamline/module")(module)
+require("./harness") 1, ({ connection }, _) ->
+  results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
+  @equal 12, results[0].num, "employee count"
+  connection.close()
+```</p>
+
+<h3>Auto-Generate Test Skeletons From Harnesses</h3>
+
+<p>Once you have a harness, you can use <code>ace create</code> to generate tests based on
+your harness.</p>
+
+<p><code>
+$ ace --generate t/model/formats.t.coffee model example
+$
+</code></p>
+
+<p>You'll have a new test harness. The execute bit is set. It is ready to go.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee</h1>
+
+<p>require("./harness") 0, ({ example, model }) -></p>
+
+<p># Here be dragons.
+```</p>
+
+<p>Now you can write your test.</p>
+
+<p>You might decide to have different name or path for your harness, or you might
+want to use streamline, or specify a starting number of tests. Just type it out
+and ace will figure it out.</p>
+
+<p><code>
+$ ace --generate t/model/formats.t.coffee 2 db ./db-harness _
+$
+</code></p>
+
+<p>Would generate.</p>
+
+<p>```</p>
+
+<h1>!/usr/bin/env coffee-streamline</h1>
+
+<p>return if not require("streamline/module")(module)
+require("./harness") 2, ({ db }, _) -></p>
+
+<p># Here be dragons.
+```</p>
+
+<p>Check the docs for details.</p>
+
+<h3>Running Tests</h3>
+
+<p>A test is a program. You can run a test to see its output.</p>
+
+<p><code>
+$ t/logic/minimal.t
+1..2
+ok 1 - true is true
+ok 2 - test arithmetic
+$
+</code></p>
+
+<p>By immutable convention, tests are grouped together by directory. The tests
+within a directory are considered a suite of tests. Test suites are generally
+kept in a directory <code>t</code> off the root of the project.</p>
+
+<p><code>
+$ find t
+t/logic/minimal.t
+t/regex/minimal.t
+t/regex/complex.t
+$
+</code></p>
+
+<p>You can run a test with the ace test runner to get gaudy console output with
+colors and non-ASCII characters (approximated below).</p>
+
+<p><code>
+$ ace t/logic/minimal.t.coffee
+ x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
+$
+</code></p>
+
+<p>Each test you pass to the test runner is will be run by the test runner. Tests
+in separate suites are run in parallel.</p>
+
+<p><code>
+$ ace t/logic/minimal.t.coffee t/regex/minimal.t.coffee
+ x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
+ x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
+$
+</code></p>
+
+<p>Run all the tests in your project with a glob.</p>
+
+<p><code>
+$ ace t/*/*.t.coffee
+ x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
+ x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
+ x t/regex/complex.t.coffee ...... (2/2) 1.045 Success
+$
+</code></p>
+
+<h3>Tests Run in Parallel</h3>
+
+<p>As above.</p>
+
+<p><code>
+$ ace t/*/*.t.coffee
+ x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
+ x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
+ x t/regex/complex.t.coffee ...... (2/2) 1.045 Success
+$
+</code></p>
+
+<p>Because each test is a program, parallelism is simply a matter of running more
+than one test program at once. The default mode of the ace runner is to run four
+test programs a time.</p>
+
+<p>The runner will run a test program from each suite, for up to four programs
+running at once. When a suite it complete, it moves onto the next one.</p>
+
+<p>Tests within suites are run one after another, in the order in which they were
+specified on the command line.</p>
+
+<p>If order matters you are doing it wrong. You should be able to run tests in
+isolation. But, should is pedants. I don't want to be one of those. You do
+what's right for you. Whatever makes you happy.</p>
+
+<p>Suites run in parallel. You can group your tests however you like, by feature,
+subsystem, stages of workflow.</p>
+
+<p>Make sure they can run in parallel though. You may have a single MySQL database
+to use for testing. You'll have to  group all your MySQL tests in a suite, you
+can be sure that they won't stomp on each other. If your application supports
+either MySQL or PostgreSQL, you could run those tests in parallel.</p>
+
+<p>If every test expects to hit a MySQL database, then create a separate MySQL
+database for each suite. Not a big deal, really, and then you have your tests
+running in parallel.</p>
+
+<h2>Shorter</h2>
+
+<p>The Shame of Programming... Probably a good title for a blog post. Java:
+Programming Made Shameful. Or Programing Java Considered Shameful. But, yet, I
+write a lot of stuff, or think hard, about what is expected. (Need to put this
+somewhere else. It is a shame to have it here. A crying shame.)</p>
+
+<p>That above is from sumbling on the word shame below...</p>
+
+<p>We write tests because we know that static analysis is not enough to ensure
+quality.  We write tests to exercise the demons from our software. We should not
+be surprised when our tests fail in ways that we cannot imagine. We should not
+feel ashamed that we could never imagine the failure states that our tests
+uncover. We should be humble before the complexity of software. We should accept
+that it is more than we can hold in our head at once.</p>
+
+<p>To think otherwise is to expect oneself to be omnicient.</p>
+
+<p>Moreover, why do you need a plan to turn off every light switch on your way out
+the door when the house is burning down? Dont' worry. The fire will take care of
+it for you.</p>
+
+<p>Uh, not shorter. Try...</p>
+
+<p>Ace uses the operating system as the fail-safe for resource management, so that
+you are unlikely to reach a point where you cannot run your tests because Ace is
+resource starved. In your tests you can show discipline and release resources
+when they are no longer needed, but you don't have plan for every contingency
+with deeply nested try/catch blocks. You shouldn't. Testing is supposed to
+reveal the error states you can't begin to imagine, so how do you plan for
+those?  It's not a good use of your time to devise a resource management
+strategy for the closing millis in the quarter-second life of a test program
+that has raised an exception.</p>
+
+<p>If you feel strongly that punting cleanup to the operating system is shameful,
+I'm probably going to argue that you're repeating something you've read a lot
+but don't really understand.</p>
+
+<h2>Why I Wrote My Own (Non-)Framework</h2>
+
+<p>This is my test framework. There are many like it, but this one is mine.</p>
+
+<p>The catalyist was Streamline.js. The frameworks that exist generally group tests
+into a object or the functional programming equavalent. Each test is a function.
+A suite is a class or other grouping of functions.</p>
+
+<p>The function may provide a callback, but the callback isn't in the <code>function
+(error, result) {}</code> format that works with Streamline.js.</p>
+
+<p>Of course, once I was done writing this, it occured to me that callback
+signature differences are easily shimmed, but it was too late by then.</p>
+
+<p>There is a lot of extra stuff your grarden variety test frameworks. Folks put a
+lot of thought into testing, which is an area that invites over-thinking.</p>
+
+<p>I don't want to pay for those features; compatability with CI frameworks I don't
+use, compatability with IDEs I don't use, histograms that I'll never look at.</p>
+
+<p>I've never thought to myself, boy, if only I could see my test results in XML,
+JSON, RDF and YAML, then I'd really get to the bottom of this pesky bug.</p>
+
+<p>I don't want to depend on a test runner to run my tests.  The test runner here
+runs tests, it does not load them, set them up and tear them down. It just runs
+them and reports on how they ran.</p>
+
+<p>I don't want to have fiddle with a test runner to run a specific test. I want a
+each test to be a a program. I want to group my tests into suites by grouping my
+test programs into directories. When I want to run a specific test, I'll just
+run the test program directly.</p>
+
+<p>I'm happy to pay the extra millis to spawn a process per test, because it is so
+much easier to write a test program, with a clean program state, and not have to
+worry about teardown. I don't want my test runner to manage memory, file handles
+and sockets. Let the operating system to do that.</p>
+
+<p>I do want pretty green check marks. Those are <em>very</em> important to me. You'll see
+that my check marks are green and they use UNICODE check marks. I splurged on
+the check marks. They make me happy.</p>
+
+<h2>Un-Filtered Blather</h2>
+
+<p>This part here are bits that need a place to go. I'm writing the documentation
+and rewriting it daily.</p>
+
+<p>Write messy little one off tests. Be a slob with open file handles lying around
+like so many pizza boxes.</p>
+
+<p>You don't have to be a slob to appreciate the resource management capabilities
+of your operating system. Do be meticulous about releasing your resources. Do
+not waste your time with deeply nested try/catch blocks that gaurd against every
+contingency in a program that won't live a quarter of a second. Allow your tests
+to fail if they need to fail. You don't have to give the same amount of care to
+exceptinal conditions in test code that you have to give to exceptional
+conditions in production code.</p>
+
+<p>At least not with Ace. You'll hopfully never find yourself in a situation where
+you're debugging your tests because they exhaust system resources.</p>
+
+<p>Frameworks group assertions into tests and tests into suites. A suite is a file
+containing test. To run a test you need to run it through the test runner. Ace
+has the same grouping this too, but a suite is a directory, a test is a program.
+Thus, to run a specific test, you run that program. No special switches to the
+test runner to pluck out the test you want to run.</p>
+
+<p><em>We cleanup at setup instead of tearing down.</em> You can be loosey goosey about
+resources in your tests because they are short lives programs, but if you need
+to have a an empty directory, or a reset a database state, do it at test start,
+and leave it a mess for the next run to cleanup. If you want to be tidy, you
+can have a cleanup function that you run at the end, but run it at the begining
+as well in case the last run ended early.</p>
+</div>
+</body>
+</html>
