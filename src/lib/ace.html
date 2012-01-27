@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ace.coffee</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" media="all" href="/edify/css/docco.css">
+</head>
+<body>
+<div id="container">
+<div id="background"></div>
+  <table cellspacing="0" cellpadding="0">
+    <thead>
+      <tr>
+        <th class="docs"><h1>ace.coffee</th>
+        <th class="code"></th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td class="docs"><p><strong>Test</strong> </p>
+
+<p>And instance of this class is bound to the test method. It provides assertions
+and tracks the progress of the test.</p></td>
+          <td class="code"><div class="highlight"><pre><div class="highlight"><pre><span class="nv">util = </span><span class="nx">require</span> <span class="s2">&quot;util&quot;</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p><code>class Test</code></p></td>
+          <td class="code"><div class="highlight"><pre>
+<span class="k">class</span> <span class="nx">Test</span></pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Construct a test that expects the given number of tests.</p></td>
+          <td class="code"><div class="highlight"><pre>
+  <span class="nv">constructor: </span><span class="nf">(@_expected) -&gt;</span>
+    <span class="vi">@_actual = </span><span class="mi">0</span>
+    <span class="vi">@_teardown = </span><span class="o">-&gt;</span>
+    <span class="nx">@_timeout</span><span class="p">()</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="s2">&quot;1..#{@_expected}\n&quot;</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Print a string to standard out as a comment, prepending each line in the
+string with a hash mark.</p></td>
+          <td class="code"><div class="highlight"><pre>
+  <span class="nv">_comment: </span><span class="nf">(string) -&gt;</span>
+    <span class="nv">lines = </span><span class="nx">string</span><span class="p">.</span><span class="nx">split</span> <span class="sr">/\n/</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span>
+      <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;# #{lines[i]}&quot;</span>
+    <span class="nx">lines</span><span class="p">.</span><span class="nx">push</span> <span class="s2">&quot;&quot;</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">join</span> <span class="s2">&quot;\n&quot;</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Set and reset a thirty second timeout between assertions.</p></td>
+          <td class="code"><div class="highlight"><pre>
+  <span class="nv">_timeout: </span><span class="o">-&gt;</span>
+    <span class="nx">clearTimeout</span> <span class="nx">@_timer</span> <span class="k">if</span> <span class="nx">@_timer</span>
+    <span class="nx">setTimeout</span> <span class="p">(</span><span class="o">=&gt;</span> <span class="nx">@bailout</span><span class="p">(</span><span class="s2">&quot;Timeout!&quot;</span><span class="p">)),</span> <span class="mi">30000</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Send a <code>Test::Harness</code> Bail Out! message to stdout. This is a message sent
+when futher testing is impossible. Use it when a valuable resource is
+missing, or everyting in the world is just plain wrong. It is sent as a
+result of uncaught exceptions, test timeouts.</p>
+
+<p>We do not call <code>_teardown</code> on bailout. We are leaving now, hotel room
+trashed, to get to the airport, before the Sheriff comes, and our attorneys
+will have to handle the bill and maybe fight extradition. Yes, it is that
+bad. What are you still standing there for? Let's go!</p>
+
+<p>Tests are supposed to exercise demons. If we must Bail Out! of a test, we
+assume that we are in a state were normal execution is impossible, therefore
+normal cleanup is impossible.</p>
+
+<p>We only offer teardown because when tests are healthy, teardown is healthy,
+and reflects normal system operation. Teardown should close database
+connections, or close file handles, but it shouldn't attempt to restore a
+database or save important data to file. It really shouldn't.</p>
+
+<p>Finally, as an implementation issue, exiting the process immediately stops
+forward motion of the test. Our teardown is involved, giving the
+teardown method an opportuntiy to run asynchrnously, so now we have to set a
+timer on the teardown, and if that timesout, to we just skip the bad
+teardown method, but try the next?</p>
+
+<p>We'll get frequent catastrophic errors that cause two minute shutdowns of a
+dozen tests. People will wake up in the morning to find their continuous
+integration system is still waiting as Ace slowly shuts down one failed
+little test after another.</p>
+
+<p>Younger programmers are going to be afraid to not do everything they can to
+handle an error in a suicidal process. (Yes, Bail Out! is process suicide,
+so the process is unstable both phyically and emotionally, and probably not
+in a mood to tidy up.) I hope we're not teaching them the same Pavlovian
+responses to exceptional conditions that we were teaching ten years ago.</p>
+
+<p>You might leave resources in a dirty state for a new test process, but new
+test processes should clean up before running. You might leave a resource in
+a locked state, but Ace ensures that processes in a suite run serially, so
+subsequent test harnesses can confidentally break those locks.</p>
+
+<p>This will all be moved to a rationale section of the Ace documentation.</p></td>
+          <td class="code"><div class="highlight"><pre>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p><code>@bailout([error])</code></p></td>
+          <td class="code"><div class="highlight"><pre>
+  <span class="nv">bailout: </span><span class="nf">(error) -&gt;</span></pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Show stack trace as a comment if error is an exception.</p></td>
+          <td class="code"><div class="highlight"><pre>
+    <span class="k">if</span> <span class="nx">error</span> <span class="k">instanceof</span> <span class="nb">Error</span>
+      <span class="nv">mesage = </span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span>
+      <span class="nv">detail = </span><span class="nx">error</span><span class="p">.</span><span class="nx">stack</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="nx">error</span>
+      <span class="nv">message = </span><span class="nx">error</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Only print first line of message. If it is multi line, we'll reprint the
+full message as a comment below the Bail Out!</p></td>
+          <td class="code"><div class="highlight"><pre>
+    <span class="k">if</span> <span class="nx">message</span><span class="o">?</span>
+      <span class="nv">lines = </span><span class="nx">message</span><span class="p">.</span><span class="nx">split</span> <span class="sr">/\n/</span>
+      <span class="k">if</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">detail</span><span class="o">?</span>
+        <span class="nv">detail = </span><span class="nx">message</span>
+      <span class="nv">message = </span><span class="s2">&quot;Bail out! #{lines[0]}\n&quot;</span>
+    <span class="k">else</span>
+      <span class="nv">message = </span><span class="s2">&quot;Bail out!\n&quot;</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="nx">message</span>
+    <span class="k">if</span> <span class="nx">detail</span><span class="o">?</span>
+      <span class="nx">@_comment</span><span class="p">(</span><span class="nx">detail</span><span class="p">)</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span> <span class="mi">1</span>
+
+  <span class="nv">say: </span><span class="nf">(object) -&gt;</span>
+    <span class="nv">inspection = </span><span class="nx">util</span><span class="p">.</span><span class="nx">inspect</span><span class="p">.</span><span class="nx">call</span> <span class="nx">util</span><span class="p">.</span><span class="nx">inspect</span><span class="p">,</span> <span class="nx">object</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="mi">1024</span>
+    <span class="nx">@_comment</span><span class="p">(</span><span class="nx">inspection</span><span class="p">)</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>A healthy end to our test program. Call any teardown hooks set by the test
+harness and then exit reflecting the pass/fail state of the program.</p></td>
+          <td class="code"><div class="highlight"><pre>
+  <span class="nv">_end: </span><span class="o">-&gt;</span></pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>In case teardowns are async, we don't want to bailout while waiting.</p></td>
+          <td class="code"><div class="highlight"><pre>
+    <span class="nx">clearTimeout</span> <span class="nx">@_timer</span> <span class="k">if</span> <span class="nx">@_timer</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>If teardown is not async, wrap the teardown in an async function. The
+try/catch block below will catch any errors in the wrapped teardown.</p></td>
+          <td class="code"><div class="highlight"><pre>
+    <span class="k">if</span> <span class="nx">@_teardown</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">0</span>
+      <span class="nv">teardown = </span><span class="nx">@_teardown</span>
+      <span class="vi">@_teardown = </span><span class="nf">(callback) -&gt;</span>
+        <span class="nx">teardown</span><span class="p">()</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">)</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Try to run the teardown and bailout if it fails in any way.</p></td>
+          <td class="code"><div class="highlight"><pre>
+    <span class="k">try</span>
+      <span class="nx">@_teardown</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="k">if</span> <span class="nx">error</span>
+          <span class="nx">@_bailout</span> <span class="nx">error</span>
+        <span class="k">else</span>
+          <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span> <span class="k">if</span> <span class="nx">@_expected</span> <span class="o">is</span> <span class="nx">@_actual</span> <span class="k">then</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="k">catch</span> <span class="nx">error</span>
+      <span class="nx">@_bailout</span> <span class="nx">error</span>
+</pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>Generate asssertion member methods for the Test class from the assert library.</p></td>
+          <td class="code"><div class="highlight"><pre>
+<span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">assertion</span> <span class="k">of</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;assert&quot;</span><span class="p">)</span>
+  <span class="nx">do</span> <span class="nf">(name, assertion) -&gt;</span>
+    <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nf">(splat...) -&gt;</span>
+      <span class="nx">@_timeout</span><span class="p">()</span>
+      <span class="nx">@_actual</span><span class="o">++</span>
+      <span class="k">try</span>
+        <span class="nx">assertion</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">@</span><span class="p">,</span> <span class="nx">splat</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="s2">&quot;ok #{@_actual} #{splat[splat.length - 1]}\n&quot;</span>
+      <span class="k">catch</span> <span class="nx">e</span>
+        <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span> <span class="s2">&quot;not ok #{@_actual} #{e.message}\n&quot;</span>
+        <span class="k">if</span> <span class="nx">assertion</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">3</span>
+          <span class="nv">inspect = </span><span class="p">{</span> <span class="nv">EXPECTED: </span><span class="nx">splat</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nv">GOT: </span><span class="nx">splat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
+          <span class="nv">inspect = </span><span class="nx">require</span><span class="p">(</span><span class="s2">&quot;util&quot;</span><span class="p">).</span><span class="nx">inspect</span> <span class="nx">inspect</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">MAX_VALUE</span>
+          <span class="nx">@_comment</span><span class="p">(</span><span class="nx">inspect</span><span class="p">)</span>
+
+<span class="nv">execution = </span><span class="nf">(test, splat...) -&gt;</span>
+  <span class="k">if</span> <span class="nx">splat</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">1</span>
+    <span class="p">[</span> <span class="nx">callback</span> <span class="p">]</span> <span class="o">=</span> <span class="nx">splat</span>
+    <span class="k">try</span>
+      <span class="k">if</span> <span class="nx">callback</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">1</span>
+        <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span> <span class="nx">test</span><span class="p">,</span> <span class="nf">(error) -&gt;</span>
+          <span class="k">if</span> <span class="nx">error</span>
+            <span class="nx">test</span><span class="p">.</span><span class="nx">bailout</span> <span class="nx">error</span>
+          <span class="k">else</span>
+            <span class="nx">test</span><span class="p">.</span><span class="nx">_end</span><span class="p">()</span>
+      <span class="k">else</span>
+        <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span> <span class="nx">test</span>
+        <span class="nx">test</span><span class="p">.</span><span class="nx">_end</span><span class="p">()</span>
+    <span class="k">catch</span> <span class="nx">error</span>
+      <span class="nx">test</span><span class="p">.</span><span class="nx">bailout</span> <span class="nx">error</span>
+  <span class="k">else</span>
+    <span class="p">[</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">callback</span> <span class="p">]</span> <span class="o">=</span> <span class="nx">splat</span>
+    <span class="k">if</span> <span class="k">typeof</span> <span class="nx">context</span> <span class="o">is</span> <span class="s2">&quot;function&quot;</span>
+      <span class="k">try</span>
+        <span class="nx">context</span> <span class="nf">(error, _context) -&gt;</span>
+          <span class="k">if</span> <span class="nx">error</span>
+            <span class="nx">test</span><span class="p">.</span><span class="nx">bailout</span> <span class="nx">error</span>
+          <span class="k">else</span>
+            <span class="nx">execution</span> <span class="nx">test</span><span class="p">,</span> <span class="nx">_context</span><span class="p">,</span> <span class="nx">callback</span>
+      <span class="k">catch</span> <span class="nx">error</span>
+        <span class="nx">test</span><span class="p">.</span><span class="nx">bailout</span> <span class="nx">error</span>
+    <span class="k">else</span>
+      <span class="k">try</span>
+        <span class="nx">execution</span> <span class="nx">test</span><span class="p">,</span> <span class="nf">(_callback) -&gt;</span>
+          <span class="k">if</span> <span class="nv">teardown = </span><span class="nx">context</span><span class="p">.</span><span class="nx">$teardown</span>
+            <span class="k">delete</span> <span class="nx">context</span><span class="p">.</span><span class="nx">$teardown</span>
+            <span class="vi">@_teardown = </span><span class="nx">teardown</span>
+          <span class="k">if</span> <span class="nx">callback</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">2</span>
+            <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span> <span class="nx">@</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">_callback</span>
+          <span class="k">else</span>
+            <span class="nx">callback</span><span class="p">.</span><span class="nx">call</span> <span class="nx">@</span><span class="p">,</span> <span class="nx">context</span>
+            <span class="nx">_callback</span><span class="p">()</span>
+      <span class="k">catch</span> <span class="nx">error</span>
+        <span class="nx">test</span><span class="p">.</span><span class="nx">bailout</span> <span class="nx">error</span>
+    </pre></div></td>
+        </tr>
+      
+        <tr>
+          <td class="docs"><p>We only export one method to both define harnesses and run tests.</p></td>
+          <td class="code"><div class="highlight"><pre>
+<span class="nv">module.exports = harness = </span><span class="nf">(splat...) -&gt;</span>
+  <span class="k">if</span> <span class="nx">splat</span><span class="p">.</span><span class="nx">length</span> <span class="o">is</span> <span class="mi">1</span>
+    <span class="p">[</span> <span class="nx">context</span> <span class="p">]</span> <span class="o">=</span> <span class="nx">splat</span>
+    <span class="nf">(expected, callback) -&gt;</span>
+      <span class="nx">execution</span><span class="p">(</span><span class="k">new</span> <span class="nx">Test</span><span class="p">(</span><span class="nx">expected</span><span class="p">),</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
+  <span class="k">else</span>
+    <span class="p">[</span> <span class="nx">expected</span><span class="p">,</span> <span class="nx">callback</span> <span class="p">]</span> <span class="o">=</span> <span class="nx">splat</span>
+    <span class="nx">execution</span><span class="p">(</span><span class="k">new</span> <span class="nx">Test</span><span class="p">(</span><span class="nx">expected</span><span class="p">),</span> <span class="nx">callback</span><span class="p">)</span>
+</pre></div>
+</pre></div></td>
+        </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

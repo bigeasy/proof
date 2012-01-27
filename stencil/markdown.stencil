@@ -1,8 +1,15 @@
 ${ "layout.stencil" }:
 ${ head }:
 <title>Hello, World!</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" media="all" href="/edify/css/docco.css">
+<link rel="stylesheet" media="all" href="/edify/css/markdown.css">
 ${ end }
 ${ body }:
--{ @page[0].docco }
+<div id="container">
+<div id="markdown">
+<div class="docs">-{ @page[0].docco }</div>
+</div>
+</div>
 ${ end }
 ${ end }
