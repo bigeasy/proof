@@ -332,7 +332,7 @@ Once you have a harness, you can use `ace create` to generate tests based on
 your harness.
 
 ```
-$ ace --generate t/model/formats.t.coffee model example
+$ ace create t/model/formats.t.coffee model example
 $
 ```
 
@@ -352,7 +352,7 @@ want to use streamline, or specify a starting number of tests. Just type it out
 and ace will figure it out.
 
 ```
-$ ace --generate t/model/formats.t.coffee 2 db ./db-harness _
+$ ace create t/model/formats.t.coffee 2 db ./db-harness _
 $
 ```
 
