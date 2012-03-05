@@ -81,6 +81,13 @@ test 1, -> @ok true, "true is true"
 The first argument to test is the number of tests to expect. If to many
 or too few tests are run, the test runner will detect it and report it.
 
+```
+test = require "ace.is.aces.in.my.book"
+
+test 1, -> @ok true, "true is true"
+
+```
+
 Here's a test with two assertions.
 
 ```
