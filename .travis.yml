@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - 0.6
 before_install:
-  - npm install --dev
+  - npm install
+  - npm install coffee-script ace.is.aces.in.my.book
   - git submodule init && git submodule update
   - cake compile
