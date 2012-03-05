@@ -1,4 +1,4 @@
-# Ace &#9824; [![Build Status](https://secure.travis-ci.org/bigeasy/ace.png)](http://travis-ci.org/bigeasy/ace)
+# Ace &#9824; [![Build Status](https://secure.travis-ci.org/bigeasy/ace.png?branch=master)](http://travis-ci.org/bigeasy/ace)
 
 A test non-framework for CoffeeScript and Streamlined CoffeeScript.
 
