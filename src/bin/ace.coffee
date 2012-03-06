@@ -66,97 +66,112 @@ json = ->
         process.stdout.write JSON.stringify object, null, 2
         process.stdout.write "\n"
 
-progress = ->
-  colorize  = (color) -> (text) -> "#{color}#{text}\u001B[39m"
-  red       = colorize("\u001B[31m")
-  green     = colorize("\u001B[32m")
-  process.stdin.resume()
-  durations = {}
-  displayed = null
-  programs = {}
-  styling = ({ time, file, start, passed, actual, bailed, expected }) ->
-    if passed < actual or bailed
-      extend programs[file],
-        status: "Failure"
-        color: red
-        icon: "\u2718"
-    { status, color, icon } = programs[file]
-    time = "#{time - start}"
+progress = do ->
+  dotted = (count) -> Array(Math.max(count - 1, 0)).join "."
+
+  styling = (program) ->
+    if program.passed < program.actual or program.bailed
+      extend program, status: "Failure", color: red, icon: "\u2718"
+
+    # Format time.
+    time = "#{program.time - program.start}"
     time = "00#{time}".slice(-3) if time.length < 3
     time = "     #{time}".replace(/(\d{3})$/, ".$1").slice(-5)
-    summary = "(#{passed}/#{expected}) #{time}"
-    dots = Array(Math.max(66 - file.length - summary.length, 0)).join "."
+
+    # Format summary.
+    summary = "(#{program.passed}/#{program.expected}) #{time}"
+
+    dots = dotted(66 - program.file.length - summary.length)
+
+    { color, icon, file, status } = program
     " #{color icon} #{file} #{dots} #{summary} #{color(status)}\r"
-  failed = []
-  parse process.stdin, (program) ->
-    { time, start, type, file } = program
-    switch type
-      when "run"
-        displayed or= file
-        programs[file] or=
-          status: "Success"
-          color: green
-          start: Number.MAX_VALUE
-          time: 0
+
+  return ->
+    # Colorization.
+    colorize  = (color) -> (text) -> "#{color}#{text}\u001B[39m"
+    red       = colorize("\u001B[31m")
+    green     = colorize("\u001B[32m")
+
+    # Consume test output from standard input.
+    process.stdin.resume()
+
+    durations = {}
+    displayed = null
+    programs = {}
+
+
+    failed = []
+    parse process.stdin, (program) ->
+      # If the type is run, we're starting up a new test, create a new program
+      # structure to gather the test output.
+      if program.type is "run"
+        displayed or= program.file
+        programs[program.file] ?= {
           actual: 0
+          color: green
+          file: program.file
+          start: Number.MAX_VALUE
+          status: "Success"
+          time: 0
           passed: 0
           expected: program.expected
           icon: "\u2713"
-    if type is "eof"
-      actual = 0
-      passed = 0
-      expected = 0
-      time = 0
-      start = Number.MAX_VALUE
-      count = 0
-      for file, program of programs
-        count++
-        actual += program.actual or 0
-        passed += program.passed or 0
-        expected += program.expected or 0
-        continue if not program.time
-        start = program.start if program.start < start
-        time = program.time if program.time > time
-      if passed is expected
-        icon = "\u2713"
-        status = "Success"
-        color = green
+        }
+
+      # At the end of all tests, we print our summary, otherwise we print .
+      if program.type is "eof"
+        summary =
+          actual: 0
+          passed: 0
+          expected: 0
+          time: 0
+          start: Number.MAX_VALUE
+          count: 0
+
+        for file, program of programs
+          summary.count++
+          summary.actual += program.actual or 0
+          summary.passed += program.passed or 0
+          summary.expected += program.expected or 0
+          continue if not program.time
+          summary.start = Math.min(summary.start, program.start)
+          summary.time = Math.max(summary.time, program.time)
+
+        summary.file = "Total tests: #{summary.count}"
+
+        extend summary, if summary.passed is summary.expected
+          { icon: "\u2713", status: "Success", color: green }
+        else
+          { icon: "\u2718", status: "Failure", color: red }
+
+        process.stdout.write Array(79).join("_") + "\n"
+        process.stdout.write styling(summary) + "\n"
+
+      # Otherwise update duration.
       else
-        color = red
-        icon = "\u2718"
-        status = "Failure"
-      file = "Total tests: #{count}"
-      time = "#{time - start}"
-      time = "00#{time}".slice(-3) if time.length < 3
-      time = "     #{time}".replace(/(\d{3})$/, ".$1").slice(-5)
-      summary = "(#{passed}/#{expected}) #{time}"
-      summary = "(#{passed}/#{expected}) #{time}"
-      dots = Array(Math.max(66 - file.length - summary.length, 0)).join "."
-      process.stdout.write Array(79).join("_") + "\n"
-      process.stdout.write " #{color icon} #{file} #{dots} #{summary} #{color(status)}\n"
-    else
-      programs[file].duration = time - start
-    switch type
-      when "test"
-        if file is displayed
-          process.stdout.write styling(program)
-      when "bail"
-        programs[file].bailed = true
-      when "exit"
-        programs[file] = extend programs[file], program
-        process.stdout.write styling(program)
-        process.stdout.write "\n"
-        if program.code isnt 0
-          failed.push program
-        #delete programs[file]
-        candidates = (v for k, v of programs)
-        candidates.sort (a, b) -> a.duration - b.duration
-        displayed = candidates.pop()?.file
-  tattled = {}
-  tattle = (message) ->
-    if not tattled[message]
-      process.stderr.write "\n#{message}"
-      tattled[message] = true
+        programs[program.file].duration = program.time - program.start
+        switch program.type
+          when "test"
+            if file is displayed
+              process.stdout.write styling(programs[file])
+          when "bail"
+            programs[file].bailed = true
+          when "exit"
+            extend programs[program.file], program
+            process.stdout.write styling(programs[program.file])
+            process.stdout.write "\n"
+            if program.code isnt 0
+              failed.push program
+            #delete programs[file]
+            candidates = (v for k, v of programs)
+            candidates.sort (a, b) -> a.duration - b.duration
+            displayed = candidates.pop()?.file
+
+    tattled = {}
+    tattle = (message) ->
+      if not tattled[message]
+        process.stderr.write "\n#{message}"
+        tattled[message] = true
 
 parser =
   plan: (plan) ->
@@ -210,9 +225,10 @@ parse = (stream, callback) ->
         throw new Error "cannot parse line #{count}"
       [ time, type, file, rest ] = match.slice(1)
       time = parseInt time
-      program = programs[file] or=
+      program = programs[file] or= {
         passed: 0
         actual: 0
+      }
       switch type
         when "test"
           record = parser.assertion rest
