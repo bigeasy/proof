@@ -173,12 +173,6 @@ progress = do ->
             candidates.sort (a, b) -> a.duration - b.duration
             displayed = candidates.pop()?.file
 
-    tattled = {}
-    tattle = (message) ->
-      if not tattled[message]
-        process.stderr.write "\n#{message}"
-        tattled[message] = true
-
 parser =
   plan: (plan) ->
     if match = /^1..(\d+)$/.exec plan
@@ -336,44 +330,6 @@ run = ->
   next = options.processes or 1
   for i in [0...next]
     execute(parallel[i].programs.shift(), i) if parallel[i]
-
-ignore = ->
-      for program_, i in parallel
-        if program_.time > time
-          time = program_.time
-          displayed = i
-      if passed isnt expected or code isnt 0
-        failures.push { program, passed, expected, time, code }
-      if parallel[index].programs.length
-        execute(parallel[index].programs.shift(), index)
-      else if next < parallel.length
-        parallel[index].running = false
-        displayed = next + 1 if displayed is index
-        index = next++
-        execute(parallel[index].programs.shift(), index)
-      else if not (value for value of parallel when value.running).length
-        for failure in failures
-          time = +(new Date()) - start
-          { program, code, passed, expected, time } = failure
-          process.stdout.write "\n#{program} exited: #{code} (#{passed}/#{expected}) in #{time} ms\n"
-        if end
-          tattle "test is writing after completion"
-        else if match = /^1..(\d+)$/.exec line
-          if expected?
-            tattle "test sent multiple plans"
-          else
-            expected = parseInt match[1], 10
-            end = actual isnt 0
-        else if match = /^(not\s+)?ok\s+(\d+)(?:\s+-\s*(.*?)\s*)?$/.exec line
-          [ failed, message ] = match.slice(1)
-          passed++    unless failed
-          end = true  if ++actual is expected
-          styling()   if displayed is index
-        else if match = /^Bail out!(?:\s+(.*?)\s*)?$/.exec line
-          process.stdout.write "\nBail out! #{match[1]}\n"
-          tattle = ->
-        else
-          tattle "test is writing out jibberish\n"
 
 create = ->
   signature = []
