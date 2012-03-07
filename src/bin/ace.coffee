@@ -54,6 +54,8 @@ json = ->
           time: program.time
           expected: program.expected
           tests: []
+      when "plan"
+        object[program.file].expected = program.expected
       when "test"
         { message, file, time, passed, skip, todo, comment } = program
         object[file].tests.push { message, time, passed, skip, todo, comment }
