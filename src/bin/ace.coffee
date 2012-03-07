@@ -149,7 +149,7 @@ progress = do ->
         process.stdout.write Array(79).join("_") + "\n"
         process.stdout.write styling(summary, "\n")
 
-        if process.stdout.isTTY
+        if process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
           console.log "HAS TTY"
         else
           console.log "NO TTY"
@@ -159,7 +159,7 @@ progress = do ->
         programs[program.file].duration = program.time - program.start
         switch program.type
           when "test"
-            if file is displayed and process.stdout.isTTY
+            if file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
               process.stdout.write styling(programs[file], "\r")
           when "bail"
             programs[file].bailed = true
