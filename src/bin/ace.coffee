@@ -244,10 +244,8 @@ parse = (stream, callback) ->
           program.start = time
           callback extend program, { time, type, file }
         when "plan"
-          record = parser.plan rest
-          program.expected = record.expected
-          extend record, program, { time, file, type }
-          callback record
+          expected = parseInt rest, 10
+          callback extend program, { time, file, type, expected }
         when "bail"
           record = parser.bailout rest
           program.bailed = true
@@ -309,8 +307,8 @@ run = ->
           emit program, "out", line
         else if parser.assertion(line)
           emit program, "test", line
-        else if parser.plan(line)
-          emit program, "plan", line
+        else if plan = parser.plan(line)
+          emit program, "plan", plan.expected
         else if parser.bailout(line)
           emit program, "bail", line
         else
