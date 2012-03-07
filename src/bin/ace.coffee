@@ -168,7 +168,6 @@ progress = do ->
             process.stdout.write styling(programs[program.file], "\n")
             if program.code isnt 0
               failed.push program
-            #delete programs[file]
             candidates = (v for k, v of programs)
             candidates.sort (a, b) -> a.duration - b.duration
             displayed = candidates.pop()?.file
