@@ -176,6 +176,10 @@ progress = do ->
 parser =
   plan: (plan) ->
     if match = /^1..(\d+)$/.exec plan
+      expected = match[1]
+    if expected
+      expected = parseInt(expected, 10)
+    if not isNaN(expected)
       { expected: parseInt(match[1], 10) }
   bailout: (bailout) ->
     if match = /^Bail out!(?:\s+(.*))?$/.exec bailout
