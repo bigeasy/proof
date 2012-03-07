@@ -149,11 +149,6 @@ progress = do ->
         process.stdout.write Array(79).join("_") + "\n"
         process.stdout.write styling(summary, "\n")
 
-        if process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
-          console.log "HAS TTY"
-        else
-          console.log "NO TTY"
-
       # Otherwise update duration.
       else
         programs[program.file].duration = program.time - program.start
