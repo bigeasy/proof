@@ -71,7 +71,7 @@ json = ->
 progress = do ->
   dotted = (count) -> Array(Math.max(count - 1, 0)).join "."
 
-  styling = (program) ->
+  styling = (program, terminal) ->
     if program.passed < program.actual or program.bailed
       extend program, status: "Failure", color: red, icon: "\u2718"
 
@@ -86,7 +86,7 @@ progress = do ->
     dots = dotted(66 - program.file.length - summary.length)
 
     { color, icon, file, status } = program
-    " #{color icon} #{file} #{dots} #{summary} #{color(status)}\r"
+    " #{color icon} #{file} #{dots} #{summary} #{color(status)}#{terminal}"
 
   return ->
     # Colorization.
@@ -147,21 +147,25 @@ progress = do ->
           { icon: "\u2718", status: "Failure", color: red }
 
         process.stdout.write Array(79).join("_") + "\n"
-        process.stdout.write styling(summary) + "\n"
+        process.stdout.write styling(summary, "\n")
+
+        if process.stdout.isTTY
+          console.log "HAS TTY"
+        else
+          console.log "NO TTY"
 
       # Otherwise update duration.
       else
         programs[program.file].duration = program.time - program.start
         switch program.type
           when "test"
-            if file is displayed
-              process.stdout.write styling(programs[file])
+            if file is displayed and process.stdout.isTTY
+              process.stdout.write styling(programs[file], "\r")
           when "bail"
             programs[file].bailed = true
           when "exit"
             extend programs[program.file], program
-            process.stdout.write styling(programs[program.file])
-            process.stdout.write "\n"
+            process.stdout.write styling(programs[program.file], "\n")
             if program.code isnt 0
               failed.push program
             #delete programs[file]
