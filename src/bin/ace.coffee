@@ -156,9 +156,9 @@ progress = do ->
         switch program.type
           when "test"
             if file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
-              process.stdout.write styling(programs[file], "\r")
+              process.stdout.write styling(programs[program.file], "\r")
           when "bail"
-            programs[file].bailed = true
+            programs[program.file].bailed = true
           when "exit"
             extend programs[program.file], program
             process.stdout.write styling(programs[program.file], "\n")
