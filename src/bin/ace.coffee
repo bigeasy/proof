@@ -69,6 +69,12 @@ json = ->
         process.stdout.write "\n"
 
 progress = do ->
+  # Colorization.
+  colorize  = (color) -> (text) -> "#{color}#{text}\u001B[39m"
+  red       = colorize("\u001B[31m")
+  green     = colorize("\u001B[32m")
+
+  # Visual queue for table layout.
   dotted = (count) -> Array(Math.max(count - 1, 0)).join "."
 
   styling = (program, terminal) ->
@@ -89,11 +95,6 @@ progress = do ->
     " #{color icon} #{file} #{dots} #{summary} #{color(status)}#{terminal}"
 
   return ->
-    # Colorization.
-    colorize  = (color) -> (text) -> "#{color}#{text}\u001B[39m"
-    red       = colorize("\u001B[31m")
-    green     = colorize("\u001B[32m")
-
     # Consume test output from standard input.
     process.stdin.resume()
 
