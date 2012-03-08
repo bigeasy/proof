@@ -3,7 +3,7 @@
 ,   "author":           "Alan Gutierrez"
 ,   "directories":      { "lib" : "./lib" }
 ,   "devDependencies":  { "coffee-script": ">=1.1.3", "ace.is.aces.in.my.book": ">=0.0.1" }
-,   "scripts":          { "test": "./bin/ace t/run/chatty.t.coffee" }
+,   "scripts":          { "test": "./bin/ace t/*/*.t.coffee" }
 ,   "main":             "./lib/ace"
 ,   "bin":              { "ace": "./bin/ace" }
 }
