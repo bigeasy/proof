@@ -102,13 +102,14 @@ progress = do ->
     displayed = null
     programs = {}
 
-
     failed = []
     parse process.stdin, (program) ->
+      # Display the output if nothing else is being displayed.
+      displayed or= program.file
+
       # If the type is run, we're starting up a new test, create a new program
       # structure to gather the test output.
       if program.type is "run"
-        displayed or= program.file
         programs[program.file] ?= {
           actual: 0
           color: green
@@ -154,19 +155,21 @@ progress = do ->
       else
         programs[program.file].duration = program.time - program.start
         switch program.type
+          when "plan"
+            programs[program.file].expected = program.expected
           when "test"
-            if file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
+            extend programs[program.file], program
+            if program.file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
               process.stdout.write styling(programs[program.file], "\r")
           when "bail"
+            displayed = null if program.file is displayed
             programs[program.file].bailed = true
           when "exit"
+            displayed = null if program.file is displayed
             extend programs[program.file], program
             process.stdout.write styling(programs[program.file], "\n")
             if program.code isnt 0
               failed.push program
-            candidates = (v for k, v of programs)
-            candidates.sort (a, b) -> a.duration - b.duration
-            displayed = candidates.pop()?.file
 
 parser =
   plan: (plan) ->
