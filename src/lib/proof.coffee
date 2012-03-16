@@ -54,7 +54,7 @@ class Test
   #
   # We'll get frequent catastrophic errors that cause two minute shutdowns of a
   # dozen tests. People will wake up in the morning to find their continuous
-  # integration system is still waiting as Ace slowly shuts down one failed
+  # integration system is still waiting as Proof slowly shuts down one failed
   # little test after another.
   #
   # Younger programmers are going to be afraid to not do everything they can to
@@ -65,10 +65,10 @@ class Test
   #
   # You might leave resources in a dirty state for a new test process, but new
   # test processes should clean up before running. You might leave a resource in
-  # a locked state, but Ace ensures that processes in a suite run serially, so
+  # a locked state, but Proof ensures that processes in a suite run serially, so
   # subsequent test harnesses can confidentally break those locks.
   #
-  # This will all be moved to a rationale section of the Ace documentation.
+  # This will all be moved to a rationale section of the Proof documentation.
 
   # `@bailout([error])`
   bailout: (error) ->
