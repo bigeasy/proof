@@ -1,5 +1,5 @@
 edify = require("./edify/lib/edify")()
-edify.language "coffee"
+edify.language "coffeescript"
   lexer: "coffeescript"
   docco: "#"
   ignore: [ /^#!/, /^#\s+vim/ ]
@@ -10,8 +10,8 @@ edify.language "c"
     start:  /^\s*\s(.*)/
     end:    /^(.*)\*\//
     strip:  /^\s+\*/
-edify.parse "coffee", "code/src", "src", /\.coffee$/
+#edify.parse "coffeescript", "code/src", "src", /\.coffee$/
 edify.parse "markdown", "code/README.md", "index.html"
 edify.stencil /\/.*.md$/, "stencil/markdown.stencil"
-edify.stencil /\/.*.coffee$/, "stencil/docco.stencil"
+#edify.stencil /\/.*.coffee$/, "stencil/docco.stencil"
 edify.tasks task

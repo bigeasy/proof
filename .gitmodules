@@ -1,6 +1,6 @@
 [submodule "code"]
 	path = code
-	url = git://github.com/bigeasy/ace.git
+	url = git://github.com/bigeasy/proof.git
 [submodule "edify"]
 	path = edify
 	url = git://github.com/bigeasy/edify.git

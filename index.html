@@ -1,23 +1,23 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-<link rel="stylesheet" type="text/css" href="/stylesheets/edify.css"><title>Hello, World!</title>
+<head><title>Hello, World!</title>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" media="all" href="/edify/css/docco.css">
-<link rel="stylesheet" media="all" href="/edify/css/markdown.css">
+<link rel="stylesheet" media="all" href="/ace/css/docco.css">
+<link rel="stylesheet" media="all" href="/ace/css/markdown.css">
 </head>
 <body>
 <div class="container"><div id="container">
 <div id="markdown">
-<div class="docs"><h1>Ace &#9824;</h1>
+
+<div class="docs"><h1>Proof &#x2713; <a href="http://travis-ci.org/bigeasy/proof"><img src="https://secure.travis-ci.org/bigeasy/proof.png?branch=master" alt="Build Status" title="" /></a></h1>
 
 <p>A test non-framework for CoffeeScript and Streamlined CoffeeScript.</p>
 
 <h2>Philosophy</h2>
 
-<p>Ace is a UNIX way test non-framework for the mightily lazy programmer.</p>
+<p>Proof is a UNIX way test non-framework for the mightily lazy programmer.</p>
 
-<p>In Ace, <strong>a unit test is a program</strong>. It does not need a runner to run. A
+<p>In Proof, a <strong>unit test</strong> is a <strong>program</strong>. It does not need a runner to run. A
 program emits minimal <code>Perl</code> <code>Test::Harness</code> output. Failed assertions appear as
 comments in the file output.</p>
 
@@ -25,20 +25,19 @@ comments in the file output.</p>
 runner will hide it from you during normal test runs. If there is a test failure
 you can run the test program directly to see the error spew.</p>
 
-<p>The Ace test runner execute test programs as child processes. <strong>If a test fails,
+<p>The Proof test runner execute test programs as child processes. <strong>If a test fails,
 even catastrophically, the test runner tests on.</strong></p>
 
-<p>The test runner does not load or evaluate JavaScript, set tests up up or tear
-tests down. Why have the test runner load programs, manage memory, file handles
-and sockets? Why count on what amounts to a fragile program loader, when you've
-got a full blown operating system at your disposal? <strong>Let the operating system
-do set up and tear down.</strong> When a test process exits, even when it fails
-catastrohically, resources are freed for the next test process.</p>
+<p><strong>Let the operating system do set up and tear down.</strong> When a test process exits,
+even when it fails catastrophically, resources are freed for the next test
+process. The test runner does not load or evaluate JavaScript, set tests up up
+or tear tests down. Why count on what amounts to a fragile program loader, when
+you've got a full blown operating system at your disposal?</p>
 
 <p>When there is housekeeping to be done, databases to be reset, temporary files to
 be deleted, we still don't clean up after ourselves. <strong>We clean up before
-oursleves.</strong> You use Ace harneses to clean up after the last test process at the
-start of the next test process, when everything is stable.</p>
+oursleves.</strong> You use Proof harnesses to clean up after the last test process at
+the start of the next test process, when everything is stable.</p>
 
 <p>With this in place, you are encouraged to <strong>be a slob</strong> in your test code.  Each
 test is a short lived process, so feel free to suck up memory, leave file
@@ -46,433 +45,371 @@ handles open, and leave sockets open. The operating system knows how to close
 them when your program exits. It won't affect the test runner, or test
 performance. </p>
 
-<p>Well, you should always close your file handles, and you will. You don't have to
-write deeply nested try/catch blocks, however. You don't have to worry if your
-cleanup is missed. You can assume the best, because we have a universal plan for
-the worst. More below. (I'll tighten this up.)</p>
+<p>Well, you'll probably always <strong>be a meticulous programmer</strong>, who would never
+leave a file handle open, but still; you don't have to develop a strategy for
+error handling in code that is supposed to exercise edge cases. You don't have
+to <em>try</em> to <em>catch</em> the crazy monkey bananas thrown from code in development.
+You have a simple, universal strategy that works for normal operation, all tests
+passed, as well at the who-would-ever-have-imagined-that failures.</p>
 
-<p>Ace is convention over configuration until configuration is zero. Programs are
+<p>And that's not all. </p>
+
+<p>Proof is convention over configuration until configuration is zero. Programs are
 organized into directories, which act as suites. The test runner will run suites
-in parallel. <strong>You don't have to think about parallel to get parallel.</strong> Your
-operating system does parallel just fine.</p>
+in parallel, one test at a time from each suite. <strong>You don't have to think about
+parallel to get parallel.</strong> Your operating system does parallel for you just
+fine, so we use the operating system.</p>
+
+<p>Proof is a <strong><em>parallel</em></strong> test runner, with a <strong><em>terse</em></strong> syntax and
+<strong><em>generated</em></strong> scaffolding, that runs <strong><em>tests that are programs</em></strong>, and can
+<strong><em>handle almost any exception</em></strong> and keep running tests.</p>
 
 <h3>Install</h3>
 
-<p>NPM repository install will come after release. For now you can install using
-<a href="https://github.com/isaacs/npm/blob/master/doc/cli/link.md">npm link</a>.</p>
+<p>Via NPM.</p></div>
 
-<p>Get a copy of the source.</p>
+<div class="docs"><pre>npm install proof</pre></div>
 
-<p><code>
-$ git clone git://github.com/bigeasy/ace.git
-$ cd ace
-$ cake compile
-$ npm link
-</code></p>
+<div class="docs"><p>To test via NPM, by extension <a href="http://travis-ci.org/">Travis CI</a>, create a
+<code>package.json</code> for your project that includes the following properties.</p></div>
 
-<p>In any directory outside of the source tree, use <code>npm link</code> to link globally.</p>
+<div class="docs"><div class="highlight"><pre><span class="p">{</span>   <span class="nt">&quot;name&quot;</span><span class="p">:</span>             <span class="s2">&quot;fibonacci&quot;</span>
+<span class="p">,</span>   <span class="nt">&quot;version&quot;</span><span class="p">:</span>          <span class="s2">&quot;1.0.3&quot;</span>
+<span class="p">,</span>   <span class="nt">&quot;author&quot;</span><span class="p">:</span>           <span class="s2">&quot;Alan Gutierrez&quot;</span>
+<span class="p">,</span>   <span class="nt">&quot;directories&quot;</span><span class="p">:</span>      <span class="p">{</span> <span class="nt">&quot;lib&quot;</span> <span class="p">:</span> <span class="s2">&quot;./lib&quot;</span> <span class="p">}</span>
+<span class="p">,</span>   <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span>  <span class="p">{</span> <span class="nt">&quot;proof&quot;</span><span class="p">:</span> <span class="s2">&quot;&gt;=0.0.1&quot;</span> <span class="p">}</span>
+<span class="p">,</span>   <span class="nt">&quot;scripts&quot;</span><span class="p">:</span>          <span class="p">{</span> <span class="nt">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;proof t/*/*.t&quot;</span> <span class="p">}</span>
+<span class="p">,</span>   <span class="nt">&quot;main&quot;</span><span class="p">:</span>             <span class="s2">&quot;./lib/fibonacci&quot;</span>
+<span class="p">}</span>
 
-<p><code>
-$ npm link ace
-</code></p>
+</pre></div></div>
+
+<div class="docs"><p>Now you can run <code>npm test</code> to test your project.</p>
 
 <h3>Every Test is a Program</h3>
 
 <p>Every test is a program. Add a shebang line and make the file executable. </p>
 
-<p>Minimal unit test.</p>
+<p>Minimal unit test.</p></div>
 
-<p>```</p>
+<div class="docs"><div class="highlight"><pre><span class="c1">#!/usr/bin/env coffee</span>
+<span class="nx">require</span><span class="p">(</span><span class="s">&quot;proof&quot;</span><span class="p">)</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="nx">@ok</span> <span class="kc">true</span><span class="p">,</span> <span class="s">&quot;true is true&quot;</span></pre></div></div>
 
-<h1>!/usr/bin/env coffee</h1>
-
-<p>test = require "ace.is.aces.in.my.book"</p>
-
-<p>test 1, -> @ok true, "true is true"
-```</p>
-
-<p>The first argument to test is the number of tests to expect. If to many
+<div class="docs"><p>The first argument to test is the number of tests to expect. If to many
 or too few tests are run, the test runner will detect it and report it.</p>
 
-<p>Here's a test with two assertions.</p>
+<p>The call to <code>require("proof")</code> returns a function. You can call
+it immediately. That makes your test preamble quick and to the point.</p>
 
-<p>```</p>
+<p>This is analogous to the above.</p></div>
 
-<h1>!/usr/bin/env coffee</h1>
+<div class="docs"><pre>test = require "proof"
 
-<p>test = require "ace.is.aces.in.my.book"</p>
+test 1, -&gt; @ok true, "true is true"</pre></div>
 
-<p>test 2, ->
-  @ok true, "true is true"
-  @equal 2 + 2, 4, "test addition"
-```</p>
+<div class="docs"><p>Here's a test with two assertions.</p></div>
 
-<p>You can see that the second argument to <code>test</code> is your program. All of the
-assertions in <code>require("assert")</code> are bound to <code>this</code>.</p>
+<div class="docs"><div class="highlight"><pre>
+<span class="c1">#!/usr/bin/env coffee</span>
+<span class="nx">require</span><span class="p">(</span><span class="s">&quot;proof&quot;</span><span class="p">)</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-&gt;</span>
+  <span class="nx">@ok</span> <span class="kc">true</span><span class="p">,</span> <span class="s">&quot;true is true&quot;</span>
+  <span class="nx">@equal</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s">&quot;test addition&quot;</span></pre></div></div>
+
+<div class="docs"><p>You can see that the second argument to <code>test</code> is your program. All of the
+assertions in <a href="http://nodejs.org/api/assert.html"><code>require("assert")</code></a> are
+available to your test function. They are bound to <code>this</code> so you can get to them
+using the <code>@</code> operator in CoffeeScript.</p>
 
 <h3>Streamline Auto-Detected</h3>
 
 <p>Minimal streamlined unit test. Simply add a callback parameter to your callback
-and your test is called asynchronously.</p>
+and your test is called asynchronously.</p></div>
 
-<p>```</p>
+<div class="docs"><pre>#!/usr/bin/env _coffee
+fs   = require "fs"
+require("proof") 1, (_) -&gt;
+    found = /test/.test(fs.readFile(__filename, "utf8", _))
+    @ok found, "found the word test"</pre></div>
 
-<h1>!/usr/bin/env coffee-streamline</h1>
-
-<p>return if not require("streamline/module")(module)
-test = require "ace.is.aces.in.my.book"
-fs   = require "fs"</p>
-
-<p>test 1, (<em>) ->
-    found = /test/.test(fs.readFile(</em>_filename, "utf8", _))
-    @ok found, "found the word test"
-```</p>
-
-<p>When you give a test a callback with a single parameter, it calls that function
+<div class="docs"><p>When you give a test a callback with a single parameter, it calls that function
 with a <code>function (error) {}</code>. This is the callback function is required by
-Streamline.js. </p>
+Streamline.js.</p>
+
+<p>No shims for Streamline.js code. Proof is Streamline.js friendly.</p>
 
 <h3>Create More Tests More Frequently With Harnesses</h3>
 
-<p>With an Ace harness you can start a test in as little as two lines and in as
-many as three.</p>
+<p>With an Proof harness you can start a test in as little as two lines of code.</p>
 
 <p>Write a harness that does the setup for a test.  It will load the libraries
-necessary to write a test against the a subsystem of your project.</p>
+necessary to write a test against the subsystem of your project.</p>
 
-<p>You add a shebang line here, not to run this harness program, but to give a hint
-to the test generator. See the test generattion section below.</p>
+<p>You add a shebang line here, because <code>proof</code> will run it for introspection when
+it generates new tests. See the test generation section below.</p></div>
 
-<p>```</p>
-
-<h1>!/usr/bin/env coffee</h1>
-
-<p>context = {}
+<div class="docs"><pre>#!/usr/bin/env coffee
+context = {}
 context.example = { firstName: "Alan", lastName: "Gutierrez" }
 context.model = require("../../lib/model")
-module.exports = require("ace.is.aces.in.my.book") context
-```</p>
+module.exports = require("proof") context</pre></div>
 
-<p>Now you can write a test with a mere two lines of preamble.</p>
+<div class="docs"><p>Now you can write tests with a mere two lines of preamble. The common setup for
+your test suite is in your harness.</p></div>
 
-<p>```</p>
-
-<h1>!/usr/bin/env coffee</h1>
-
-<p>require("./harness") 2, ({ example, model }) ->
+<div class="docs"><pre>#!/usr/bin/env coffee
+require("./harness") 2, ({ example, model }) -&gt;
   @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
-  @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
-```</p>
+  @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"</pre></div>
+
+<div class="docs"><h3>Auto-Generate Test Skeletons From Harnesses</h3>
+
+<p>Once you have a harness, you can use <code>proof create</code> to generate tests based on
+your harness.</p></div>
+
+<div class="docs"><pre>$ proof create t/model/formats.t.coffee model example
+$</pre></div>
+
+<div class="docs"><p>You'll have a new test harness. The execute bit is set. It is ready to go.</p></div>
+
+<div class="docs"><pre>#!/usr/bin/env coffee
+require("./harness") 0, ({ example, model }) -&gt;
+
+  # Here be dragons.</pre></div>
+
+<div class="docs"><p>Now you can write your test.</p>
+
+<p>Proof assumes that you've created a harness in the target directory named
+<code>harness.js</code>, <code>harness._js</code>, <code>harness.coffee</code> or `harness._coffee'. You might
+decide to have different name or path for your harness, or you might want to use
+streamline, or specify a starting number of tests. Just type it out and proof
+will figure it out.</p></div>
+
+<div class="docs"><pre>$ proof create t/model/formats.t._coffee 2 db ./db-harness _
+$</pre></div>
+
+<div class="docs"><p>Would generate.</p></div>
+
+<div class="docs"><pre>#!/usr/bin/env _coffee
+require("./harness") 2, ({ db }, _) -&gt;
+
+  # Here be dragons.</pre></div>
+
+<div class="docs"><p>Check the docs for details.</p>
 
 <h3>Asynchronous Harnesses</h3>
 
-<p>Some setup will require asynchronous calls. Database connections require it. You
-can create asynchrous harnesses by providing a callback function instead of an
-object to the require method in your harness.</p>
+<p>Some setup will require asynchronous calls. Database connections are a common
+case. You can create asynchrous harnesses by providing a callback function
+instead of an object to the require method in your harness.</p>
 
 <p>The callback function will itself get a callback that is used to return an
 object that is given to the test program.</p>
 
 <p>You'll note that, if you add a member to the object named <code>$teardown</code> that has a
-function value, that function will be called at teardown time.</p>
+function value, that function will be called at teardown time.</p></div>
 
-<p>```</p>
-
-<h1>!/usr/bin/env coffee</h1>
-
-<p>mysql   = require "mysql"
+<div class="docs"><pre>#!/usr/bin/env _coffee
+mysql   = require "mysql"
 fs      = require "fs"
-module exports = require("ace.is.aces.in.my.book") (callback) ->
-  fs.readFile "./configuration.json", "utf8", (error, file) ->
+module exports = require("proof") (callback) -&gt;
+  fs.readFile "./configuration.json", "utf8", (error, file) -&gt;
     if error
       callback error
     else
       mysql = new mysql.Database(JSON.stringify file)
-      mysql.connect (error, connection) ->
+      mysql.connect (error, connection) -&gt;
         if error
           callback error
         else
-          callback null, { connection }
-```</p>
+          callback null, { connection }</pre></div>
 
-<p>Or streamlined.</p>
+<div class="docs"><p>Or streamlined.</p></div>
 
-<p>```</p>
-
-<h1>!/usr/bin/env coffee-streamline</h1>
-
-<p>return if not require("streamline/module")(module)
+<div class="docs"><pre>#!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
-module exports = require("ace.is.aces.in.my.book") (_) ->
+module exports = require("proof") (_) -&gt;
   file = fs.readFile "./configuration.json", "utf8", _
   mysql = new mysql.Database(JSON.stringify file)
   conneciton = mysql.connect _
-  { connection }
-```</p>
+  { connection }</pre></div>
 
-<p>The test itself is no more complicated.</p>
+<div class="docs"><p>The test itself is no more complicated.</p></div>
 
-<p>```</p>
-
-<h1>!/usr/bin/env coffee-streamline</h1>
-
-<p>return if not require("streamline/module")(module)
-require("./harness") 1, ({ connection }, _) ->
+<div class="docs"><pre>#!/usr/bin/env _coffee
+require("./harness") 1, ({ connection }, _) -&gt;
   results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
   @equal 12, results[0].num, "employee count"
-  connection.close()
-```</p>
+  connection.close()</pre></div>
 
-<p>Note that, you can use asynchronous harnesses with synchronous tests, and create
+<div class="docs"><p>Note that, you can use asynchronous harnesses with synchronous tests, and create
 asynchronous tests from synchronous harnesses.</p>
+
+<h3>Exception Handling</h3>
+
+<p>When a test is healthy, it is healthy for the test to release resources. When a
+test fails catastrophically, Proof lets the operating system to hard work of
+releasing system resources, such as memory, sockets and file handles.</p>
+
+<p>Here's a test that opens a file handle, then closes it like a good citizen.</p></div>
+
+<div class="docs"><pre>#!/usr/bin/env _coffee
+require("./harness") 1, ({ fs, tmp }, _) -&gt;
+  fs.open(__filename, "r", _)
+
+  buffer = new Buffer(2)
+  fs.read(fd, buffer, 0, buffer.length, 0, _)
+  @equal buffer.readInt16BE(0), 0x2321, "shebang magic number"
+
+  fs.close(fd, _)</pre></div>
+
+<div class="docs"><p>But, what if there is a catastrophic error? Let's say that in the code above,
+the <code>Buffer</code> cannot be allocated because the system is out of memory. What
+happens? An exception is thrown, the process exits, and the operating system
+closes the file handle.</p>
+
+<p>Of course, we could register an error handler to run at the last minute, or we
+could create a towering pyramid of try/catch blocks, but why bother? Let the
+operating system handle your exceptions in your test code. Much easier than
+trying to account for every possible error in code that is under active
+development.</p>
 
 <h3>Housekeeping</h3>
 
-<p>Hmm...</p>
+<p>Rather than cleaning up after ourselves, we cleanup before ourselves. We create
+a harness that cleanups any mess form a previously failed test.</p></div>
 
-<p><em>Please skip to next section for more useful documentation. Housekeeping is
-working fine, but this documentation is in awful shape.</em></p>
+<div class="docs"><pre>#!/usr/bin/env _coffee
+require("./harness") 1, ({ fs, spawn, cwd }, _) -&gt;
+  program = "#{cwd}/example.sh"
+  fs.writeFile(program, "utf8", "#!/bin/bash\nexit 1\n", _)
 
-<p>Dumping a lot here, because most frameworks have a test runner process, and
-tests are loaded by the test runner process, so they have to have a lot of
-robust setup and teardown, to keep from killing the test runner process.</p>
+  try
+    exec "#{cwd}/example.sh", _
+  catch e
+    @equal e.code, 1, "failed"</pre></div>
 
-<p>I want to keep a novice programmer (or programming pedant) from freaking out on
-me when I talk about being a slob, letting the program exit, and letting the
-operating system cleanup.</p>
+<div class="docs"><p>In the test above, we create a bash program to to test that error codes work
+correctly. If no exception is thrown, the test runner will report that a test
+was missed.</p>
 
-<p>I'm not saying you shouldn't close your handles. I'm saying it is stupid to
-imagine that a test process that is crashing is supposed to have the same level
-error handling as a production process. I might have to tone down the notion of
-being a slob, which amuses me, but might fan flames.</p>
+<p>This leaves a file lying around. How do we clean it up? With a harness.</p>
 
-<p>Tests are meant to exercise the demons in our software. We're not surprised when
-they fail catastrohpically. Why do we try to register last minute callbacks to
-do housekeeping in a process that might have just decided to kill itself rather
-than go on? Why do try to run test after test in a single long-running test
-runner process, when we know full well that the failure states of code in
-development are unimaginable?</p>
+<p>Here's a streamlined harness for our function.</p></div>
 
-<p>We set up our tests to fail. But then, why do we try to clean up after a test,
-within a process that we know might fail?</p>
-
-<p>The Ace way is to cleanup after the last test at the start of the next test.</p>
-
-<p>We do this by using harnesses. You create a harness that cleans up after the
-last test, and gets things ready for the current test, at the start of a new
-process when everything is stable. With harnesses and 2 to 4 lines of
-boilerplate, you can wrap your test logic in housekeeping and resource
-management. </p>
-
-<p>Tests will require housekeeping.
-The Ace way is to cleanup after the last test in the next test.
-After a test is set up and running, it is supposed to
-exericse demons.</p>
-
-<p><code>
-TK: Example that maybe cleans out a working directory.
-</code></p>
-
-<p>If it fails catastrophically, Ace lets the operating system to hard work of
-releasing system resources, such as memory, sockets and file handles. When a
-test is healthy, it is healthy for the test to release resources. However, we
-don't count on in-process cleanup handlers that are supposed to be run at the
-last minute, even if the test process is so unstable it cannot proceed with
-testing normally.</p>
-
-<p>Close your file handles, for example.</p>
-
-<p>```</p>
-
-<h1>!/usr/bin/env coffee-streamline</h1>
-
-<p>return if not require("streamline/module")(module)
-require("./harness") 1, ({ fs }, <em>) ->
-  fd = fs.open(</em>_filename, "r", _)</p>
-
-<p>buffer = new Buffer(2)
-  fs.read(fd, buffer, 0, buffer.length, 0, _)
-  @equal buffer.readInt16BE(0), 0x2321, "shebang magic number"</p>
-
-<p>fs.close(fd, _)
-```</p>
-
-<p>Let's say that in the code above, the <code>Buffer</code> cannot be allocated because the
-system is out of memory. What happens? An exception is thrown, the process
-exits, and the operating system closes the file handle.</p>
-
-<p>The test does the right thing when it is healthy, but it doesn't bother with
-some sort of fail-safe cleanup code that runs at exit. Tests are supposed to
-exercise demons and encounter catastrophic errors that you could never imagine
-in a million years of static analysis. If something so horrible happens in this
-test that it cannot reach the last line, how is it going to be able to run last
-minute teardown callbacks?</p>
-
-<p>Instead of reling on a on a terminal, unstable process for housekeeping,
-housekeeping should be done at test startup.</p>
-
-<p>```</p>
-
-<h1>!/usr/bin/env coffee</h1>
-
-<p>mysql   = require "mysql"
-fs      = require "fs"
-module exports = require("ace.is.aces.in.my.book") (callback) ->
-  fs.readFile "./configuration.json", "utf8", (error, file) ->
-    if error
-      callback error
-    else
-      mysql = new mysql.Database(JSON.stringify file)
-      mysql.connect (error, connection) ->
-        if error
-          callback error
-        else
-          callback null, { connection }
-```</p>
-
-<p>Or streamlined.</p>
-
-<p>```</p>
-
-<h1>!/usr/bin/env coffee-streamline</h1>
-
-<p>return if not require("streamline/module")(module)
+<div class="docs"><pre>#!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
-module exports = require("ace.is.aces.in.my.book") (_) ->
-  file = fs.readFile "./configuration.json", "utf8", _
-  mysql = new mysql.Database(JSON.stringify file)
-  conneciton = mysql.connect _
-  { connection }
-```</p>
+module.exports = require("proof") -&gt;
+  cwd = "#{__dirname}"
+  $cleanup = (_) -&gt;
+    try
+      fs.unlink "#{cwd}/example.sh", _
+    catch e
+      throw e if e.code isnt "ENOENT" 
+  { cwd, $cleanup }</pre></div>
 
-<p>The test itself is no more complicated.</p>
+<div class="docs"><p>As you can see, your cleanup function can use Streamline.js, even if your
+harness function does not.</p>
 
-<p>```</p>
+<p>We run your clean up function at the start of a test, then again at the end of
+the test if the test exits normally. Thus, even if the test fails, everything
+will be clean for the next test using the same harness.</p>
 
-<h1>!/usr/bin/env coffee-streamline</h1>
+<p>Your <code>$cleanup</code> function must be <strong>idempotent</strong>, as the kids like to say. You
+must be able to run it over and over again and get the same results. If your
+cleanup function deletes a temporary file, it can't complain if the temporary
+file has already been deleted.</p>
 
-<p>return if not require("streamline/module")(module)
-require("./harness") 1, ({ connection }, _) ->
-  results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
-  @equal 12, results[0].num, "employee count"
-  connection.close()
-```</p>
+<p>What if you're <code>$cleanup</code> function deletes something you need? Then you provide
+a <code>$setup</code> function. Before your test is run, <code>$cleanup</code> is run to clear out the
+remains of any failed tests, then <code>$setup</code> is run. After your test is run
+<code>$cleanup</code> is run, and everything goes back to the way it was.</p></div>
 
-<h3>Auto-Generate Test Skeletons From Harnesses</h3>
+<div class="docs"><pre>#!/usr/bin/env _coffee
+mysql   = require "mysql"
+fs      = require "fs"
+module.exports = require("proof") -&gt;
+  tmp = "#{__dirname}/tmp"
+  $setup = (_) -&gt;
+    fs.mkdir tmp, 0755, _
+  $cleanup = (_) -&gt;
+    try
+      for file in fs.readdir tmp, _
+        fs.unlink file, _
+      fs.unlink tmp, _
+    catch e
+      throw e if e.code isnt "ENOENT" 
+  { tmp, $setup, $cleanup }</pre></div>
 
-<p>Once you have a harness, you can use <code>ace create</code> to generate tests based on
-your harness.</p>
+<div class="docs"><p>Now we can use a temporary directory to create our bash program.</p></div>
 
-<p><code>
-$ ace --generate t/model/formats.t.coffee model example
-$
-</code></p>
+<div class="docs"><div class="highlight"><pre>
+<span class="c1">#!/usr/bin/env _coffee</span>
+<span class="nx">require</span><span class="p">(</span><span class="s">&quot;./harness&quot;</span><span class="p">)</span> <span class="mi">1</span><span class="p">,</span> <span class="nf">({ fs, spawn, tmp }, _) -&gt;</span>
+  <span class="nv">program = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">tmp</span><span class="si">}</span><span class="s">/example.sh&quot;</span>
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="s">&quot;utf8&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="err">#</span><span class="s">!/bin/bash\nexit 1\n&quot;</span><span class="p">,</span> <span class="nx">_</span><span class="p">)</span>
 
-<p>You'll have a new test harness. The execute bit is set. It is ready to go.</p>
+  <span class="k">try</span>
+    <span class="nx">exec</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">tmp</span><span class="si">}</span><span class="s">/example.sh&quot;</span><span class="p">,</span> <span class="nx">_</span>
+  <span class="k">catch</span> <span class="nx">e</span>
+    <span class="nx">@equal</span> <span class="nx">e</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;failed&quot;</span>
 
-<p>```</p>
+</pre></div></div>
 
-<h1>!/usr/bin/env coffee</h1>
+<div class="docs"><h3>Running Tests</h3>
 
-<p>require("./harness") 0, ({ example, model }) -></p>
+<p>A test is a program. You can run a test to see its output.</p></div>
 
-<p># Here be dragons.
-```</p>
-
-<p>Now you can write your test.</p>
-
-<p>You might decide to have different name or path for your harness, or you might
-want to use streamline, or specify a starting number of tests. Just type it out
-and ace will figure it out.</p>
-
-<p><code>
-$ ace --generate t/model/formats.t.coffee 2 db ./db-harness _
-$
-</code></p>
-
-<p>Would generate.</p>
-
-<p>```</p>
-
-<h1>!/usr/bin/env coffee-streamline</h1>
-
-<p>return if not require("streamline/module")(module)
-require("./harness") 2, ({ db }, _) -></p>
-
-<p># Here be dragons.
-```</p>
-
-<p>Check the docs for details.</p>
-
-<h3>Running Tests</h3>
-
-<p>A test is a program. You can run a test to see its output.</p>
-
-<p><code>
-$ t/logic/minimal.t
+<div class="docs"><pre>$ t/logic/minimal.t
 1..2
 ok 1 - true is true
 ok 2 - test arithmetic
-$
-</code></p>
+$</pre></div>
 
-<p>By immutable convention, tests are grouped together by directory. The tests
+<div class="docs"><p>By immutable convention, tests are grouped together by directory. The tests
 within a directory are considered a suite of tests. Test suites are generally
-kept in a directory <code>t</code> off the root of the project.</p>
+kept in a directory <code>t</code> off the root of the project.</p></div>
 
-<p><code>
-$ find t
+<div class="docs"><pre>$ find t
 t/logic/minimal.t
 t/regex/minimal.t
 t/regex/complex.t
-$
-</code></p>
+$</pre></div>
 
-<p>You can run a test with the ace test runner to get gaudy console output with
+<div class="docs"><p>You can run a test with the proof test runner to get gaudy console output with
 colors and non-ASCII characters (approximated below).</p>
 
-<p><code>
-$ ace t/logic/minimal.t.coffee
- x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
+<pre>
+$ proof t/logic/minimal.t.coffee
+ &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
 $
-</code></p>
+</pre>
 
 <p>Each test you pass to the test runner is will be run by the test runner. Tests
 in separate suites are run in parallel.</p>
 
-<p><code>
-$ ace t/logic/minimal.t.coffee t/regex/minimal.t.coffee
- x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
- x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
+<pre>
+$ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee
+ &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
+ &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
 $
-</code></p>
-
-<p>Run all the tests in your project with a glob.</p>
-
-<p><code>
-$ ace t/*/*.t.coffee
- x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
- x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
- x t/regex/complex.t.coffee ...... (2/2) 1.045 Success
-$
-</code></p>
+</pre>
 
 <h3>Tests Run in Parallel</h3>
 
 <p>As above.</p>
 
-<p><code>
-$ ace t/*/*.t.coffee
- x t/logic/minimal.t.coffee ...... (2/2)  .230 Success
- x t/regex/minimal.t.coffee ...... (2/2)  .331 Success
- x t/regex/complex.t.coffee ...... (2/2) 1.045 Success
+<pre>
+$ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee t/regex/complex.t.coffee
+ &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
+ &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
+ &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
 $
-</code></p>
+</pre>
 
 <p>Because each test is a program, parallelism is simply a matter of running more
-than one test program at once. The default mode of the ace runner is to run four
+than one test program at once. The default mode of the proof runner is to run four
 test programs a time.</p>
 
 <p>The runner will run a test program from each suite, for up to four programs
@@ -481,9 +418,19 @@ running at once. When a suite it complete, it moves onto the next one.</p>
 <p>Tests within suites are run one after another, in the order in which they were
 specified on the command line.</p>
 
-<p>If order matters you are doing it wrong. You should be able to run tests in
-isolation. But, should is pedants. I don't want to be one of those. You do
-what's right for you. Whatever makes you happy.</p>
+<p>If you design your tests so that they can run in any order, then you can run an
+entire suite of tests with globbing.</p>
+
+<pre>
+$ proof t/*/*.t.coffee
+ &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
+ &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
+ &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
+$
+</pre>
+
+<p>Generally avoid making tests depend on being run in a specific order. That way
+you can get parallelism easily.</p>
 
 <p>Suites run in parallel. You can group your tests however you like, by feature,
 subsystem, stages of workflow.</p>
@@ -497,43 +444,39 @@ either MySQL or PostgreSQL, you could run those tests in parallel.</p>
 database for each suite. Not a big deal, really, and then you have your tests
 running in parallel.</p>
 
-<h2>Shorter</h2>
+<h3>Continuous Integration With Travis CI</h3>
 
-<p>The Shame of Programming... Probably a good title for a blog post. Java:
-Programming Made Shameful. Or Programing Java Considered Shameful. But, yet, I
-write a lot of stuff, or think hard, about what is expected. (Need to put this
-somewhere else. It is a shame to have it here. A crying shame.)</p>
+<p>For an example of Travis CI output, you can look at the <a href="http://travis-ci.org/#!/bigeasy/ace">output from Proof
+itself</a>.</p>
 
-<p>That above is from sumbling on the word shame below...</p>
+<p>With a minimal <code>.travis.yml</code> and Proof will work with Travis CI.</p></div>
 
-<p>We write tests because we know that static analysis is not enough to ensure
-quality.  We write tests to exercise the demons from our software. We should not
-be surprised when our tests fail in ways that we cannot imagine. We should not
-feel ashamed that we could never imagine the failure states that our tests
-uncover. We should be humble before the complexity of software. We should accept
-that it is more than we can hold in our head at once.</p>
+<div class="docs"><pre>language: node_js
 
-<p>To think otherwise is to expect oneself to be omnicient.</p>
+node_js:
+  - 0.6
 
-<p>Moreover, why do you need a plan to turn off every light switch on your way out
-the door when the house is burning down? Dont' worry. The fire will take care of
-it for you.</p>
+before_install:
+  - npm install --dev
+  - git submodule init &amp;&amp; git submodule update</pre></div>
 
-<p>Uh, not shorter. Try...</p>
+<div class="docs"><p>However, <code>npm install --dev</code> will recursively install development dependencies,
+bringing in all of CoffeeScript, which is not necessary. Explicitly installing
+your development dependencies makes your Travis CI output much less verbose.</p></div>
 
-<p>Ace uses the operating system as the fail-safe for resource management, so that
-you are unlikely to reach a point where you cannot run your tests because Ace is
-resource starved. In your tests you can show discipline and release resources
-when they are no longer needed, but you don't have plan for every contingency
-with deeply nested try/catch blocks. You shouldn't. Testing is supposed to
-reveal the error states you can't begin to imagine, so how do you plan for
-those?  It's not a good use of your time to devise a resource management
-strategy for the closing millis in the quarter-second life of a test program
-that has raised an exception.</p>
+<div class="docs"><pre>language: node_js
 
-<p>If you feel strongly that punting cleanup to the operating system is shameful,
-I'm probably going to argue that you're repeating something you've read a lot
-but don't really understand.</p>
+node_js:
+  - 0.6
+
+before_install:
+  - npm install
+  - npm install proof coffee-script streamline
+  - git submodule init &amp;&amp; git submodule update</pre></div>
+
+<div class="docs"><p>If you are not using Streamline.js exclude <code>streamline</code>. If you are not using
+CoffeeScript exclude <code>coffee-script</code>. Add additional development dependencies as
+to suit your project's needs.</p>
 
 <h2>Why I Wrote My Own (Non-)Framework</h2>
 
@@ -578,35 +521,39 @@ the check marks. They make me happy.</p>
 
 <h2>Un-Filtered Blather</h2>
 
-<p>This part here are bits that need a place to go. I'm writing the documentation
-and rewriting it daily.</p>
+<ul>
+<li>Deeply nested try/catch blocks.</li>
+<li>Frameworks group assertions into tests and tests into suites. A suite is a
+file containing test. To run a test you need to run it through the test
+runner. Proof has the same grouping this too, but a suite is a directory, a
+test is a program.  Thus, to run a specific test, you run that program. No
+special switches to the test runner to pluck out the test you want to run.</li>
+<li><em>We cleanup at setup instead of tearing down.</em> You can be loosey goosey about
+resources in your tests because they are short lives programs, but if you
+need to have a an empty directory, or a reset a database state, do it at test
+start, and leave it a mess for the next run to cleanup. If you want to be
+tidy, you can have a cleanup function that you run at the end, but run it at
+the begining as well in case the last run ended early.</li>
+<li>Tests are meant to exercise the demons in our software. We're not surprised
+when they fail catastrohpically. Why do we try to register last minute
+callbacks to do housekeeping in a process that might have just decided to
+kill itself rather than go on? Why do try to run test after test in a single
+long-running test runner process, when we know that an error most likely
+means resources left unused, yet uncollected?</li>
+<li>Do we want to manage all the failure states for code in development? A long
+running test runner is a horrible model for a test framework.</li>
+<li>We write tests because we know that static analysis is not enough to ensure
+quality.  We write tests to exercise the demons from our software. We should
+not be surprised when our tests fail in ways that we cannot imagine. We
+should not feel ashamed that we could never imagine the failure states that
+our tests uncover. We should be humble before the complexity of software. We
+should accept that it is more than we can hold in our head at once.</li>
+<li>To think otherwise is to expect oneself to be omnicient.</li>
+<li>Moreover, why do you need a plan to turn off every light switch on your way
+out the door when the house is burning down? Dont' worry. The fire will take
+care of it for you.</li>
+</ul></div>
 
-<p>Write messy little one off tests. Be a slob with open file handles lying around
-like so many pizza boxes.</p>
-
-<p>You don't have to be a slob to appreciate the resource management capabilities
-of your operating system. Do be meticulous about releasing your resources. Do
-not waste your time with deeply nested try/catch blocks that gaurd against every
-contingency in a program that won't live a quarter of a second. Allow your tests
-to fail if they need to fail. You don't have to give the same amount of care to
-exceptinal conditions in test code that you have to give to exceptional
-conditions in production code.</p>
-
-<p>At least not with Ace. You'll hopfully never find yourself in a situation where
-you're debugging your tests because they exhaust system resources.</p>
-
-<p>Frameworks group assertions into tests and tests into suites. A suite is a file
-containing test. To run a test you need to run it through the test runner. Ace
-has the same grouping this too, but a suite is a directory, a test is a program.
-Thus, to run a specific test, you run that program. No special switches to the
-test runner to pluck out the test you want to run.</p>
-
-<p><em>We cleanup at setup instead of tearing down.</em> You can be loosey goosey about
-resources in your tests because they are short lives programs, but if you need
-to have a an empty directory, or a reset a database state, do it at test start,
-and leave it a mess for the next run to cleanup. If you want to be tidy, you
-can have a cleanup function that you run at the end, but run it at the begining
-as well in case the last run ended early.</p></div>
 </div>
 </div>
 
