@@ -7,39 +7,86 @@ die = (splat...) ->
   process.exit 1
 
 {spawn} = require "child_process"
-{OptionParser}  = require "coffee-script/lib/coffee-script/optparse"
 
+# Verbose usage specific to each action.
 options =
-  create: []
-  json: []
-  run: [ [ "-p", "--processes [COUNT]", "run multiple processes" ] ]
-  progress: []
+  create: """
+    usage: proof create [test] [harness] [<parameter>...] [_] [count]
 
-args = process.argv.slice(2)
+    test:
+      Name of the test.
+    harness:
+      Name and path to test harness relative to test file.
+    parameter
+      One or more parameters to extract from the test context.
+    _:
+      Test is a Streamline.js test, so pass in an underscore.
+    expected:
+      The number of tests expected.
+  """
+  json: """
+    usage: proof json [<test>...]
+  """
+  progress: """
+    usage: proof progress [<test>...]
+  """
+  run: """
+    usage: proof run [options] [<test>...]
 
-if opts = options[args[0]]
-  action = args.shift()
+    options:
+      -p,   --processes [count]     number of processes to run
+  """
+
+# Choose an option based on an action name. The default action is `run`.
+argv = process.argv.slice(2)
+if opts = options[argv[0]]
+  action = argv.shift()
 else
   action = "piped"
   opts = options.run
 
-parser = new OptionParser opts
-
-usage = (message) ->
-  process.stderr.write "error: #{message}\n"
-  process.stderr.write parser.help()
-  process.stderr.write "\n"
+# If we can't figure out what the user wants, we print usage and die.
+usage = ->
+  console.log opts
   process.exit 1
 
-try
-  options = parser.parse args
-catch e
-  usage "Invalid arguments."
+# Extract the action specific options from the command line arguments. We parse
+# our usage text to get our long and short option names.
+[ options, argv ]  = do ->
+  # Options, option names.
+  [ options, flag, full ]  = [ {}, {}, {} ]
+  # Map option descriptions to conversion functions. We use the arity of the
+  # conversion function to determine if an option takes a parameter.
+  converter =
+    count: (name, next) -> not isNaN(@[name] = parseInt next, 10)
+    path: (name, next) -> @[name] = next
+    none: (name) -> (@[name] = not @[name])?
+  # Split out usage text and grep for long and short option names. Create a few
+  # maps of names to converters.
+  for opt in opts.split /\n/
+    if match = ///
+        \s*(?:(-\w),)?        # short option
+        \s*(--\w+)            # long option
+        \s*(?:\[([^\]]+)\])?  # parameter
+      ///.exec(opt)
+      [ short, long, param ] = match[1..]
+      flag[short] = flag[long] = converter[param]
+      full[short] = long
+  # Pull options off the front of argv. Convert the option parameter, if it
+  # takes a parameter.
+  while conv = flag[argv[0]]
+    name = argv.shift()
+    name = (full[name] or name).substring(2)
+    length = conv.length - 1
+    usage() if argv.length < length
+    usage() unless conv.apply options, [ name ].concat(argv.splice(0, length))
+  # Return the options and the remaining arguments.
+  [ options, argv ]
 
 piped = ->
   formatter = spawn __filename, [ "progress" ], customFds: [ -1, 1, 2 ]
   formatter.on "exit", (code) -> process.exit code if code isnt 0
-  runner = spawn __filename, [ "run" ].concat args
+  runner = spawn __filename, [ "run" ].concat argv
   runner.stderr.on "data", (chunk) ->
   runner.stdout.pipe(formatter.stdin)
   runner.on "exit", (code) -> process.exit code if code isnt 0
@@ -263,7 +310,7 @@ parse = (stream, callback) ->
           throw new Error "unknown type #{type}"
 
 run = ->
-  programs = options.arguments
+  programs = argv
   parallel = {}
   for program in programs
     if /\s+/.test program
@@ -334,7 +381,7 @@ create = ->
   plan = 0
   async = ""
   harness = "./harness"
-  for argument in options.arguments
+  for argument in argv
     if argument is "_"
       async = ", _"
     else if /^t(?:est)?\//.test argument
