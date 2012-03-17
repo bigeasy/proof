@@ -198,6 +198,8 @@ progress = do ->
         process.stdout.write Array(79).join("_") + "\n"
         process.stdout.write styling(summary, "\n")
 
+        process.exit 1 if summary.passed isnt summary.expected
+
       # Otherwise update duration.
       else
         programs[program.file].duration = program.time - program.start
