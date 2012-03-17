@@ -7,9 +7,9 @@ util = require "util"
 # `class Test`
 class Test
   # Construct a test that expects the given number of tests.
-  constructor: (@_expected) ->
+  constructor: (@_expected, housekeepers) ->
+    @_housekeepers = []
     @_actual = 0
-    @_teardown = ->
     @_timeout()
     process.stdout.write "1..#{@_expected}\n"
 
@@ -91,35 +91,52 @@ class Test
     process.stdout.write message
     if detail?
       @_comment(detail)
-    process.exit 1
+    @_tidy 1
 
   say: (object) ->
     inspection = util.inspect.call util.inspect, object, false, 1024
     @_comment(inspection)
+
+  # Register a cleanup function to run at exit, invoking it immediately to
+  # cleanup a possible failed previous run.
+  cleanup: (callback..., housekeeper) ->
+    @_housekeepers.push (callback) ->
+      try
+        if housekeeper.length is 1
+          housekeeper callback
+        else
+          callback()
+          housekeeper null
+      catch e
+        callback e
+    try
+      if housekeeper.length is 1
+        housekeeper (error) -> callback[0](error)
+      else
+        housekeeper()
+    catch e
+      @bailout e
+
+  # Try to run the cleanup functions and bailout if any fail in any way. We copy
+  # the housekeepers property and empty it so we don't run more housekeepers
+  # from a bailout we invoke.
+  _tidy: (code) ->
+    housekeepers = @_housekeepers.splice(0)
+    if not process.env.PROOF_NO_CLEANUP
+      tidy = =>
+        if housekeeper = housekeepers.shift()
+          housekeeper (error) => if error then @bailout error else tidy()
+        else
+          process.exit code
+      tidy()
 
   # A healthy end to our test program. Call any teardown hooks set by the test
   # harness and then exit reflecting the pass/fail state of the program.
   _end: ->
     # In case teardowns are async, we don't want to bailout while waiting.
     clearTimeout @_timer if @_timer
+    @_tidy if @_expected is @_actual then 0 else 1
 
-    # If teardown is not async, wrap the teardown in an async function. The
-    # try/catch block below will catch any errors in the wrapped teardown.
-    if @_teardown.length is 0
-      teardown = @_teardown
-      @_teardown = (callback) ->
-        teardown()
-        callback(null)
-
-    # Try to run the teardown and bailout if it fails in any way.
-    try
-      @_teardown (error) =>
-        if error
-          @_bailout error
-        else
-          process.exit if @_expected is @_actual then 0 else 1
-    catch error
-      @_bailout error
 
 # Generate asssertion member methods for the Test class from the assert library.
 for name, assertion of require("assert")
@@ -156,7 +173,7 @@ execution = (test, splat...) ->
     [ context, callback ] = splat
     if typeof context is "function"
       try
-        context (error, _context) ->
+        context.call test, (error, _context) ->
           if error
             test.bailout error
           else
@@ -166,9 +183,6 @@ execution = (test, splat...) ->
     else
       try
         execution test, (_callback) ->
-          if teardown = context.$teardown
-            delete context.$teardown
-            @_teardown = teardown
           if callback.length is 2
             callback.call @, context, _callback
           else

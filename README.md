@@ -286,99 +286,135 @@ the `Buffer` cannot be allocated because the system is out of memory. What
 happens? An exception is thrown, the process exits, and the operating system
 closes the file handle.
 
-Of course, we could register an error handler to run at the last minute, or we
-could create a towering pyramid of try/catch blocks, but why bother? Let the
-operating system handle your exceptions in your test code. Much easier than
-trying to account for every possible error in code that is under active
-development.
+The operating system? Aren't we always supposed to close our own file handles?
+
+Well, we could register an error handler to run at the last minute, or we could
+create a towering pyramid of try/catch blocks, but why bother? None of that will
+matter if your test has hung and you feed it a `kill -9`.
+
+Trying to write tests that account for every possible error in code that is
+under active development is a waste of your time.
+
+Test code is supposed to raise unexpected exceptions. It is supposed to discover
+the unexpected. Let your tests find the exceptions. Let your operating system
+clean up after your tests when the exceptions are found.
 
 ### Housekeeping
 
-Rather than cleaning up after ourselves, we cleanup before ourselves. We create
-a harness that cleanups any mess form a previously failed test.
+Because each test is a short lived program, we can count on the operating system
+to reclaim resources like memory, file handles, and sockets when exceptions
+occur. But there is state that will not be reclaimed automatically. The most
+obvious example is temporary files and directories. We reclaim these using
+***cleanup functions***.
+
+We're so meticulous, we run our cleanup functions twice for each test. Rather
+than counting on our test to clean up after itself, when it might be in bad
+shape due to some unforeseen error state, we count on it to always ***cleanup
+before itself***, at the start of the test program, when it is most stable.
+
+We do try to run our test again at exit. What we don't do is jump through hoops
+to ensure that our cleanup functions are called at exit. We could register exit
+handlers and create intricate try/catch blocks, but the test still might not run
+its cleanup functions at exit if the test exhausts system memory, segfaults, or
+gets a `kill -9`. We can't guarantee a cleanup at exit, so we don't count on it.
+
+Because your cleanup functions are run twice, they must be **idempotent**, as
+the kids like to say. You must be able to run a cleanup function over and over
+again and get the same results.  If a cleanup function deletes a temporary file,
+for example, it can't complain if the temporary file has already been deleted.
 
 ```
 #!/usr/bin/env _coffee
-require("./harness") 1, ({ fs, spawn, cwd }, _) ->
-  program = "#{cwd}/example.sh"
-  fs.writeFile(program, "utf8", "#!/bin/bash\nexit 1\n", _)
+mysql   = require "mysql"
+fs      = require "fs"
+{exec}  = require "child_process"
+module.exports = require("proof") (_) ->
+  tmp = "#{__dirname}/tmp"
+  @cleanup _, (_) ->
+    try
+      fs.unlink "#{tmp}/#{file}", _ for file in fs.readdir tmp, _
+      fs.rmdir tmp, _
+    catch e
+      throw e if e.code isnt "ENOENT"
+  fs.mkdir tmp, 0755, _
+  { fs, exec, tmp }
+```
+
+When we register a cleanup function, the cleanup function is called immediately
+upon registration. Cleanup functions are run at the start of a test to cleanup
+in case our last test run exited abnormally. As long as the test does not exit
+abnormally, the cleanup function is called again at exit.
+
+In the harness above, we register a cleanup function that deletes files in a
+temporary directory, then deletes the temporary directory. Because the cleanup
+function is called immediately when we pass it to `@cleanup`, we call `fs.mkdir`
+without checking to see if it already exists. We know that it doesn't.
+
+Now we can use our temporary directory in a test. The test doesn't have to
+perform any housekeeping. We can write test after test in the same suite, each
+one making use of this temporary directory, because it is cleaned up after or
+before every run.
+
+```
+#!/usr/bin/env _coffee
+require("./harness") 1, ({ fs, exec, tmp }, _) ->
+  program = "#{tmp}/example.sh"
+
+  fs.writeFile program, "#!/bin/bash\nexit 1\n", "utf8", _
+  fs.chmod program, 0755, _
 
   try
-    exec "#{cwd}/example.sh", _
+    exec program, _
   catch e
-    @equal e.code, 1, "failed"
+    @equal e.code, 1, "exit code"
 ```
 
 In the test above, we create a bash program to to test that error codes work
 correctly. If no exception is thrown, the test runner will report that a test
 was missed.
 
-This leaves a file lying around. How do we clean it up? With a harness.
-
-Here's a streamlined harness for our function.
+Tests can register cleanup functions too. It is generally easier to keep them in
+the harnesses, but its fine to use them in tests as well.
 
 ```
 #!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module.exports = require("proof") ->
-  cwd = "#{__dirname}"
-  $cleanup = (_) ->
+require("proof") 1, (_) ->
+  fs = require "fs"
+  {exec} = require "child_process"
+
+  program = "#{__dirname}/example.sh"
+
+  @cleanup _, (_) ->
     try
-      fs.unlink "#{cwd}/example.sh", _
+      fs.unlink program, _
     catch e
-      throw e if e.code isnt "ENOENT" 
-  { cwd, $cleanup }
-```
+      throw e if e.code isnt "ENOENT"
 
-As you can see, your cleanup function can use Streamline.js, even if your
-harness function does not.
-
-We run your clean up function at the start of a test, then again at the end of
-the test if the test exits normally. Thus, even if the test fails, everything
-will be clean for the next test using the same harness.
-
-Your `$cleanup` function must be **idempotent**, as the kids like to say. You
-must be able to run it over and over again and get the same results. If your
-cleanup function deletes a temporary file, it can't complain if the temporary
-file has already been deleted.
-
-What if you're `$cleanup` function deletes something you need? Then you provide
-a `$setup` function. Before your test is run, `$cleanup` is run to clear out the
-remains of any failed tests, then `$setup` is run. After your test is run
-`$cleanup` is run, and everything goes back to the way it was.
-
-```
-#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module.exports = require("proof") ->
-  tmp = "#{__dirname}/tmp"
-  $setup = (_) ->
-    fs.mkdir tmp, 0755, _
-  $cleanup = (_) ->
-    try
-      for file in fs.readdir tmp, _
-        fs.unlink file, _
-      fs.unlink tmp, _
-    catch e
-      throw e if e.code isnt "ENOENT" 
-  { tmp, $setup, $cleanup }
-```
-
-Now we can use a temporary directory to create our bash program.
-
-```
-#!/usr/bin/env _coffee
-require("./harness") 1, ({ fs, spawn, tmp }, _) ->
-  program = "#{tmp}/example.sh"
-  fs.writeFile(program, "utf8", "#!/bin/bash\nexit 1\n", _)
+  fs.writeFile program, "#!/bin/bash\nexit 1\n", "utf8", _
+  fs.chmod program, 0755, _
 
   try
-    exec "#{tmp}/example.sh", _
+    exec program, _
   catch e
-    @equal e.code, 1, "failed"
+    @equal e.code, 1, "exit code"
 ```
+
+Here our test creates a temporary file in the same directory as the test,
+instead of in a harness provided temporary directory. It registers a cleanup
+function that deletes the file, so that the file is deleted before and after we
+write to it.
+
+A useful pattern falls out of cleanup before. You may want to skip cleanup at
+exit so you can inspect the file output of a test. If so, you can set the
+environment variable `PROOF_NO_CLEANUP=1` before running an individual test. It
+will cleanup before the test but not after. Now you can go through an edit,
+test, inspect cycle and watch how the output changes.
+
+We count on cleanup before a test to allow us to keep running our tests until
+they pass, without having us have to stop and cleanup cruft after each because a
+test is exiting abnormally. If tests are exiting normally, regardless of whether
+they pass or fail, they will clean up after themselves, leaving your project
+directory nice and tidy after each run.
 
 ### Running Tests
 
