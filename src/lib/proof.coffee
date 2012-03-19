@@ -173,11 +173,15 @@ execution = (test, splat...) ->
     [ context, callback ] = splat
     if typeof context is "function"
       try
-        context.call test, (error, _context) ->
-          if error
-            test.bailout error
-          else
-            execution test, _context, callback
+        if context.length is 0
+          _context = context.call test
+          execution test, _context, callback
+        else
+          context.call test, (error, _context) ->
+            if error
+              test.bailout error
+            else
+              execution test, _context, callback
       catch error
         test.bailout error
     else
