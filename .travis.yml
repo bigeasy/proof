@@ -14,6 +14,6 @@ branches:
 
 before_install:
   - npm install
-  - npm install coffee-script ace.is.aces.in.my.book streamline
+  - npm install coffee-script proof streamline@0.2.4 streamliner_
   - git submodule init && git submodule update
   - cake compile

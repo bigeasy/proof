@@ -1,5 +1,6 @@
 #!/usr/bin/env coffee
 fs = require "fs"
+path = require "path"
 
 say = (splat...) -> console.error.apply null, splat
 die = (splat...) ->
@@ -16,8 +17,12 @@ options =
     test:
       Name of the test.
     harness:
-      Name and path to test harness relative to test file.
-    parameter
+      Name and path to test harness relative to test file. By default the
+      generator will look for a source file with a base name of `./proof`
+      relative to the test file. The file is expected to have an extension of
+      one of the Proof supported languages, either `.coffee`, `._coffee`, `.js`
+      or `._js`.
+    parameter:
       One or more parameters to extract from the test context.
     _:
       Test is a Streamline.js test, so pass in an underscore.
@@ -382,10 +387,11 @@ create = ->
   signature = []
   plan = 0
   async = ""
-  harness = "./harness"
+  harness = "./proof"
   for argument in argv
     if argument is "_"
       async = ", _"
+    # TODO Document.
     else if /^t(?:est)?\//.test argument
       name = argument
     else if /^\./.test argument
@@ -399,17 +405,21 @@ create = ->
       die "test file already exists: #{name}"
   catch e
     throw e unless e.code is "ENOENT"
-  [ directory, file ] = /^(.*)\/(.*)/.exec(name)[1..]
-  harnessFile = "#{directory}/#{harness}.coffee"
-  try
-    stat = fs.statSync harnessFile
-  catch e
-    if e.code is "ENOENT"
-      die "cannot find harness #{harnessFile}"
-    throw e
-  shebang = /^(.*)\n/.exec(fs.readFileSync(harnessFile, "utf8"))[1]
+  directory = path.dirname(name)
+  file = path.basename(name)
+  isHarness = new RegExp("^#{path.basename(harness)}")
+  for harnessFile in fs.readdirSync path.resolve directory, path.dirname harness
+    if isHarness.test(harnessFile)
+      resolvedHarness = harnessFile
+      break
+  if not resolvedHarness
+    die "cannot find harness #{harness}"
+  executable = if async or path.extname(resolvedHarness)[0] is "_"
+    "_coffee"
+  else
+    "coffee"
   fs.writeFileSync name, """
-    #{shebang}
+    #!/usr/bin/env #{executable}
     require("#{harness}") 0, (context) ->
       process.stdout.write JSON.stringify Object.keys context
       process.stdout.write "\\n"
@@ -418,16 +428,15 @@ create = ->
   fs.chmodSync name, 0755
   output = ""
   inspect = spawn name
+  inspect.stderr.setEncoding "utf8"
+  inspect.stderr.on "data", (chunk) -> process.stdout.write chunk
   inspect.stdout.setEncoding "utf8"
   inspect.stdout.on "data", (chunk) -> output += chunk
   inspect.on "exit", (code) ->
     fs.unlinkSync name
     if code isnt 0
+      say output
       die "cannot generate inspection program"
-    if async
-      shebang += """
-        \nreturn if not require("streamline/module")(module)
-      """
     json = JSON.parse output.split(/\n/)[1]
     missing = []
     for arg in signature
@@ -439,7 +448,7 @@ create = ->
         try: #{json.join(", ")}
       """
     fs.writeFileSync name, """
-      #{shebang}
+      #!/usr/bin/env #{executable}
       require("#{harness}") #{plan}, ({ #{signature.join(", ")} }#{async}) ->
 
         # Here be dragons.\n

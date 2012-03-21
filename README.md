@@ -79,7 +79,14 @@ Now you can run `npm test` to test your project.
 
 ### Every Test is a Program
 
-Every test is a program. Add a shebang line and make the file executable. 
+Every test is a program.
+
+Place your test in a file under a test directory in your project. Add a shebang
+line and make the file executable.
+
+By convention, all tests are given a `.t` file extension, regardless of the
+language the test is written in. By convention, the test directory is named
+`./t` relative to the project root, but `./test` is good too.
 
 Minimal unit test.
 
@@ -97,9 +104,11 @@ it immediately. That makes your test preamble quick and to the point.
 This is analogous to the above.
 
 ```
+#!/usr/bin/env coffee
 test = require "proof"
 
-test 1, -> @ok true, "true is true"
+test 1, ->
+  @ok true, "true is true"
 ```
 
 Here's a test with two assertions.
@@ -137,28 +146,35 @@ No shims for Streamline.js code. Proof is Streamline.js friendly.
 
 ### Create More Tests More Frequently With Harnesses
 
-With an Proof harness you can start a test in as little as two lines of code.
+With an Proof harness you can give a test everything it needs to run with as
+little as two lines of code.
 
 Write a harness that does the setup for a test.  It will load the libraries
-necessary to write a test against the subsystem of your project.
+necessary to write a test against a subsystem of your project.
 
-You add a shebang line here, because `proof` will run it for introspection when
-it generates new tests. See the test generation section below.
+By convention, we name give our test harnesses a file name with a base of
+`proof`. This allows us to continue to `require("./proof")`, which is such a
+clever thing to say. The test harness file should have an extension of one of
+the supported languages, either `.coffee`, `._coffee`, `.js` or `._js`.
+
+In the harness you create a context `Object` and stuff it with useful bits and
+pieces for your test. 
 
 ```
-#!/usr/bin/env coffee
 context = {}
 context.example = { firstName: "Alan", lastName: "Gutierrez" }
 context.model = require("../../lib/model")
 module.exports = require("proof") context
 ```
 
+You would place the above in a file named `proof.coffee`, for example.
+
 Now you can write tests with a mere two lines of preamble. The common setup for
-your test suite is in your harness.
+the tests in your test suite is in your harness.
 
 ```
 #!/usr/bin/env coffee
-require("./harness") 2, ({ example, model }) ->
+require("./proof") 2, ({ example, model }) ->
   @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
   @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
 ```
@@ -169,7 +185,7 @@ Once you have a harness, you can use `proof create` to generate tests based on
 your harness.
 
 ```
-$ proof create t/model/formats.t.coffee model example
+$ proof create t/model/formats.t model example
 $
 ```
 
@@ -177,7 +193,7 @@ You'll have a new test harness. The execute bit is set. It is ready to go.
 
 ```
 #!/usr/bin/env coffee
-require("./harness") 0, ({ example, model }) ->
+require("./proof") 0, ({ example, model }) ->
 
   # Here be dragons.
 ```
@@ -185,13 +201,13 @@ require("./harness") 0, ({ example, model }) ->
 Now you can write your test.
 
 Proof assumes that you've created a harness in the target directory named
-`harness.js`, `harness._js`, `harness.coffee` or `harness._coffee'. You might
-decide to have different name or path for your harness, or you might want to use
+`proof.js`, `proof._js`, `proof.coffee` or `proof._coffee'. You might decide to
+have different name or path for your harness, or you might want to use
 streamline, or specify a starting number of tests. Just type it out and proof
 will figure it out.
 
 ```
-$ proof create t/model/formats.t._coffee 2 db ./db-harness _
+$ proof create t/model/formats.t 2 db ../db-harness _
 $
 ```
 
@@ -199,17 +215,19 @@ Would generate.
 
 ```
 #!/usr/bin/env _coffee
-require("./harness") 2, ({ db }, _) ->
+require("./proof") 2, ({ db }, _) ->
 
   # Here be dragons.
 ```
 
-Check the docs for details.
+If your harness is written in Streamline.js or you provide an underscore on the
+command then, then Proof uses `_coffee` as the executable in the shebang line.
+Otherwise it uses `coffee`.
 
 ### Asynchronous Harnesses
 
 Some setup will require asynchronous calls. Database connections are a common
-case. You can create asynchrous harnesses by providing a callback function
+case. You can create asynchronous harnesses by providing a callback function
 instead of an object to the require method in your harness.
 
 The callback function will itself get a callback that is used to return an
@@ -252,7 +270,7 @@ The test itself is no more complicated.
 
 ```
 #!/usr/bin/env _coffee
-require("./harness") 1, ({ connection }, _) ->
+require("./proof") 1, ({ connection }, _) ->
   results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
   @equal 12, results[0].num, "employee count"
   connection.close()
@@ -271,7 +289,7 @@ Here's a test that opens a file handle, then closes it like a good citizen.
 
 ```
 #!/usr/bin/env _coffee
-require("./harness") 1, ({ fs, tmp }, _) ->
+require("./proof") 1, ({ fs, tmp }, _) ->
   fs.open(__filename, "r", _)
 
   buffer = new Buffer(2)
@@ -357,7 +375,7 @@ before every run.
 
 ```
 #!/usr/bin/env _coffee
-require("./harness") 1, ({ fs, exec, tmp }, _) ->
+require("./proof") 1, ({ fs, exec, tmp }, _) ->
   program = "#{tmp}/example.sh"
 
   fs.writeFile program, "#!/bin/bash\nexit 1\n", "utf8", _
