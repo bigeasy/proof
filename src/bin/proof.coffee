@@ -127,21 +127,24 @@ progress = do ->
   green     = colorize("\u001B[32m")
 
   # Visual queue for table layout.
-  dotted = (count) -> Array(Math.max(count - 1, 0)).join "."
+  fill = (filler, count) -> Array(Math.max(count - 1, 0)).join filler
+
+  # Format time.
+  time = (program) ->
+    str = "#{program.time - program.start}"
+    str = "00#{str}".slice(-3) if str.length < 3
+    str = "0#{str}" if str.length < 4
+    str = "      #{str}".replace(/(\d{3})$/, ".$1")
+    str.replace(/^\s{6}/, '')
 
   styling = (program, terminal) ->
     if program.passed < program.actual or program.bailed
       extend program, status: "Failure", color: red, icon: "\u2718"
 
-    # Format time.
-    time = "#{program.time - program.start}"
-    time = "00#{time}".slice(-3) if time.length < 3
-    time = "     #{time}".replace(/(\d{3})$/, ".$1").slice(-5)
-
     # Format summary.
-    summary = "(#{program.passed}/#{program.expected}) #{time}"
+    summary = "(#{program.passed}/#{program.expected}) #{time program}"
 
-    dots = dotted(66 - program.file.length - summary.length)
+    dots = fill(".", 66 - program.file.length - summary.length)
 
     { color, icon, file, status } = program
     " #{color icon} #{file} #{dots} #{summary} #{color(status)}#{terminal}"
@@ -184,7 +187,10 @@ progress = do ->
           start: Number.MAX_VALUE
           count: 0
 
+        tests = { actual: 0, passed: 0 }
         for file, program of programs
+          tests.actual++
+          tests.passed++ if program.expected is program.passed
           summary.count++
           summary.actual += program.actual or 0
           summary.passed += program.passed or 0
@@ -193,15 +199,20 @@ progress = do ->
           summary.start = Math.min(summary.start, program.start)
           summary.time = Math.max(summary.time, program.time)
 
-        summary.file = "Total tests: #{summary.count}"
+        summary.file = "tests (#{tests.passed}/#{tests.actual}) assertions"
 
         extend summary, if summary.passed is summary.expected
           { icon: "\u2713", status: "Success", color: green }
         else
           { icon: "\u2718", status: "Failure", color: red }
 
-        process.stdout.write Array(79).join("_") + "\n"
-        process.stdout.write styling(summary, "\n")
+        # Format summary.
+        stats = "(#{program.passed}/#{program.expected}) #{time summary}"
+
+        dots = fill(" ", 66 - summary.file.length - stats.length)
+
+        { color, icon, file, status } = summary
+        process.stdout.write " #{color ' '} #{dots} #{file} #{stats} #{color(status)}\n"
 
         process.exit 1 if summary.passed isnt summary.expected
 
