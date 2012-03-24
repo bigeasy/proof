@@ -1,6 +1,4 @@
-#!/usr/bin/env coffee
-return if not require("streamline/module")(module)
-
+#!/usr/bin/env _coffee
 test = require "../../lib/proof"
 
 streamlined = (callback) -> callback(null, true)

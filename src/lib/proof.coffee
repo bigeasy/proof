@@ -27,6 +27,50 @@ class Test
     clearTimeout @_timer if @_timer
     setTimeout (=> @bailout("Timeout!")), 30000
 
+  # A `throws` assertion that is Streamline.js aware. The final argument is a
+  # function that is expected to throw an exception.
+  throws: (expected, splat..., block) ->
+    # If the function accepts an argument, that means it is asynchronous. The
+    # argument is the asynchronous callback. In this case, the last parameter in
+    # the splat will the caller's asynchronous callback.
+    invoke = (callback) =>
+      try
+        if block.length is 1
+          block(callback)
+        else
+          block()
+          callback(null)
+      catch error
+        callback(error)
+    # If the block is synchronous we warp it in a callback function so we can
+    # call it with the same logic for asynchronous blocks. Otherwise, we wrap
+    # the caller's callback, so that we return the caught exception as the
+    # return value, instead of as the error value.
+    #
+    # Both of these wrappers, when called, will return the caught exception to
+    # the caller, or null if no exception was caught. The caller can perform
+    # additional assertions to check exception properties other than the
+    # assertion message.
+    if block.length is 1
+      _callback = splat.pop()
+      callback = (error) -> _callback(null, error)
+    else
+      callback = (error) -> error
+    # The splat may also contain an optional assertion message. If not, we use
+    # the string value of the expected message. The expected message can either
+    # be a string for comparison, or a regular expression to test against the
+    # exception message.
+    invoke (error) =>
+      if error
+        if typeof expected is "string"
+          @equal error.message, expected, splat.pop() or expected
+        else
+          @ok expected.test(error.message), splat.pop() or expected.toString()
+        callback(error)
+      else
+        @ok false, splat.pop() or expected.toString()
+        callback(null)
+
   # Send a `Test::Harness` Bail Out! message to stdout. This is a message sent
   # when futher testing is impossible. Use it when a valuable resource is
   # missing, or everyting in the world is just plain wrong. It is sent as a
@@ -137,22 +181,26 @@ class Test
     clearTimeout @_timer if @_timer
     @_tidy if @_expected is @_actual then 0 else 1
 
+  # Silly to call this directly. It doesn't fit with the way Proof tests are
+  # organized.
+  fail: (expected, actual, message, operator, comment) ->
 
-# Generate asssertion member methods for the Test class from the assert library.
+# Generate assertion member methods for the Test class from the assert library.
 for name, assertion of require("assert")
+  continue if Test.prototype[name] or name is "AssertionError"
   do (name, assertion) ->
     Test.prototype[name] = (splat...) ->
       @_timeout()
-      @_actual++
+      message = splat[splat.length - 1]
       try
         assertion.apply @, splat
-        process.stdout.write "ok #{@_actual} #{splat[splat.length - 1]}\n"
+        process.stdout.write "ok #{++@_actual} #{message}\n"
       catch e
-        process.stdout.write "not ok #{@_actual} #{e.message}\n"
-        if assertion.length is 3
-          inspect = { EXPECTED: splat[1], GOT: splat[0] }
-          inspect = require("util").inspect inspect, null, Math.MAX_VALUE
-          @_comment(inspect)
+        process.stdout.write "not ok #{++@_actual} #{message} # #{e.message}\n"
+        EXPECTED = if name is "ok" then true else splat[1]
+        inspect = { EXPECTED, GOT: splat[0] }
+        inspect = require("util").inspect inspect, null, Math.MAX_VALUE
+        @_comment(inspect)
 
 execution = (test, splat...) ->
   if splat.length is 1

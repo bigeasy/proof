@@ -279,6 +279,65 @@ require("./proof") 1, ({ connection }, _) ->
 Note that, you can use asynchronous harnesses with synchronous tests, and create
 asynchronous tests from synchronous harnesses.
 
+### Assertions
+
+Proof defines the assertions `ok`, `equal`, `notEqual`, `deepEqual`,
+`notDeepEqual`, `strictEqual`, and `notStrictEqual`. They are identical to the
+assertions of the same named defined in the
+[assert](http://nodejs.org/api/assert.html) Node.js module, except that they
+print a message to `stdout`, instead of throwing an exception.
+
+```
+#!/usr/bin/env coffee
+require("proof") 3, ->
+  @ok true, "truth works"
+  @equal 1 + 1, 2, "math works"
+  @deepEqual "a b".split(/\s/), [ "a", "b" ], "strings work"
+```
+
+Proof also defines a `throws` assertion, one that supports Streamline.js. It is
+different from the Node.js `throws`.
+
+When used with or without Streamline.js, the block comes last.
+
+```
+#!/usr/bin/env coffee
+require ("proof") 1, ->
+  @throws "oops", -> throw new Error "oops"
+```
+
+The expected exception message is used as the assertion message by default. You
+can also provide an explicit assertion message.
+
+```
+#!/usr/bin/env coffee
+require ("proof") 1, ->
+  @throws "oops", "exception thrown", -> throw new Error "oops"
+```
+
+With Streamline.js, you define a callback with an underscore, and pass in the
+underscore before the callback.
+
+```
+#!/usr/bin/env _coffee
+require ("proof") 1, (_) ->
+  @throws "oops", _, (_) -> throw new Error "oops"
+```
+
+Here's a practical example of a Streamline.js `throws` assertion.
+
+```
+#!/usr/bin/env _coffee
+require ("proof") 1, (_) ->
+  fs = require "fs"
+  error = @throws /not defined/, "failed open message", _, (_) ->
+    fs.open("./missing")
+  @equal error?.code, "ENOENT", "failed open code"
+```
+
+As you can see, the `throws` method returns the caught exception. With it, you
+can assert that additional exception properties are set correctly.
+
 ### Exception Handling
 
 When a test is healthy, it is healthy for the test to release resources. When a
