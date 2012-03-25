@@ -196,7 +196,9 @@ for name, assertion of require("assert")
         assertion.apply @, splat
         process.stdout.write "ok #{++@_actual} #{message}\n"
       catch e
-        process.stdout.write "not ok #{++@_actual} #{message} # #{e.message}\n"
+        # Recall that the assertion message is the same as the assertion
+        # exception message.
+        process.stdout.write "not ok #{++@_actual} #{e.message}\n"
         EXPECTED = if name is "ok" then true else splat[1]
         inspect = { EXPECTED, GOT: splat[0] }
         inspect = require("util").inspect inspect, null, Math.MAX_VALUE
