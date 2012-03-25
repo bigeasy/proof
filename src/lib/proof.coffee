@@ -165,14 +165,14 @@ class Test
   # the housekeepers property and empty it so we don't run more housekeepers
   # from a bailout we invoke.
   _tidy: (code) ->
-    housekeepers = @_housekeepers.splice(0)
-    if not process.env.PROOF_NO_CLEANUP
-      tidy = =>
-        if housekeeper = housekeepers.shift()
-          housekeeper (error) => if error then @bailout error else tidy()
-        else
-          process.exit code
-      tidy()
+    housekeepers = []
+    housekeepers = @_housekeepers.splice(0) unless process.env.PROOF_NO_CLEANUP
+    tidy = =>
+      if housekeeper = housekeepers.shift()
+        housekeeper (error) => if error then @bailout error else tidy()
+      else
+        process.exit code
+    tidy()
 
   # A healthy end to our test program. Call any teardown hooks set by the test
   # harness and then exit reflecting the pass/fail state of the program.
