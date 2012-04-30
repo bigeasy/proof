@@ -207,7 +207,7 @@ progress = do ->
           { icon: "\u2718", status: "Failure", color: red }
 
         # Format summary.
-        stats = "(#{program.passed}/#{program.expected}) #{time summary}"
+        stats = "(#{summary.passed}/#{summary.expected}) #{time summary}"
 
         dots = fill(" ", 66 - summary.file.length - stats.length)
 
