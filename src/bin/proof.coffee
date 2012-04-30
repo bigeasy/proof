@@ -436,7 +436,7 @@ create = ->
       process.stdout.write "\\n"
 
   """, "utf8"
-  fs.chmodSync name, 0755
+  fs.chmodSync name, 0o755
   output = ""
   inspect = spawn name
   inspect.stderr.setEncoding "utf8"
@@ -464,6 +464,6 @@ create = ->
 
         # Here be dragons.\n
     """, "utf8"
-    fs.chmodSync name, 0755
+    fs.chmodSync name, 0o755
 
 ({ create, piped, json, run, progress })[action]()

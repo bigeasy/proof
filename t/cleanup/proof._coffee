@@ -1,8 +1,7 @@
 #!/usr/bin/env _coffee
-mysql   = require "mysql"
 fs      = require "fs"
 {exec}  = require "child_process"
-module.exports = require("proof") (_) ->
+module.exports = require("../../lib/proof") (_) ->
   tmp = "#{__dirname}/tmp"
   @cleanup _, (_) ->
     try
@@ -10,5 +9,5 @@ module.exports = require("proof") (_) ->
       fs.rmdir tmp, _
     catch e
       throw e if e.code isnt "ENOENT"
-  fs.mkdir tmp, 0755, _
+  fs.mkdir tmp, 0o755, _
   { fs, exec, tmp }
