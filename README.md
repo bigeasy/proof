@@ -695,3 +695,12 @@ the check marks. They make me happy.
  * Moreover, why do you need a plan to turn off every light switch on your way
    out the door when the house is burning down? Dont' worry. The fire will take
    care of it for you.
+
+## Change Log
+
+Changes for each release.
+
+### Release 0.0.2
+
+ * Correctly summing assertions. #13.
+ * Failed assertions no longer repeat message. #11.
