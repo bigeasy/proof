@@ -13,7 +13,6 @@ branches:
 # build output.
 
 before_install:
-  - npm install
-  - npm install coffee-script proof streamline
+  - npm install coffee-script streamline
   - git submodule init && git submodule update
   - cake compile
