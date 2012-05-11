@@ -72,14 +72,14 @@ class Test
         callback(null)
 
   # Send a `Test::Harness` Bail Out! message to stdout. This is a message sent
-  # when futher testing is impossible. Use it when a valuable resource is
-  # missing, or everyting in the world is just plain wrong. It is sent as a
+  # when further testing is impossible. Use it when a valuable resource is
+  # missing, or everything in the world is just plain wrong. It is sent as a
   # result of uncaught exceptions, test timeouts.
   #
   # We do not call `_teardown` on bailout. We are leaving now, hotel room
-  # trashed, to get to the airport, before the Sheriff comes, and our attorneys
-  # will have to handle the bill and maybe fight extradition. Yes, it is that
-  # bad. What are you still standing there for? Let's go!
+  # trashed, to get to the airport, before the Sheriff comes. Our attorneys will
+  # have to settle the bill and maybe fight extradition. Yes, it is that bad.
+  # What are you still standing there for? Let's go!
   #
   # Tests are supposed to exercise demons. If we must Bail Out! of a test, we
   # assume that we are in a state were normal execution is impossible, therefore
@@ -91,10 +91,10 @@ class Test
   # database or save important data to file. It really shouldn't.
   #
   # Finally, as an implementation issue, exiting the process immediately stops
-  # forward motion of the test. Our teardown is involved, giving the
-  # teardown method an opportuntiy to run asynchrnously, so now we have to set a
-  # timer on the teardown, and if that timesout, to we just skip the bad
-  # teardown method, but try the next?
+  # forward motion of the test. Our teardown is involved, giving the teardown
+  # method an opportunity to run asynchronously, so now we have to set a timer
+  # on the teardown, and if that times out, to we just skip the bad teardown
+  # method, but try the next?
   #
   # We'll get frequent catastrophic errors that cause two minute shutdowns of a
   # dozen tests. People will wake up in the morning to find their continuous
@@ -103,14 +103,14 @@ class Test
   #
   # Younger programmers are going to be afraid to not do everything they can to
   # handle an error in a suicidal process. (Yes, Bail Out! is process suicide,
-  # so the process is unstable both phyically and emotionally, and probably not
+  # so the process is unstable both physically and emotionally, and probably not
   # in a mood to tidy up.) I hope we're not teaching them the same Pavlovian
   # responses to exceptional conditions that we were teaching ten years ago.
   #
   # You might leave resources in a dirty state for a new test process, but new
   # test processes should clean up before running. You might leave a resource in
   # a locked state, but Proof ensures that processes in a suite run serially, so
-  # subsequent test harnesses can confidentally break those locks.
+  # subsequent test harnesses can confidentially break those locks.
   #
   # This will all be moved to a rationale section of the Proof documentation.
 
@@ -177,7 +177,7 @@ class Test
   # A healthy end to our test program. Call any teardown hooks set by the test
   # harness and then exit reflecting the pass/fail state of the program.
   _end: ->
-    # In case teardowns are async, we don't want to bailout while waiting.
+    # In case tear downs are async, we don't want to bailout while waiting.
     clearTimeout @_timer if @_timer
     @_tidy if @_expected is @_actual then 0 else 1
 

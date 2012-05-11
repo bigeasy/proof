@@ -23,10 +23,10 @@ process. The test runner does not load or evaluate JavaScript, set tests up up
 or tear tests down. Why count on what amounts to a fragile program loader, when
 you've got a full blown operating system at your disposal?
 
-When there is housekeeping to be done, databases to be reset, temporary files to
-be deleted, we still don't clean up after ourselves. **We clean up before
-oursleves.** You use Proof harnesses to clean up after the last test process at
-the start of the next test process, when everything is stable.
+When there is housekeeping to be done &mdash; databases to be reset, temporary
+files to be deleted &mdash; we still don't clean up after ourselves. **We clean
+up before ourselves.** You use Proof harnesses to clean up after the *previous*
+test process at the start of the *next* test process, when everything is stable.
 
 With this in place, you are encouraged to **be a slob** in your test code.  Each
 test is a short lived process, so feel free to suck up memory, leave file
@@ -64,7 +64,7 @@ npm install proof
 To test via NPM, by extension [Travis CI](http://travis-ci.org/), create a
 `package.json` for your project that includes the following properties.
 
-```
+```json
 {   "name":             "fibonacci"
 ,   "version":          "1.0.3"
 ,   "author":           "Alan Gutierrez"
@@ -90,7 +90,7 @@ language the test is written in. By convention, the test directory is named
 
 Minimal unit test.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("proof") 1, -> @ok true, "true is true"
 ```
@@ -103,7 +103,7 @@ it immediately. That makes your test preamble quick and to the point.
 
 This is analogous to the above.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 test = require "proof"
 
@@ -113,7 +113,7 @@ test 1, ->
 
 Here's a test with two assertions.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("proof") 2, ->
   @ok true, "true is true"
@@ -130,7 +130,7 @@ using the `@` operator in CoffeeScript.
 Minimal streamlined unit test. Simply add a callback parameter to your callback
 and your test is called asynchronously.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 fs   = require "fs"
 require("proof") 1, (_) ->
@@ -160,7 +160,7 @@ the supported languages, either `.coffee`, `._coffee`, `.js` or `._js`.
 In the harness you create a context `Object` and stuff it with useful bits and
 pieces for your test. 
 
-```
+```coffeescript
 context = {}
 context.example = { firstName: "Alan", lastName: "Gutierrez" }
 context.model = require("../../lib/model")
@@ -172,7 +172,7 @@ You would place the above in a file named `proof.coffee`, for example.
 Now you can write tests with a mere two lines of preamble. The common setup for
 the tests in your test suite is in your harness.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("./proof") 2, ({ example, model }) ->
   @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
@@ -191,7 +191,7 @@ $
 
 You'll have a new test harness. The execute bit is set. It is ready to go.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("./proof") 0, ({ example, model }) ->
 
@@ -201,7 +201,7 @@ require("./proof") 0, ({ example, model }) ->
 Now you can write your test.
 
 Proof assumes that you've created a harness in the target directory named
-`proof.js`, `proof._js`, `proof.coffee` or `proof._coffee'. You might decide to
+`proof.js`, `proof._js`, `proof.coffee` or `proof._coffee`. You might decide to
 have different name or path for your harness, or you might want to use
 streamline, or specify a starting number of tests. Just type it out and proof
 will figure it out.
@@ -213,7 +213,7 @@ $
 
 Would generate.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 2, ({ db }, _) ->
 
@@ -233,14 +233,11 @@ instead of an object to the require method in your harness.
 The callback function will itself get a callback that is used to return an
 object that is given to the test program.
 
-You'll note that, if you add a member to the object named `$teardown` that has a
-function value, that function will be called at teardown time.
-
-```
+```coffeescript
 #!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
-module exports = require("proof") (callback) ->
+module.exports = require("proof") (callback) ->
   fs.readFile "./configuration.json", "utf8", (error, file) ->
     if error
       callback error
@@ -255,11 +252,11 @@ module exports = require("proof") (callback) ->
 
 Or streamlined.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
-module exports = require("proof") (_) ->
+module.exports = require("proof") (_) ->
   file = fs.readFile "./configuration.json", "utf8", _
   mysql = new mysql.Database(JSON.stringify file)
   conneciton = mysql.connect _
@@ -268,7 +265,7 @@ module exports = require("proof") (_) ->
 
 The test itself is no more complicated.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 1, ({ connection }, _) ->
   results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
@@ -287,7 +284,7 @@ assertions of the same named defined in the
 [assert](http://nodejs.org/api/assert.html) Node.js module, except that they
 print a message to `stdout`, instead of throwing an exception.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("proof") 3, ->
   @ok true, "truth works"
@@ -300,7 +297,7 @@ different from the Node.js `throws`.
 
 When used with or without Streamline.js, the block comes last.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require ("proof") 1, ->
   @throws "oops", -> throw new Error "oops"
@@ -309,7 +306,7 @@ require ("proof") 1, ->
 The expected exception message is used as the assertion message by default. You
 can also provide an explicit assertion message.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require ("proof") 1, ->
   @throws "oops", "exception thrown", -> throw new Error "oops"
@@ -318,7 +315,7 @@ require ("proof") 1, ->
 With Streamline.js, you define a callback with an underscore, and pass in the
 underscore before the callback.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require ("proof") 1, (_) ->
   @throws "oops", _, (_) -> throw new Error "oops"
@@ -326,12 +323,12 @@ require ("proof") 1, (_) ->
 
 Here's a practical example of a Streamline.js `throws` assertion.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require ("proof") 1, (_) ->
   fs = require "fs"
   error = @throws /not defined/, "failed open message", _, (_) ->
-    fs.open("./missing")
+    fs.open("./missing", "r", _)
   @equal error?.code, "ENOENT", "failed open code"
 ```
 
@@ -341,12 +338,12 @@ can assert that additional exception properties are set correctly.
 ### Exception Handling
 
 When a test is healthy, it is healthy for the test to release resources. When a
-test fails catastrophically, Proof lets the operating system to hard work of
+test fails catastrophically, Proof lets the operating system do the hard work of
 releasing system resources, such as memory, sockets and file handles.
 
 Here's a test that opens a file handle, then closes it like a good citizen.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 1, ({ fs, tmp }, _) ->
   fs.open(__filename, "r", _)
@@ -369,8 +366,9 @@ Well, we could register an error handler to run at the last minute, or we could
 create a towering pyramid of try/catch blocks, but why bother? None of that will
 matter if your test has hung and you feed it a `kill -9`.
 
-Trying to write tests that account for every possible error in code that is
-under active development is a waste of your time.
+Trying to write exception handlers that account for every possible error that a
+test might find in code that is under active development is a tall order and a
+not a good use of your time.
 
 Test code is supposed to raise unexpected exceptions. It is supposed to discover
 the unexpected. Let your tests find the exceptions. Let your operating system
@@ -400,7 +398,7 @@ the kids like to say. You must be able to run a cleanup function over and over
 again and get the same results.  If a cleanup function deletes a temporary file,
 for example, it can't complain if the temporary file has already been deleted.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
@@ -423,16 +421,18 @@ in case our last test run exited abnormally. As long as the test does not exit
 abnormally, the cleanup function is called again at exit.
 
 In the harness above, we register a cleanup function that deletes files in a
-temporary directory, then deletes the temporary directory. Because the cleanup
-function is called immediately when we pass it to `@cleanup`, we call `fs.mkdir`
-without checking to see if it already exists. We know that it doesn't.
+temporary directory, then deletes the temporary directory. If the directory
+doesn't exist, that's okay, we catch the `ENOENT` exception and return. Because
+the cleanup function is called immediately when we pass it to `@cleanup`, we're
+assured a clean slate. We call `fs.mkdir` without checking to see if it already
+exists. We know that it doesn't.
 
 Now we can use our temporary directory in a test. The test doesn't have to
 perform any housekeeping. We can write test after test in the same suite, each
 one making use of this temporary directory, because it is cleaned up after or
 before every run.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 1, ({ fs, exec, tmp }, _) ->
   program = "#{tmp}/example.sh"
@@ -453,7 +453,7 @@ was missed.
 Tests can register cleanup functions too. It is generally easier to keep them in
 the harnesses, but its fine to use them in tests as well.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("proof") 1, (_) ->
   fs = require "fs"
@@ -500,8 +500,8 @@ A test is a program. You can run a test to see its output.
 ```
 $ t/logic/minimal.t
 1..2
-ok 1 - true is true
-ok 2 - test arithmetic
+ok 1 true is true
+ok 2 test arithmetic
 $
 ```
 
@@ -522,7 +522,8 @@ colors and non-ASCII characters (approximated below).
 
 <pre>
 $ proof t/logic/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
+                                      tests (1/1) assertions (2/2) 0.230 Success
 $
 </pre>
 
@@ -531,8 +532,9 @@ in separate suites are run in parallel.
 
 <pre>
 $ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
+ &#x2713; t/regex/minimal.t.coffee ................................ (2/2) 0.331 Success
+                                      tests (2/2) assertions (4/4) 0.561 Success
 $
 </pre>
 
@@ -542,9 +544,10 @@ As above.
 
 <pre>
 $ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee t/regex/complex.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
- &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
+ &#x2713; t/regex/minimal.t.coffee ................................ (2/2) 0.331 Success
+ &#x2713; t/regex/complex.t.coffee ................................ (2/2) 1.045 Success
+                                      tests (3/3) assertions (6/6) 1.606 Success
 $
 </pre>
 
@@ -563,9 +566,10 @@ entire suite of tests with globbing.
 
 <pre>
 $ proof t/*/*.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
- &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2)  .230 Success
+ &#x2713; t/regex/minimal.t.coffee ................................ (2/2)  .331 Success
+ &#x2713; t/regex/complex.t.coffee ................................ (2/2) 1.045 Success
+                                      tests (3/3) assertions (6/6) 1.606 Success
 $
 </pre>
 
@@ -587,7 +591,7 @@ running in parallel.
 ### Continuous Integration With Travis CI
 
 For an example of Travis CI output, you can look at the [output from Proof
-itself](http://travis-ci.org/#!/bigeasy/ace).
+itself](http://travis-ci.org/#!/bigeasy/proof).
 
 With a minimal `.travis.yml` and Proof will work with Travis CI.
 
@@ -619,82 +623,8 @@ before_install:
 ```
 
 If you are not using Streamline.js exclude `streamline`. If you are not using
-CoffeeScript exclude `coffee-script`. Add additional development dependencies as
-to suit your project's needs.
-
-## Why I Wrote My Own (Non-)Framework
-
-This is my test framework. There are many like it, but this one is mine.
-
-The catalyist was Streamline.js. The frameworks that exist generally group tests
-into a object or the functional programming equavalent. Each test is a function.
-A suite is a class or other grouping of functions.
-
-The function may provide a callback, but the callback isn't in the `function
-(error, result) {}` format that works with Streamline.js.
-
-Of course, once I was done writing this, it occured to me that callback
-signature differences are easily shimmed, but it was too late by then.
-
-There is a lot of extra stuff your grarden variety test frameworks. Folks put a
-lot of thought into testing, which is an area that invites over-thinking.
-
-I don't want to pay for those features; compatability with CI frameworks I don't
-use, compatability with IDEs I don't use, histograms that I'll never look at.
-
-I've never thought to myself, boy, if only I could see my test results in XML,
-JSON, RDF and YAML, then I'd really get to the bottom of this pesky bug.
-
-I don't want to depend on a test runner to run my tests.  The test runner here
-runs tests, it does not load them, set them up and tear them down. It just runs
-them and reports on how they ran.
-
-I don't want to have fiddle with a test runner to run a specific test. I want a
-each test to be a a program. I want to group my tests into suites by grouping my
-test programs into directories. When I want to run a specific test, I'll just
-run the test program directly.
-
-I'm happy to pay the extra millis to spawn a process per test, because it is so
-much easier to write a test program, with a clean program state, and not have to
-worry about teardown. I don't want my test runner to manage memory, file handles
-and sockets. Let the operating system to do that.
-
-I do want pretty green check marks. Those are *very* important to me. You'll see
-that my check marks are green and they use UNICODE check marks. I splurged on
-the check marks. They make me happy.
-
-## Un-Filtered Blather
-
- * Deeply nested try/catch blocks.
- * Frameworks group assertions into tests and tests into suites. A suite is a
-   file containing test. To run a test you need to run it through the test
-   runner. Proof has the same grouping this too, but a suite is a directory, a
-   test is a program.  Thus, to run a specific test, you run that program. No
-   special switches to the test runner to pluck out the test you want to run.
- * *We cleanup at setup instead of tearing down.* You can be loosey goosey about
-   resources in your tests because they are short lives programs, but if you
-   need to have a an empty directory, or a reset a database state, do it at test
-   start, and leave it a mess for the next run to cleanup. If you want to be
-   tidy, you can have a cleanup function that you run at the end, but run it at
-   the begining as well in case the last run ended early.
- * Tests are meant to exercise the demons in our software. We're not surprised
-   when they fail catastrohpically. Why do we try to register last minute
-   callbacks to do housekeeping in a process that might have just decided to
-   kill itself rather than go on? Why do try to run test after test in a single
-   long-running test runner process, when we know that an error most likely
-   means resources left unused, yet uncollected?
- * Do we want to manage all the failure states for code in development? A long
-   running test runner is a horrible model for a test framework.
- * We write tests because we know that static analysis is not enough to ensure
-   quality.  We write tests to exercise the demons from our software. We should
-   not be surprised when our tests fail in ways that we cannot imagine. We
-   should not feel ashamed that we could never imagine the failure states that
-   our tests uncover. We should be humble before the complexity of software. We
-   should accept that it is more than we can hold in our head at once.
- * To think otherwise is to expect oneself to be omnicient.
- * Moreover, why do you need a plan to turn off every light switch on your way
-   out the door when the house is burning down? Dont' worry. The fire will take
-   care of it for you.
+CoffeeScript exclude `coffee-script`. Add additional development dependencies to
+suit your project's needs.
 
 ## Change Log
 
