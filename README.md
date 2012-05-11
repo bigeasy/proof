@@ -64,7 +64,7 @@ npm install proof
 To test via NPM, by extension [Travis CI](http://travis-ci.org/), create a
 `package.json` for your project that includes the following properties.
 
-```
+```json
 {   "name":             "fibonacci"
 ,   "version":          "1.0.3"
 ,   "author":           "Alan Gutierrez"
@@ -90,7 +90,7 @@ language the test is written in. By convention, the test directory is named
 
 Minimal unit test.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("proof") 1, -> @ok true, "true is true"
 ```
@@ -103,7 +103,7 @@ it immediately. That makes your test preamble quick and to the point.
 
 This is analogous to the above.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 test = require "proof"
 
@@ -113,7 +113,7 @@ test 1, ->
 
 Here's a test with two assertions.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("proof") 2, ->
   @ok true, "true is true"
@@ -130,7 +130,7 @@ using the `@` operator in CoffeeScript.
 Minimal streamlined unit test. Simply add a callback parameter to your callback
 and your test is called asynchronously.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 fs   = require "fs"
 require("proof") 1, (_) ->
@@ -160,7 +160,7 @@ the supported languages, either `.coffee`, `._coffee`, `.js` or `._js`.
 In the harness you create a context `Object` and stuff it with useful bits and
 pieces for your test. 
 
-```
+```coffeescript
 context = {}
 context.example = { firstName: "Alan", lastName: "Gutierrez" }
 context.model = require("../../lib/model")
@@ -172,7 +172,7 @@ You would place the above in a file named `proof.coffee`, for example.
 Now you can write tests with a mere two lines of preamble. The common setup for
 the tests in your test suite is in your harness.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("./proof") 2, ({ example, model }) ->
   @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
@@ -191,7 +191,7 @@ $
 
 You'll have a new test harness. The execute bit is set. It is ready to go.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("./proof") 0, ({ example, model }) ->
 
@@ -213,7 +213,7 @@ $
 
 Would generate.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 2, ({ db }, _) ->
 
@@ -233,11 +233,11 @@ instead of an object to the require method in your harness.
 The callback function will itself get a callback that is used to return an
 object that is given to the test program.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
-module exports = require("proof") (callback) ->
+module.exports = require("proof") (callback) ->
   fs.readFile "./configuration.json", "utf8", (error, file) ->
     if error
       callback error
@@ -252,11 +252,11 @@ module exports = require("proof") (callback) ->
 
 Or streamlined.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
-module exports = require("proof") (_) ->
+module.exports = require("proof") (_) ->
   file = fs.readFile "./configuration.json", "utf8", _
   mysql = new mysql.Database(JSON.stringify file)
   conneciton = mysql.connect _
@@ -265,7 +265,7 @@ module exports = require("proof") (_) ->
 
 The test itself is no more complicated.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 1, ({ connection }, _) ->
   results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
@@ -284,7 +284,7 @@ assertions of the same named defined in the
 [assert](http://nodejs.org/api/assert.html) Node.js module, except that they
 print a message to `stdout`, instead of throwing an exception.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require("proof") 3, ->
   @ok true, "truth works"
@@ -297,7 +297,7 @@ different from the Node.js `throws`.
 
 When used with or without Streamline.js, the block comes last.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require ("proof") 1, ->
   @throws "oops", -> throw new Error "oops"
@@ -306,7 +306,7 @@ require ("proof") 1, ->
 The expected exception message is used as the assertion message by default. You
 can also provide an explicit assertion message.
 
-```
+```coffeescript
 #!/usr/bin/env coffee
 require ("proof") 1, ->
   @throws "oops", "exception thrown", -> throw new Error "oops"
@@ -315,7 +315,7 @@ require ("proof") 1, ->
 With Streamline.js, you define a callback with an underscore, and pass in the
 underscore before the callback.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require ("proof") 1, (_) ->
   @throws "oops", _, (_) -> throw new Error "oops"
@@ -323,7 +323,7 @@ require ("proof") 1, (_) ->
 
 Here's a practical example of a Streamline.js `throws` assertion.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require ("proof") 1, (_) ->
   fs = require "fs"
@@ -343,7 +343,7 @@ releasing system resources, such as memory, sockets and file handles.
 
 Here's a test that opens a file handle, then closes it like a good citizen.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 1, ({ fs, tmp }, _) ->
   fs.open(__filename, "r", _)
@@ -398,7 +398,7 @@ the kids like to say. You must be able to run a cleanup function over and over
 again and get the same results.  If a cleanup function deletes a temporary file,
 for example, it can't complain if the temporary file has already been deleted.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 mysql   = require "mysql"
 fs      = require "fs"
@@ -432,7 +432,7 @@ perform any housekeeping. We can write test after test in the same suite, each
 one making use of this temporary directory, because it is cleaned up after or
 before every run.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("./proof") 1, ({ fs, exec, tmp }, _) ->
   program = "#{tmp}/example.sh"
@@ -453,7 +453,7 @@ was missed.
 Tests can register cleanup functions too. It is generally easier to keep them in
 the harnesses, but its fine to use them in tests as well.
 
-```
+```coffeescript
 #!/usr/bin/env _coffee
 require("proof") 1, (_) ->
   fs = require "fs"
@@ -522,7 +522,7 @@ colors and non-ASCII characters (approximated below).
 
 <pre>
 $ proof t/logic/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2) 0.230 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
                                       tests (1/1) assertions (2/2) 0.230 Success
 $
 </pre>
@@ -532,8 +532,8 @@ in separate suites are run in parallel.
 
 <pre>
 $ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2) 0.230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2) 0.331 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
+ &#x2713; t/regex/minimal.t.coffee ................................ (2/2) 0.331 Success
                                       tests (2/2) assertions (4/4) 0.561 Success
 $
 </pre>
@@ -544,9 +544,10 @@ As above.
 
 <pre>
 $ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee t/regex/complex.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
- &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
+ &#x2713; t/regex/minimal.t.coffee ................................ (2/2) 0.331 Success
+ &#x2713; t/regex/complex.t.coffee ................................ (2/2) 1.045 Success
+                                      tests (3/3) assertions (6/6) 1.606 Success
 $
 </pre>
 
@@ -565,9 +566,10 @@ entire suite of tests with globbing.
 
 <pre>
 $ proof t/*/*.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
- &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
+ &#x2713; t/logic/minimal.t.coffee ................................ (2/2)  .230 Success
+ &#x2713; t/regex/minimal.t.coffee ................................ (2/2)  .331 Success
+ &#x2713; t/regex/complex.t.coffee ................................ (2/2) 1.045 Success
+                                      tests (3/3) assertions (6/6) 1.606 Success
 $
 </pre>
 
@@ -589,7 +591,7 @@ running in parallel.
 ### Continuous Integration With Travis CI
 
 For an example of Travis CI output, you can look at the [output from Proof
-itself](http://travis-ci.org/#!/bigeasy/ace).
+itself](http://travis-ci.org/#!/bigeasy/proof).
 
 With a minimal `.travis.yml` and Proof will work with Travis CI.
 
