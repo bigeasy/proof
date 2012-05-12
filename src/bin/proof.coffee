@@ -330,7 +330,11 @@ parse = (stream, callback) ->
 run = ->
   programs = argv
   parallel = {}
+  seen = {}
   for program in programs
+    if seen[program]
+      throw new Error "programs cannot be run twice in a test run: #{program}"
+    seen[program] = true
     if /\s+/.test program
       throw new Error "program names cannot contain spaces: #{program}"
     dirname = /^(.*)\/.*/.exec(program)[1]
