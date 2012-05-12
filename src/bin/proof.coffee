@@ -32,6 +32,9 @@ options =
   json: """
     usage: proof json [<test>...]
   """
+  errors: """
+    usage: proof progress [<test>...]
+  """
   progress: """
     usage: proof progress [<test>...]
   """
@@ -120,11 +123,14 @@ json = ->
         process.stdout.write JSON.stringify object, null, 2
         process.stdout.write "\n"
 
-progress = do ->
+[ red, green ] = do ->
   # Colorization.
   colorize  = (color) -> (text) -> "#{color}#{text}\u001B[39m"
   red       = colorize("\u001B[31m")
   green     = colorize("\u001B[32m")
+  [ red, green ]
+
+progress = do ->
 
   # Visual queue for table layout.
   fill = (filler, count) -> Array(Math.max(count - 1, 0)).join filler
@@ -235,6 +241,55 @@ progress = do ->
             process.stdout.write styling(programs[program.file], "\n")
             if program.code isnt 0
               failed.push program
+
+# Problem with errors is that output can be interleaved, so we need to gather up
+# the lines of output after a failed assertion, or else the output of other
+# assertions get interleaved.
+#
+# The first formatting style that comes to mind would be one that grouped all
+# the failed assertions under their failed test, but that means waiting for a
+# full test to load. There are test with a great many failures, one of the
+# automated tests, like the one in Timezone that tests every clock transition in
+# the world since the dawn of standardized time. We might run out of memory if a
+# test of that nature is really broken and really chatty about it.
+#
+# What we're going to do for a stab at this problem is create a queue, as we do
+# with progress, and one go at a time. Chances are the queue will be empty. If
+# there is one long running test interleaved with a quick test, then the quick
+# test will be done quickly, and the long running test can take over. If two
+# long running test are interleaved, then we might want to view the tests one at
+# a time by piping the test through `grep`, or piping it through `sort`, before
+# passing it to `proof errors`.
+errors = do ->
+  # TODO Shouldn't `test` be `assertion`?
+  return ->
+    process.stdin.resume()
+    queue = []
+    failed = {}
+    parse process.stdin, (record) ->
+      failure = failed[record.file]
+      if record.type is "test"
+        if not record.ok
+          if not failure
+            failure = failed[record.file] = { records: [], spewing: true }
+            queue.push failure
+          failure.records.push record
+        else if failure
+          failure.spewing = true
+      else if failure and /^out|err|exit$/.test(record.type)
+        failure.records.push record
+      while queue.length and queue[0].records.length
+        record = queue[0].records.shift()
+        switch record.type
+          when "test"
+            if not queue[0].header
+              process.stdout.write "#{record.file}\n"
+              queue[0].header = true
+            process.stdout.write "  #{record.message}\n"
+          when "err", "out"
+            process.stdout.write "    #{record.line}\n"
+          when "exit"
+            queue.shift()
 
 parser =
   plan: (plan) ->
@@ -470,4 +525,4 @@ create = ->
     """, "utf8"
     fs.chmodSync name, 0o755
 
-({ create, piped, json, run, progress })[action]()
+({ create, piped, json, run, progress, errors })[action]()
