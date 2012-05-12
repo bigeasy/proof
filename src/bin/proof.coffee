@@ -160,7 +160,7 @@ progress = do ->
     str.slice(- (options.digits + 1))
 
   styling = (program, terminal) ->
-    if program.passed < program.actual or program.bailed
+    if program.passed < program.actual or program.bailed or (program.code? and program.code)
       extend program, status: "Failure", color: red, icon: "\u2718"
 
     # Format summary.
@@ -195,7 +195,7 @@ progress = do ->
           status: "Success"
           time: 0
           passed: 0
-          expected: program.expected
+          expected: 0
           icon: "\u2713"
         }
 
@@ -208,9 +208,11 @@ progress = do ->
           time: 0
           start: Number.MAX_VALUE
           count: 0
+          code: 0
 
         tests = { actual: 0, passed: 0 }
         for file, program of programs
+          summary.code = program.code if program.code
           tests.actual++
           tests.passed++ if program.expected is program.passed
           summary.count++
@@ -223,7 +225,7 @@ progress = do ->
 
         summary.file = "tests (#{tests.passed}/#{tests.actual}) assertions"
 
-        extend summary, if summary.passed is summary.expected
+        extend summary, if summary.passed is summary.expected and not summary.code
           { icon: "\u2713", status: "Success", color: green }
         else
           { icon: "\u2718", status: "Failure", color: red }
@@ -253,8 +255,8 @@ progress = do ->
             programs[program.file].bailed = true
           when "exit"
             displayed = null if program.file is displayed
-            extend programs[program.file], program
-            process.stdout.write styling(programs[program.file], "\n")
+            program = extend programs[program.file], program
+            process.stdout.write styling(program, "\n")
             if program.code isnt 0
               failed.push program
 
@@ -389,8 +391,7 @@ parse = (stream, callback) ->
           code = parseInt rest, 10
           if isNaN code
             throw new Error "cannot read exit code #{code} on line #{count}"
-          record = extend {}, program, { code, file, type, time }
-          callback record
+          callback extend {}, program, { code, file, type, time }
         when "err", "out"
           callback({ time, type, file, line: rest })
         when "eof"
