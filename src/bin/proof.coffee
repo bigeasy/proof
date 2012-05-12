@@ -37,6 +37,18 @@ options =
   """
   progress: """
     usage: proof progress [<test>...]
+
+    options:
+      -d,   --digits    [count]     number of timing digits to display 
+      -w,   --width     [count]     width in characters of progress display
+  """
+  default: """
+    usage: proof [options] [<test>...]
+
+    options:
+      -p,   --processes [count]     number of processes to run
+      -d,   --digits    [count]     number of timing digits to display
+      -w,   --width     [count]     width in characters of progress display
   """
   run: """
     usage: proof run [options] [<test>...]
@@ -51,7 +63,7 @@ if opts = options[argv[0]]
   action = argv.shift()
 else
   action = "piped"
-  opts = options.run
+  opts = options.default
 
 # If we can't figure out what the user wants, we print usage and die.
 usage = ->
@@ -92,7 +104,7 @@ usage = ->
   [ options, argv ]
 
 piped = ->
-  formatter = spawn __filename, [ "progress" ], customFds: [ -1, 1, 2 ]
+  formatter = spawn __filename, [ "progress", "--width", options.width || 76, "--digits", options.digits || 6 ], customFds: [ -1, 1, 2 ]
   formatter.on "exit", (code) -> process.exit code if code isnt 0
   runner = spawn __filename, [ "run" ].concat argv
   runner.stderr.on "data", (chunk) ->
@@ -131,17 +143,21 @@ json = ->
   [ red, green ]
 
 progress = do ->
+  options.width or= 76
+
+  options.digits or= 4
+  options.digits = 4 if options.digits < 4
+  options.digits = 10 if options.digits > 10
 
   # Visual queue for table layout.
-  fill = (filler, count) -> Array(Math.max(count - 1, 0)).join filler
+  fill = (filler, count) -> Array(Math.max(count + 1, 0)).join filler
 
   # Format time.
   time = (program) ->
     str = "#{program.time - program.start}"
-    str = "00#{str}".slice(-3) if str.length < 3
-    str = "0#{str}" if str.length < 4
+    str = "000#{str}".slice(-4) if str.length < 4
     str = "      #{str}".replace(/(\d{3})$/, ".$1")
-    str.replace(/^\s{6}/, '')
+    str.slice(- (options.digits + 1))
 
   styling = (program, terminal) ->
     if program.passed < program.actual or program.bailed
@@ -150,9 +166,9 @@ progress = do ->
     # Format summary.
     summary = "(#{program.passed}/#{program.expected}) #{time program}"
 
-    dots = fill(".", 66 - program.file.length - summary.length)
-
     { color, icon, file, status } = program
+
+    dots = fill(".", options.width - 6 - file.length - summary.length - status.length)
     " #{color icon} #{file} #{dots} #{summary} #{color(status)}#{terminal}"
 
   return ->
@@ -215,9 +231,9 @@ progress = do ->
         # Format summary.
         stats = "(#{summary.passed}/#{summary.expected}) #{time summary}"
 
-        dots = fill(" ", 66 - summary.file.length - stats.length)
-
         { color, icon, file, status } = summary
+
+        dots = fill(" ", options.width - 6 - summary.file.length - stats.length - status.length)
         process.stdout.write " #{color ' '} #{dots} #{file} #{stats} #{color(status)}\n"
 
         process.exit 1 if summary.passed isnt summary.expected
