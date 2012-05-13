@@ -1,7 +1,7 @@
 {   "name":             "proof"
 ,   "description":      "A UNIX way test non-framework for the lazy programmer."
 ,   "keywords":         [ "test", "unit", "tap" ]
-,   "version":          "0.0.2"
+,   "version":          "0.0.3"
 ,   "author":           "Alan Gutierrez"
 ,   "directories":      { "lib" : "./lib" }
 ,   "devDependencies":  { "coffee-script": ">=1.1.3" }
