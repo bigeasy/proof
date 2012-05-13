@@ -114,23 +114,23 @@ piped = ->
 json = ->
   object = {}
   process.stdin.resume()
-  parse process.stdin, (program) ->
-    switch program.type
+  parse process.stdin, (event) ->
+    switch event.type
       when "run"
-        object[program.file] =
-          time: program.time
-          expected: program.expected
+        object[event.file] =
+          time: event.time
+          expected: event.expected
           tests: []
       when "plan"
-        object[program.file].expected = program.expected
+        object[event.file].expected = event.expected
       when "test"
-        { message, file, time, passed, skip, todo, comment } = program
+        { message, file, time, passed, skip, todo, comment } = event
         object[file].tests.push { message, time, passed, skip, todo, comment }
       when "exit"
-        extend object[program.file],
-          actual: program.actual
-          duration: program.time - program.start
-          code: program.code
+        extend object[event.file],
+          actual: event.actual
+          duration: event.time - event.start
+          code: event.code
       when "eof"
         process.stdout.write JSON.stringify object, null, 2
         process.stdout.write "\n"
@@ -142,14 +142,18 @@ json = ->
   green     = colorize("\u001B[32m")
   [ red, green ]
 
+# Generate progress reporting, something to watch as the tests are run.
 progress = do ->
+  # Default witdth.
   options.width or= 76
 
+  # Default timing digits, or a reaonable amount if the user is being
+  # unreasonable.
   options.digits or= 4
   options.digits = 4 if options.digits < 4
   options.digits = 10 if options.digits > 10
 
-  # Visual queue for table layout.
+  # Visual cue for table layout.
   fill = (filler, count) -> Array(Math.max(count + 1, 0)).join filler
 
   # Format time.
@@ -159,7 +163,10 @@ progress = do ->
     str = "      #{str}".replace(/(\d{3})$/, ".$1")
     str.slice(- (options.digits + 1))
 
-  styling = (program, terminal) ->
+  # Update our progress bar. The `terminal` parameter is either `\n` if we're
+  # done displaying the progress for this test, or `\r` to reset the cursor for
+  # to overwrite the line.
+  bar = (program, terminal) ->
     if program.passed < program.actual or program.bailed or (program.code? and program.code)
       extend program, status: "Failure", color: red, icon: "\u2718"
 
@@ -179,18 +186,17 @@ progress = do ->
     displayed = null
     programs = {}
 
-    failed = []
-    parse process.stdin, (program) ->
+    parse process.stdin, (event) ->
       # Display the output if nothing else is being displayed.
-      displayed or= program.file
+      displayed or= event.file
 
       # If the type is run, we're starting up a new test, create a new program
       # structure to gather the test output.
-      if program.type is "run"
-        programs[program.file] ?= {
+      if event.type is "run"
+        programs[event.file] ?= {
           actual: 0
           color: green
-          file: program.file
+          file: event.file
           start: Number.MAX_VALUE
           status: "Success"
           time: 0
@@ -200,7 +206,7 @@ progress = do ->
         }
 
       # At the end of all tests, we print our summary, otherwise we print .
-      if program.type is "eof"
+      if event.type is "eof"
         summary =
           actual: 0
           passed: 0
@@ -242,23 +248,21 @@ progress = do ->
 
       # Otherwise update duration.
       else
-        programs[program.file].duration = program.time - program.start
-        switch program.type
+        programs[event.file].duration = event.time - event.start
+        switch event.type
           when "plan"
-            programs[program.file].expected = program.expected
+            programs[event.file].expected = event.expected
           when "test"
-            extend programs[program.file], program
-            if program.file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
-              process.stdout.write styling(programs[program.file], "\r")
+            extend programs[event.file], event
+            if event.file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
+              process.stdout.write bar(programs[event.file], "\r")
           when "bail"
-            displayed = null if program.file is displayed
-            programs[program.file].bailed = true
+            displayed = null if event.file is displayed
+            programs[event.file].bailed = true
           when "exit"
-            displayed = null if program.file is displayed
-            program = extend programs[program.file], program
-            process.stdout.write styling(program, "\n")
-            if program.code isnt 0
-              failed.push program
+            displayed = null if event.file is displayed
+            program = extend programs[event.file], event
+            process.stdout.write bar(program, "\n")
 
 # Problem with errors is that output can be interleaved, so we need to gather up
 # the lines of output after a failed assertion, or else the output of other
@@ -284,28 +288,28 @@ errors = do ->
     process.stdin.resume()
     queue = []
     failed = {}
-    parse process.stdin, (record) ->
-      failure = failed[record.file]
-      if record.type is "test"
-        if not record.ok
+    parse process.stdin, (event) ->
+      failure = failed[event.file]
+      if event.type is "test"
+        if not event.ok
           if not failure
-            failure = failed[record.file] = { records: [], spewing: true }
+            failure = failed[event.file] = { events: [], spewing: true }
             queue.push failure
-          failure.records.push record
+          failure.events.push event
         else if failure
           failure.spewing = true
-      else if failure and /^out|err|exit$/.test(record.type)
-        failure.records.push record
-      while queue.length and queue[0].records.length
-        record = queue[0].records.shift()
-        switch record.type
+      else if failure and /^out|err|exit$/.test(event.type)
+        failure.events.push event
+      while queue.length and queue[0].events.length
+        event = queue[0].events.shift()
+        switch event.type
           when "test"
             if not queue[0].header
-              process.stdout.write "#{record.file}\n"
+              process.stdout.write "#{event.file}\n"
               queue[0].header = true
-            process.stdout.write "  #{record.message}\n"
+            process.stdout.write "  #{event.message}\n"
           when "err", "out"
-            process.stdout.write "    #{record.line}\n"
+            process.stdout.write "    #{event.line}\n"
           when "exit"
             queue.shift()
 
@@ -371,11 +375,10 @@ parse = (stream, callback) ->
       }
       switch type
         when "test"
-          record = parser.assertion rest
+          event = parser.assertion rest
           program.actual++
-          program.passed++ if record.ok
-          extend record, program, { time, file, type }
-          callback record
+          program.passed++ if event.ok
+          callback extend event, program, { time, file, type }
         when "run"
           program.start = time
           callback extend program, { time, type, file }
@@ -383,10 +386,9 @@ parse = (stream, callback) ->
           expected = parseInt rest, 10
           callback extend program, { time, file, type, expected }
         when "bail"
-          record = parser.bailout rest
+          event = parser.bailout rest
           program.bailed = true
-          extend record, program, { time, file, type }
-          callback record
+          callback extend event, program, { time, file, type }
         when "exit"
           code = parseInt rest, 10
           if isNaN code
