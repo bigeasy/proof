@@ -290,31 +290,46 @@ errors = do ->
     process.stdin.resume()
     queue = []
     failed = {}
+    prefix = ""
+    backlog = {}
+    offset = 2
     parse process.stdin, (event) ->
+      if event.type is "run"
+        backlog[event.file] = [ { type: "out", line: "" }, { type: "out", line: ">--" }, { type: "out", line: "" } ]
       if failed[event.file]
         failed[event.file].events.push event
         delete failed[event.file] if (event.type is "test" and event.ok)
       else if (event.type is "bail") or (event.type is "test" and not event.ok) or (event.type is "exit" and event.code)
-        queue.push failed[event.file] = { events: [ event ] }
-      prefix = "\n"
+        queue.push failed[event.file] = { events: backlog[event.file].concat([ event ]) }
+        if event.type is "test"
+          backlog[event.file].length = 3
+        else
+          delete backlog[event.file]
+      else if event.type is "test"
+        backlog[event.file].length = 3
+      else if event.type is "exit"
+        delete backlog[event.file]
+      else if event.type isnt "eof"
+        backlog[event.file].push event
+      else if event.type is "eof" and offset isnt 2
+        process.stdout.write "\n"
       while queue.length and queue[0].events.length
         event = queue[0].events.shift()
+        continue if offset-- > 0
         switch event.type
           when "bail"
-            process.stdout.write "#{prefix}> #{red("\u2718")} #{event.file}: Bail Out!\n"
-            prefix = "\n\n"
+            process.stdout.write "> #{red("\u2718")} #{event.file}: Bail Out!\n"
           when "test"
-            say event
             if event.ok
               queue.shift()
             else
-              process.stdout.write "#{prefix}> #{red("\u2718")} #{event.file}: #{event.message}\n"
-              prefix = "\n\n"
+              process.stdout.write "> #{red("\u2718")} #{event.file}: #{event.message}\n"
           when "err", "out"
             process.stdout.write "#{event.line}\n"
+            prefix = ""
           when "exit"
             if event.code
-              process.stdout.write "#{prefix}> #{red("\u2718")} #{event.file}: exited with code #{event.code}\n"
+              process.stdout.write "> #{red("\u2718")} #{event.file}: exited with code #{event.code}\n"
               prefix = "\n\n"
             queue.shift()
 
