@@ -32,8 +32,23 @@ options =
   json: """
     usage: proof json [<test>...]
   """
+  errors: """
+    usage: proof progress [<test>...]
+  """
   progress: """
     usage: proof progress [<test>...]
+
+    options:
+      -d,   --digits    [count]     number of timing digits to display 
+      -w,   --width     [count]     width in characters of progress display
+  """
+  default: """
+    usage: proof [options] [<test>...]
+
+    options:
+      -p,   --processes [count]     number of processes to run
+      -d,   --digits    [count]     number of timing digits to display
+      -w,   --width     [count]     width in characters of progress display
   """
   run: """
     usage: proof run [options] [<test>...]
@@ -48,7 +63,7 @@ if opts = options[argv[0]]
   action = argv.shift()
 else
   action = "piped"
-  opts = options.run
+  opts = options.default
 
 # If we can't figure out what the user wants, we print usage and die.
 usage = ->
@@ -89,7 +104,7 @@ usage = ->
   [ options, argv ]
 
 piped = ->
-  formatter = spawn __filename, [ "progress" ], customFds: [ -1, 1, 2 ]
+  formatter = spawn __filename, [ "progress", "--width", options.width || 76, "--digits", options.digits || 6 ], customFds: [ -1, 1, 2 ]
   formatter.on "exit", (code) -> process.exit code if code isnt 0
   runner = spawn __filename, [ "run" ].concat argv
   runner.stderr.on "data", (chunk) ->
@@ -99,54 +114,70 @@ piped = ->
 json = ->
   object = {}
   process.stdin.resume()
-  parse process.stdin, (program) ->
-    switch program.type
+  parse process.stdin, (event) ->
+    switch event.type
       when "run"
-        object[program.file] =
-          time: program.time
-          expected: program.expected
+        object[event.file] =
+          time: event.time
+          expected: event.expected
           tests: []
       when "plan"
-        object[program.file].expected = program.expected
+        object[event.file].expected = event.expected
       when "test"
-        { message, file, time, passed, skip, todo, comment } = program
+        { message, file, time, passed, skip, todo, comment } = event
         object[file].tests.push { message, time, passed, skip, todo, comment }
       when "exit"
-        extend object[program.file],
-          actual: program.actual
-          duration: program.time - program.start
-          code: program.code
+        extend object[event.file],
+          actual: event.actual
+          duration: event.time - event.start
+          code: event.code
       when "eof"
         process.stdout.write JSON.stringify object, null, 2
         process.stdout.write "\n"
 
-progress = do ->
+[ red, green, blue, gray ] = do ->
   # Colorization.
-  colorize  = (color) -> (text) -> "#{color}#{text}\u001B[39m"
+  colorize  = (color) -> (text) -> "#{color}#{text}\u001B[0m"
   red       = colorize("\u001B[31m")
   green     = colorize("\u001B[32m")
+  blue      = colorize("\u001B[34m")
+  gray      = colorize("\u001B[38;5;244m")
+  [ red, green, blue, gray ]
 
-  # Visual queue for table layout.
-  fill = (filler, count) -> Array(Math.max(count - 1, 0)).join filler
+# Generate progress reporting, something to watch as the tests are run.
+progress = do ->
+  # Default witdth.
+  options.width or= 76
+
+  # Default timing digits, or a reaonable amount if the user is being
+  # unreasonable.
+  options.digits or= 4
+  options.digits = 4 if options.digits < 4
+  options.digits = 10 if options.digits > 10
+
+  # Visual cue for table layout.
+  fill = (filler, count) -> Array(Math.max(count + 1, 0)).join filler
 
   # Format time.
   time = (program) ->
     str = "#{program.time - program.start}"
-    str = "00#{str}".slice(-3) if str.length < 3
-    str = "0#{str}" if str.length < 4
+    str = "000#{str}".slice(-4) if str.length < 4
     str = "      #{str}".replace(/(\d{3})$/, ".$1")
-    str.replace(/^\s{6}/, '')
+    str.slice(- (options.digits + 1))
 
-  styling = (program, terminal) ->
-    if program.passed < program.actual or program.bailed
+  # Update our progress bar. The `terminal` parameter is either `\n` if we're
+  # done displaying the progress for this test, or `\r` to reset the cursor for
+  # to overwrite the line.
+  bar = (program, terminal) ->
+    if program.passed < program.actual or program.bailed or (program.code? and program.code)
       extend program, status: "Failure", color: red, icon: "\u2718"
 
     # Format summary.
     summary = "(#{program.passed}/#{program.expected}) #{time program}"
 
-    dots = fill(".", 66 - program.file.length - summary.length)
-
     { color, icon, file, status } = program
+
+    dots = fill(".", options.width - 6 - file.length - summary.length - status.length)
     " #{color icon} #{file} #{dots} #{summary} #{color(status)}#{terminal}"
 
   return ->
@@ -157,28 +188,27 @@ progress = do ->
     displayed = null
     programs = {}
 
-    failed = []
-    parse process.stdin, (program) ->
+    parse process.stdin, (event) ->
       # Display the output if nothing else is being displayed.
-      displayed or= program.file
+      displayed or= event.file
 
       # If the type is run, we're starting up a new test, create a new program
       # structure to gather the test output.
-      if program.type is "run"
-        programs[program.file] ?= {
+      if event.type is "run"
+        programs[event.file] ?= {
           actual: 0
           color: green
-          file: program.file
+          file: event.file
           start: Number.MAX_VALUE
           status: "Success"
           time: 0
           passed: 0
-          expected: program.expected
+          expected: 0
           icon: "\u2713"
         }
 
       # At the end of all tests, we print our summary, otherwise we print .
-      if program.type is "eof"
+      if event.type is "eof"
         summary =
           actual: 0
           passed: 0
@@ -186,9 +216,11 @@ progress = do ->
           time: 0
           start: Number.MAX_VALUE
           count: 0
+          code: 0
 
         tests = { actual: 0, passed: 0 }
         for file, program of programs
+          summary.code = program.code if program.code
           tests.actual++
           tests.passed++ if program.expected is program.passed
           summary.count++
@@ -201,7 +233,7 @@ progress = do ->
 
         summary.file = "tests (#{tests.passed}/#{tests.actual}) assertions"
 
-        extend summary, if summary.passed is summary.expected
+        extend summary, if summary.passed is summary.expected and not summary.code
           { icon: "\u2713", status: "Success", color: green }
         else
           { icon: "\u2718", status: "Failure", color: red }
@@ -209,32 +241,81 @@ progress = do ->
         # Format summary.
         stats = "(#{summary.passed}/#{summary.expected}) #{time summary}"
 
-        dots = fill(" ", 66 - summary.file.length - stats.length)
-
         { color, icon, file, status } = summary
+
+        dots = fill(" ", options.width - 6 - summary.file.length - stats.length - status.length)
         process.stdout.write " #{color ' '} #{dots} #{file} #{stats} #{color(status)}\n"
 
         process.exit 1 if summary.passed isnt summary.expected
 
       # Otherwise update duration.
       else
-        programs[program.file].duration = program.time - program.start
-        switch program.type
+        programs[event.file].duration = event.time - event.start
+        switch event.type
           when "plan"
-            programs[program.file].expected = program.expected
+            programs[event.file].expected = event.expected
           when "test"
-            extend programs[program.file], program
-            if program.file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
-              process.stdout.write styling(programs[program.file], "\r")
+            extend programs[event.file], event
+            if event.file is displayed and process.stdout.isTTY and process.env["TRAVIS"] isnt "true"
+              process.stdout.write bar(programs[event.file], "\r")
           when "bail"
-            displayed = null if program.file is displayed
-            programs[program.file].bailed = true
+            displayed = null if event.file is displayed
+            programs[event.file].bailed = true
           when "exit"
-            displayed = null if program.file is displayed
-            extend programs[program.file], program
-            process.stdout.write styling(programs[program.file], "\n")
-            if program.code isnt 0
-              failed.push program
+            displayed = null if event.file is displayed
+            program = extend programs[event.file], event
+            process.stdout.write bar(program, "\n")
+
+# Problem with errors is that output can be interleaved, so we need to gather up
+# the lines of output after a failed assertion, or else the output of other
+# assertions get interleaved.
+#
+# The first formatting style that comes to mind would be one that grouped all
+# the failed assertions under their failed test, but that means waiting for a
+# full test to load. There are test with a great many failures, one of the
+# automated tests, like the one in Timezone that tests every clock transition in
+# the world since the dawn of standardized time. We might run out of memory if a
+# test of that nature is really broken and really chatty about it.
+#
+# What we're going to do for a stab at this problem is create a queue, as we do
+# with progress, and one go at a time. Chances are the queue will be empty. If
+# there is one long running test interleaved with a quick test, then the quick
+# test will be done quickly, and the long running test can take over. If two
+# long running test are interleaved, then we might want to view the tests one at
+# a time by piping the test through `grep`, or piping it through `sort`, before
+# passing it to `proof errors`.
+errors = do ->
+  # TODO Shouldn't `test` be `assertion`?
+  return ->
+    process.stdin.resume()
+    queue = []
+    failed = {}
+    parse process.stdin, (event) ->
+      failure = failed[event.file]
+      if event.type is "test"
+        if not event.ok
+          if not failure
+            failure = failed[event.file] = { events: [ event ], spewing: true }
+            queue.push failure
+        else if failure
+          failure.spewing = true
+      else if failure and /^out|err|exit$/.test(event.type)
+        failure.events.push event
+      else if event.type is "exit" and event.code isnt 0
+        queue.push failed[event.file] = { events: [ event ], spewing: true }
+      prefix = ""
+      while queue.length and queue[0].events.length
+        event = queue[0].events.shift()
+        switch event.type
+          when "test"
+            if not queue[0].header
+              process.stdout.write "> #{red("\u2718")} #{event.file}: #{event.message}\n\n"
+              queue[0].header = true
+          when "err", "out"
+            process.stdout.write "#{event.line}\n"
+          when "exit"
+            process.stdout.write "\n> #{red("\u2718")} #{event.file}: exited with code #{event.code}\n"
+            queue.shift()
 
 parser =
   plan: (plan) ->
@@ -298,11 +379,10 @@ parse = (stream, callback) ->
       }
       switch type
         when "test"
-          record = parser.assertion rest
+          event = parser.assertion rest
           program.actual++
-          program.passed++ if record.ok
-          extend record, program, { time, file, type }
-          callback record
+          program.passed++ if event.ok
+          callback extend event, program, { time, file, type }
         when "run"
           program.start = time
           callback extend program, { time, type, file }
@@ -310,16 +390,14 @@ parse = (stream, callback) ->
           expected = parseInt rest, 10
           callback extend program, { time, file, type, expected }
         when "bail"
-          record = parser.bailout rest
+          event = parser.bailout rest
           program.bailed = true
-          extend record, program, { time, file, type }
-          callback record
+          callback extend event, program, { time, file, type }
         when "exit"
           code = parseInt rest, 10
           if isNaN code
             throw new Error "cannot read exit code #{code} on line #{count}"
-          record = extend {}, program, { code, file, type, time }
-          callback record
+          callback extend {}, program, { code, file, type, time }
         when "err", "out"
           callback({ time, type, file, line: rest })
         when "eof"
@@ -330,7 +408,11 @@ parse = (stream, callback) ->
 run = ->
   programs = argv
   parallel = {}
+  seen = {}
   for program in programs
+    if seen[program]
+      throw new Error "programs cannot be run twice in a test run: #{program}"
+    seen[program] = true
     if /\s+/.test program
       throw new Error "program names cannot contain spaces: #{program}"
     dirname = /^(.*)\/.*/.exec(program)[1]
@@ -466,4 +548,4 @@ create = ->
     """, "utf8"
     fs.chmodSync name, 0o755
 
-({ create, piped, json, run, progress })[action]()
+({ create, piped, json, run, progress, errors })[action]()
