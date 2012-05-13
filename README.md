@@ -630,6 +630,11 @@ suit your project's needs.
 
 Changes for each release.
 
+### Release X &mdash; 
+
+ * Exiting with a non-zero exit code from `proof errors` if errors are detected.
+   #25.
+
 ### Release 0.0.4 &mdash; May 12th, 2012
 
  * Showing standard error and standard output prior to a failed test or a bail

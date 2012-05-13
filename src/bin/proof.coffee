@@ -313,6 +313,7 @@ errors = do ->
         backlog[event.file].push event
       else if event.type is "eof" and offset isnt 2
         process.stdout.write "\n"
+        process.exit 1
       while queue.length and queue[0].events.length
         event = queue[0].events.shift()
         continue if offset-- > 0
