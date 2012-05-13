@@ -630,7 +630,22 @@ suit your project's needs.
 
 Changes for each release.
 
-### Release 0.0.2
+### Release 0.0.4 &mdash; May 12th, 2012
+
+ * Showing standard error and standard output prior to a failed test or a bail
+   out in failed assertions display. #24.
+
+### Release 0.0.3 &mdash; May 12th, 2012
+
+ * Created `proof errors` to display the failed assertions of a failed test run.
+   #5.
+ * Correctly reporting tests that fail before they start, like failure to
+   compile. #8.
+ * Set width of progress display using `--width` option. #19.
+ * Set width of progress timing display using `--digits` option. #16.
+ * Fixed spelling in documentation and comments, cleanup documentation. #10. #9.
+
+### Release 0.0.2 &mdash; May 9th, 2012
 
  * Correctly summing assertions. #13.
  * Failed assertions no longer repeat message. #11.
