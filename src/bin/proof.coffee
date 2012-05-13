@@ -135,12 +135,14 @@ json = ->
         process.stdout.write JSON.stringify object, null, 2
         process.stdout.write "\n"
 
-[ red, green ] = do ->
+[ red, green, blue, gray ] = do ->
   # Colorization.
-  colorize  = (color) -> (text) -> "#{color}#{text}\u001B[39m"
+  colorize  = (color) -> (text) -> "#{color}#{text}\u001B[0m"
   red       = colorize("\u001B[31m")
   green     = colorize("\u001B[32m")
-  [ red, green ]
+  blue      = colorize("\u001B[34m")
+  gray      = colorize("\u001B[38;5;244m")
+  [ red, green, blue, gray ]
 
 # Generate progress reporting, something to watch as the tests are run.
 progress = do ->
@@ -293,24 +295,26 @@ errors = do ->
       if event.type is "test"
         if not event.ok
           if not failure
-            failure = failed[event.file] = { events: [], spewing: true }
+            failure = failed[event.file] = { events: [ event ], spewing: true }
             queue.push failure
-          failure.events.push event
         else if failure
           failure.spewing = true
       else if failure and /^out|err|exit$/.test(event.type)
         failure.events.push event
+      else if event.type is "exit" and event.code isnt 0
+        queue.push failed[event.file] = { events: [ event ], spewing: true }
+      prefix = ""
       while queue.length and queue[0].events.length
         event = queue[0].events.shift()
         switch event.type
           when "test"
             if not queue[0].header
-              process.stdout.write "#{event.file}\n"
+              process.stdout.write "> #{red("\u2718")} #{event.file}: #{event.message}\n\n"
               queue[0].header = true
-            process.stdout.write "  #{event.message}\n"
           when "err", "out"
-            process.stdout.write "    #{event.line}\n"
+            process.stdout.write "#{event.line}\n"
           when "exit"
+            process.stdout.write "\n> #{red("\u2718")} #{event.file}: exited with code #{event.code}\n"
             queue.shift()
 
 parser =
