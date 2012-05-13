@@ -291,30 +291,31 @@ errors = do ->
     queue = []
     failed = {}
     parse process.stdin, (event) ->
-      failure = failed[event.file]
-      if event.type is "test"
-        if not event.ok
-          if not failure
-            failure = failed[event.file] = { events: [ event ], spewing: true }
-            queue.push failure
-        else if failure
-          failure.spewing = true
-      else if failure and /^out|err|exit$/.test(event.type)
-        failure.events.push event
-      else if event.type is "exit" and event.code isnt 0
-        queue.push failed[event.file] = { events: [ event ], spewing: true }
-      prefix = ""
+      if failed[event.file]
+        failed[event.file].events.push event
+        delete failed[event.file] if (event.type is "test" and event.ok)
+      else if (event.type is "bail") or (event.type is "test" and not event.ok) or (event.type is "exit" and event.code)
+        queue.push failed[event.file] = { events: [ event ] }
+      prefix = "\n"
       while queue.length and queue[0].events.length
         event = queue[0].events.shift()
         switch event.type
+          when "bail"
+            process.stdout.write "#{prefix}> #{red("\u2718")} #{event.file}: Bail Out!\n"
+            prefix = "\n\n"
           when "test"
-            if not queue[0].header
-              process.stdout.write "> #{red("\u2718")} #{event.file}: #{event.message}\n\n"
-              queue[0].header = true
+            say event
+            if event.ok
+              queue.shift()
+            else
+              process.stdout.write "#{prefix}> #{red("\u2718")} #{event.file}: #{event.message}\n"
+              prefix = "\n\n"
           when "err", "out"
             process.stdout.write "#{event.line}\n"
           when "exit"
-            process.stdout.write "\n> #{red("\u2718")} #{event.file}: exited with code #{event.code}\n"
+            if event.code
+              process.stdout.write "#{prefix}> #{red("\u2718")} #{event.file}: exited with code #{event.code}\n"
+              prefix = "\n\n"
             queue.shift()
 
 parser =
