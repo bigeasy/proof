@@ -166,7 +166,9 @@ class Test
   # from a bailout we invoke.
   _tidy: (code) ->
     housekeepers = []
-    housekeepers = @_housekeepers.splice(0) unless process.env.PROOF_NO_CLEANUP
+    untidy = process.env.PROOF_NO_CLEANUP or process.env.UNTIDY
+    unless untidy and /^(0|no|false)$/.test untidy
+      housekeepers = @_housekeepers.splice(0)
     tidy = =>
       if housekeeper = housekeepers.shift()
         housekeeper (error) => if error then @bailout error else tidy()
