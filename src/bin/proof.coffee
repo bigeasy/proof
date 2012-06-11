@@ -369,7 +369,10 @@ parse = (stream, callback) ->
   programs = {}
   [ out ] = [ "" ]
   count = 0
+  done = false
   stream.setEncoding "utf8"
+  stream.on "end", ->
+    process.exit 1 unless done
   stream.on "data", (chunk) ->
     out  += chunk
     lines = out.split /\n/
@@ -419,6 +422,7 @@ parse = (stream, callback) ->
           callback({ time, type, file, line: rest })
         when "eof"
           callback({ time, type })
+          done = true
         else
           throw new Error "unknown type #{type}"
 
