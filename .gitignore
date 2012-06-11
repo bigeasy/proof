@@ -4,3 +4,4 @@ node_modules
 *.swp
 bin/*
 lib/*
+.proof.out
