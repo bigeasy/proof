@@ -14,5 +14,4 @@ branches:
 
 before_install:
   - npm install coffee-script streamline
-  - git submodule init && git submodule update
-  - cake compile
+  - make
