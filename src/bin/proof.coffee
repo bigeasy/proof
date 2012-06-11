@@ -313,6 +313,7 @@ errors = do ->
         backlog[event.file].push event
       else if event.type is "eof" and offset isnt 2
         process.stdout.write "\n"
+        process.exit 1
       while queue.length and queue[0].events.length
         event = queue[0].events.shift()
         continue if offset-- > 0
@@ -368,7 +369,10 @@ parse = (stream, callback) ->
   programs = {}
   [ out ] = [ "" ]
   count = 0
+  done = false
   stream.setEncoding "utf8"
+  stream.on "end", ->
+    process.exit 1 unless done
   stream.on "data", (chunk) ->
     out  += chunk
     lines = out.split /\n/
@@ -418,6 +422,7 @@ parse = (stream, callback) ->
           callback({ time, type, file, line: rest })
         when "eof"
           callback({ time, type })
+          done = true
         else
           throw new Error "unknown type #{type}"
 
