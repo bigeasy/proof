@@ -1,0 +1,6 @@
+.DS_Store
+.AppleDouble
+node_modules
+*.swp
+bin/*
+lib/*
