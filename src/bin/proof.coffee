@@ -9,100 +9,6 @@ die = (splat...) ->
 
 {spawn} = require "child_process"
 
-# Verbose usage specific to each action.
-options =
-  create: """
-    usage: proof create [test] [harness] [<parameter>...] [_] [count]
-
-    test:
-      Name of the test.
-    harness:
-      Name and path to test harness relative to test file. By default the
-      generator will look for a source file with a base name of `./proof`
-      relative to the test file. The file is expected to have an extension of
-      one of the Proof supported languages, either `.coffee`, `._coffee`, `.js`
-      or `._js`.
-    parameter:
-      One or more parameters to extract from the test context.
-    _:
-      Test is a Streamline.js test, so pass in an underscore.
-    expected:
-      The number of tests expected.
-  """
-  json: """
-    usage: proof json [<test>...]
-  """
-  errors: """
-    usage: proof progress [<test>...]
-  """
-  progress: """
-    usage: proof progress [<test>...]
-
-    options:
-      -d,   --digits    [count]     number of timing digits to display 
-      -w,   --width     [count]     width in characters of progress display
-  """
-  default: """
-    usage: proof [options] [<test>...]
-
-    options:
-      -p,   --processes [count]     number of processes to run
-      -d,   --digits    [count]     number of timing digits to display
-      -w,   --width     [count]     width in characters of progress display
-  """
-  run: """
-    usage: proof run [options] [<test>...]
-
-    options:
-      -p,   --processes [count]     number of processes to run
-  """
-
-# Choose an option based on an action name. The default action is `run`.
-argv = process.argv.slice(2)
-if opts = options[argv[0]]
-  action = argv.shift()
-else
-  action = "piped"
-  opts = options.default
-
-# If we can't figure out what the user wants, we print usage and die.
-usage = ->
-  console.log opts
-  process.exit 1
-
-# Extract the action specific options from the command line arguments. We parse
-# our usage text to get our long and short option names.
-[ options, argv ]  = do ->
-  # Options, option names.
-  [ options, flag, full ]  = [ {}, {}, {} ]
-  # Map option descriptions to conversion functions. We use the arity of the
-  # conversion function to determine if an option takes a parameter.
-  converter =
-    count: (name, next) -> not isNaN(@[name] = parseInt next, 10)
-    path: (name, next) -> @[name] = next
-    none: (name) -> (@[name] = not @[name])?
-  # Split out usage text and grep for long and short option names. Create a few
-  # maps of names to converters.
-  for opt in opts.split /\n/
-    if match = ///
-        \s*(?:(-\w),)?        # short option
-        \s*(--\w+)            # long option
-        \s*(?:\[([^\]]+)\])?  # parameter
-      ///.exec(opt)
-      [ short, long, param ] = match[1..]
-      flag[short] = flag[long] = converter[param]
-      full[short] = long
-  # Pull options off the front of argv. Convert the option parameter, if it
-  # takes a parameter.
-  while conv = flag[argv[0]]
-    name = argv.shift()
-    name = (full[name] or name).substring(2)
-    length = conv.length - 1
-    usage() if argv.length < length
-    usage() unless conv.apply options, [ name ].concat(argv.splice(0, length))
-  # Return the options and the remaining arguments.
-  [ options, argv ]
-
 piped = ->
   formatter = spawn __filename, [ "progress", "--width", options.width || 76, "--digits", options.digits || 6 ], customFds: [ -1, 1, 2 ]
   formatter.on "exit", (code) -> process.exit code if code isnt 0
@@ -146,15 +52,6 @@ json = ->
 
 # Generate progress reporting, something to watch as the tests are run.
 progress = do ->
-  # Default witdth.
-  options.width or= 76
-
-  # Default timing digits, or a reaonable amount if the user is being
-  # unreasonable.
-  options.digits or= 4
-  options.digits = 4 if options.digits < 4
-  options.digits = 10 if options.digits > 10
-
   # Visual cue for table layout.
   fill = (filler, count) -> Array(Math.max(count + 1, 0)).join filler
 
@@ -181,6 +78,15 @@ progress = do ->
     " #{color icon} #{file} #{dots} #{summary} #{color(status)}#{terminal}"
 
   return ->
+    # Default witdth.
+    options.width or= 76
+
+    # Default timing digits, or a reaonable amount if the user is being
+    # unreasonable.
+    options.digits or= 4
+    options.digits = 4 if options.digits < 4
+    options.digits = 10 if options.digits > 10
+
     # Consume test output from standard input.
     process.stdin.resume()
 
@@ -569,4 +475,112 @@ create = ->
     """, "utf8"
     fs.chmodSync name, 0o755
 
-({ create, piped, json, run, progress, errors })[action]()
+
+# Verbose usage specific to each action.
+options =
+  create: """
+    usage: proof create [test] [harness] [<parameter>...] [_] [count]
+
+    test:
+      Name of the test.
+    harness:
+      Name and path to test harness relative to test file. By default the
+      generator will look for a source file with a base name of `./proof`
+      relative to the test file. The file is expected to have an extension of
+      one of the Proof supported languages, either `.coffee`, `._coffee`, `.js`
+      or `._js`.
+    parameter:
+      One or more parameters to extract from the test context.
+    _:
+      Test is a Streamline.js test, so pass in an underscore.
+    expected:
+      The number of tests expected.
+  """
+  json: """
+    usage: proof json [<test>...]
+  """
+  errors: """
+    usage: proof progress [<test>...]
+  """
+  progress: """
+    usage: proof progress [<test>...]
+
+    options:
+      -d,   --digits    [count]     number of timing digits to display 
+      -w,   --width     [count]     width in characters of progress display
+  """
+  run: """
+    usage: proof run [options] [<test>...]
+
+    options:
+      -p,   --processes [count]     number of processes to run
+  """
+
+# Choose an option based on an action name. The default action is `run`.
+argv = process.argv.slice(2)
+if opts = options[argv[0]] then do ->
+  action = argv.shift()
+
+  # If we can't figure out what the user wants, we print usage and die.
+  usage = ->
+    console.log opts
+    process.exit 1
+
+  # Extract the action specific options from the command line arguments. We parse
+  # our usage text to get our long and short option names.
+  [ options, argv ]  = do ->
+    # Options, option names.
+    [ options, flag, full ]  = [ {}, {}, {} ]
+    # Map option descriptions to conversion functions. We use the arity of the
+    # conversion function to determine if an option takes a parameter.
+    converter =
+      count: (name, next) -> not isNaN(@[name] = parseInt next, 10)
+      path: (name, next) -> @[name] = next
+      none: (name) -> (@[name] = not @[name])?
+    # Split out usage text and grep for long and short option names. Create a few
+    # maps of names to converters.
+    for opt in opts.split /\n/
+      if match = ///
+          \s*(?:(-\w),)?        # short option
+          \s*(--\w+)            # long option
+          \s*(?:\[([^\]]+)\])?  # parameter
+        ///.exec(opt)
+        [ short, long, param ] = match[1..]
+        flag[short] = flag[long] = converter[param]
+        full[short] = long
+    # Pull options off the front of argv. Convert the option parameter, if it
+    # takes a parameter.
+    while conv = flag[argv[0]]
+      name = argv.shift()
+      name = (full[name] or name).substring(2)
+      length = conv.length - 1
+      usage() if argv.length < length
+      usage() unless conv.apply options, [ name ].concat(argv.splice(0, length))
+    # Return the options and the remaining arguments.
+    [ options, argv ]
+
+  ({ create, piped, json, run, progress, errors })[action]()
+else
+  do ->
+    path = require "path"
+    if argv.length and not /[-.\/]/.test argv[0]
+      executable = "proof-#{argv.shift()}"
+    else
+      executable = "proof-default"
+    parts = process.env.PATH.split(if process.platform is "win32" then ";" else ":")
+    found = (error, stat) ->
+      if error
+        throw error if error.code isnt "ENOENT"
+        parts.shift()
+        if parts.length
+          fs.stat path.resolve(parts[0], executable), found
+        else
+          throw new Error "Cannot find executable #{executable}."
+      else
+        child = spawn path.resolve(parts[0], executable), argv
+        process.stdin.resume()
+        process.stdin.on "data", (buffer) -> child.stdin.write buffer
+        child.stdout.on "data", (buffer) -> process.stdout.write buffer
+        child.stderr.on "data", (buffer) -> process.stderr.write buffer
+        child.on "exit", (code) -> process.exit code
+    fs.stat path.resolve(parts[0], executable), found
