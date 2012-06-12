@@ -1,0 +1,3 @@
+[submodule "vendor/getopt"]
+	path = vendor/getopt
+	url = git://github.com/bigeasy/getopt.git
