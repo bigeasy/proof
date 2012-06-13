@@ -3,6 +3,10 @@
 # And instance of this class is bound to the test method. It provides assertions
 # and tracks the progress of the test.
 util = require "util"
+die = (splat...) ->
+  console.log.apply console, splat if splat.length
+  process.exit 1
+say = (splat...) -> console.log.apply console, splat
 
 # `class Test`
 class Test
@@ -187,6 +191,54 @@ class Test
   # organized.
   fail: (expected, actual, message, operator, comment) ->
 
+  store: (name) ->
+    @_callbacks or= {}
+    @_callbacks[name] or= { count: 0, results: [] }
+    @_callbacks[name].count++
+    callback = (error, result) ->
+      @bailout error if error
+      @_callbacks[name].results.push result
+      if not --@_callbacks.count
+        for key, value of @_callbacks
+          if value.count is 1
+            @context[key] = value.results[0]
+          else
+            @context[key] = value.results
+        @_invoke()
+    callback.bind(@)
+
+  _invoke: () ->
+    if @_procedures.length is 0
+      @_callback()
+    else
+      match = /^function\s*[^(]*\(([^)]*)\)/.exec(@_procedures[0].toString())
+      throw new Error "bad function" unless match
+      args = []
+      calledback = false
+      parameters = match[1].split /\s*,\s/
+      for parameter in parameters
+        switch parameter
+          when "callback", "_"
+            args.push ((error) -> if error then @bailout error else @_invoke()).bind(@)
+            calledback = true
+          else
+            arg = @context[parameter]
+            arg?= if typeof @[parameter] is "function" then @[parameter].bind(@)
+            args.push arg
+      switch parameters.length
+        when 1
+          args[0] ?= @context unless calledback
+        when 2
+          if calledback
+            args[0] ?= @context
+            args[1] ?= @context
+      @_callbacks = null
+      try
+        @_procedures.shift().apply @, args
+        @_invoke() unless calledback or @_callbacks
+      catch e
+        @bailout e
+
 # Generate assertion member methods for the Test class from the assert library.
 for name, assertion of require("assert")
   continue if Test.prototype[name] or name is "AssertionError"
@@ -222,28 +274,27 @@ execution = (test, splat...) ->
     catch error
       test.bailout error
   else
-    [ context, callback ] = splat
+    [ context, callbacks ] = splat
     if typeof context is "function"
       try
         if context.length is 0
           _context = context.call test
-          execution test, _context, callback
+          execution test, _context, callbacks
         else
           context.call test, (error, _context) ->
             if error
               test.bailout error
             else
-              execution test, _context, callback
+              execution test, _context, callbacks
       catch error
         test.bailout error
     else
       try
-        execution test, (_callback) ->
-          if callback.length is 2
-            callback.call @, context, _callback
-          else
-            callback.call @, context
-            _callback()
+        execution test, (callback) ->
+          test._procedures = callbacks
+          test._callback = callback
+          test.context = context
+          test._invoke()
       catch error
         test.bailout error
     
@@ -251,8 +302,8 @@ execution = (test, splat...) ->
 module.exports = harness = (splat...) ->
   if splat.length is 1
     [ context ] = splat
-    (expected, callback) ->
-      execution(new Test(expected), context, callback)
+    (expected, callbacks...) ->
+      execution(new Test(expected), context, callbacks)
   else
     [ expected, callback ] = splat
     execution(new Test(expected), callback)
