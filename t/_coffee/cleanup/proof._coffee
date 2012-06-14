@@ -1,7 +1,7 @@
 #!/usr/bin/env _coffee
 fs      = require "fs"
 {exec}  = require "child_process"
-module.exports = require("../../lib/proof") (_) ->
+module.exports = require("../../../lib/proof") (_) ->
   tmp = "#{__dirname}/tmp"
   @cleanup _, (_) ->
     try
