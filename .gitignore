@@ -2,6 +2,5 @@
 .AppleDouble
 node_modules
 *.swp
-bin/*
-lib/*
 .proof.out
+bin/proof-getopt
