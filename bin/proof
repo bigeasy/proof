@@ -1,0 +1,812 @@
+#!/usr/bin/env node
+
+var argv, blue, create, die, errors, extend, fs, gray, green, json, options,
+    opts, parse, parser, path, piped, progress, red, run, say, spawn, _ref;
+
+var fs = require("fs")
+  , path = require("path")
+  , spawn = require("child_process").spawn
+  , __slice = [].slice;
+
+function say () {
+  var splat;
+  splat = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+  return console.error.apply(null, splat);
+};
+
+function die () {
+  var splat;
+  splat = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+  if (splat.length) {
+    console.error.apply(null, splat);
+  }
+  return process.exit(1);
+};
+
+function json () {
+  var object = {};
+  process.stdin.resume();
+  parse(process.stdin, function (event) {
+    var comment, file, message, passed, skip, time, todo;
+    switch (event.type) {
+      case "run":
+        object[event.file] = {
+          time: event.time,
+          expected: event.expected,
+          tests: []
+        };
+      case "plan":
+        object[event.file].expected = event.expected;
+      case "test":
+        object[file].tests.push({
+          message: event.message,
+          time: event.time,
+          passed: event.passed,
+          skip: event.skip,
+          todo: event.todo,
+          comment: event.comment
+        });
+      case "exit":
+        extend(object[event.file], {
+          actual: event.actual,
+          duration: event.time - event.start,
+          code: event.code
+        });
+      case "eof":
+        process.stdout.write(JSON.stringify(object, null, 2));
+        process.stdout.write("\n");
+    }
+  });
+};
+
+colorize = (function () {
+  function colorize (color) {
+    return function (text) { return "" + color + text + "\u001B[0m" };
+  };
+  return {
+    red: colorize("\u001B[31m"),
+    green: colorize("\u001B[32m"),
+    blue: colorize("\u001B[34m"),
+    gray: colorize("\u001B[38;5;244m")
+  };
+})();
+
+// Generate progress reporting, something to watch as the tests are run.
+progress = (function () {
+  var bar, fill, time;
+  // Visual cue for table layout.
+  fill = function (filler, count) {
+    return Array(Math.max(count + 1, 0)).join(filler);
+  };
+  // Format time.
+  time = function (program) {
+    var str;
+    str = "" + (program.time - program.start);
+    if (str.length < 4) {
+      str = ("000" + str).slice(-4);
+    }
+    str = ("      " + str).replace(/(\d{3})$/, ".$1");
+    return str.slice(-(options.digits + 1));
+  };
+  // Update our progress bar. The `terminal` parameter is either `\n` if we're
+  // done displaying the progress for this test, or `\r` to reset the cursor for
+  // to overwrite the line.
+  bar = function (program, terminal) {
+    var color, dots, file, icon, status, summary;
+    if (program.passed < program.actual || program.bailed || ((program.code != null) && program.code)) {
+      extend(program, {
+        status: "Failure",
+        color: colorize.red,
+        icon: "\u2718"
+      });
+    }
+    // Format summary.
+    summary = "(" + program.passed + "/" + program.expected + ") " + (time(program));
+    color = program.color, icon = program.icon, file = program.file, status = program.status;
+    dots = fill(".", options.width - 6 - file.length - summary.length - status.length);
+    return " " + (color(icon)) + " " + file + " " + dots + " " + summary + " " + (color(status)) + terminal;
+  };
+  return function () {
+    var displayed, durations, programs;
+    // Default witdth.
+    options.width || (options.width = 76);
+    // Default timing digits, or a reaonable amount if the user is being
+    // unreasonable.
+    options.digits || (options.digits = 4);
+    if (options.digits < 4) {
+      options.digits = 4;
+    }
+    if (options.digits > 10) {
+      options.digits = 10;
+    }
+    // Consume test output from standard input.
+    process.stdin.resume();
+    durations = {};
+    displayed = null;
+    programs = {};
+    return parse(process.stdin, function (event) {
+      var color, dots, file, icon, program, stats, status, summary, tests, _name, _ref1;
+      // Display the output if nothing else is being displayed.
+      displayed || (displayed = event.file);
+      // If the type is run, we're starting up a new test, create a new program
+      // structure to gather the test output.
+      if (event.type === "run") {
+        if ((_ref1 = programs[_name = event.file]) == null) {
+          programs[_name] = {
+            actual: 0,
+            color: colorize.green,
+            file: event.file,
+            start: Number.MAX_VALUE,
+            status: "Success",
+            time: 0,
+            passed: 0,
+            expected: 0,
+            icon: "\u2713"
+          };
+        }
+      }
+      // At the end of all tests, we print our summary, otherwise we print.
+      if (event.type === "eof") {
+        summary = {
+          actual: 0,
+          passed: 0,
+          expected: 0,
+          time: 0,
+          start: Number.MAX_VALUE,
+          count: 0,
+          code: 0
+        };
+        tests = {
+          actual: 0,
+          passed: 0
+        };
+        for (file in programs) {
+          program = programs[file];
+          if (program.code) {
+            summary.code = program.code;
+          }
+          tests.actual++;
+          if (program.expected === program.passed) {
+            tests.passed++;
+          }
+          summary.count++;
+          summary.actual += program.actual || 0;
+          summary.passed += program.passed || 0;
+          summary.expected += program.expected || 0;
+          if (!program.time) {
+            continue;
+          }
+          summary.start = Math.min(summary.start, program.start);
+          summary.time = Math.max(summary.time, program.time);
+        }
+        summary.file = "tests (" + tests.passed + "/" + tests.actual + ") assertions";
+        extend(summary, summary.passed === summary.expected && !summary.code ? {
+          icon: "\u2713",
+          status: "Success",
+          color: colorize.green
+        } : {
+          icon: "\u2718",
+          status: "Failure",
+          color: colorize.red
+        });
+        // Format summary.
+        stats = "(" + summary.passed + "/" + summary.expected + ") " + (time(summary));
+        color = summary.color, icon = summary.icon, file = summary.file, status = summary.status;
+        dots = fill(" ", options.width - 6 - summary.file.length - stats.length - status.length);
+        process.stdout.write(" " + (color(' ')) + " " + dots + " " + file + " " + stats + " " + (color(status)) + "\n");
+        if (summary.passed !== summary.expected) {
+          return process.exit(1);
+        }
+      } else {
+        // Otherwise update duration.
+        programs[event.file].duration = event.time - event.start;
+        switch (event.type) {
+          case "plan":
+            return programs[event.file].expected = event.expected;
+          case "test":
+            extend(programs[event.file], event);
+            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] !== "true") {
+              return process.stdout.write(bar(programs[event.file], "\r"));
+            }
+            break;
+          case "bail":
+            if (event.file === displayed) {
+              displayed = null;
+            }
+            return programs[event.file].bailed = true;
+          case "exit":
+            if (event.file === displayed) {
+              displayed = null;
+            }
+            program = extend(programs[event.file], event);
+            return process.stdout.write(bar(program, "\n"));
+        }
+      }
+    });
+  };
+})();
+
+// Problem with errors is that output can be interleaved, so we need to gather
+// up the lines of output after a failed assertion, or else the output of other
+// assertions get interleaved.
+// 
+// The first formatting style that comes to mind would be one that grouped all
+// the failed assertions under their failed test, but that means waiting for a
+// full test to load. There are test with a great many failures, one of the
+// automated tests, like the one in Timezone that tests every clock transition
+// in the world since the dawn of standardized time. We might run out of memory
+// if a test of that nature is really broken and really chatty about it.
+// 
+// What we're going to do for a stab at this problem is create a queue, as we do
+// with progress, and one go at a time. Chances are the queue will be empty. If
+// there is one long running test interleaved with a quick test, then the quick
+// test will be done quickly, and the long running test can take over. If two
+// long running test are interleaved, then we might want to view the tests one
+// at a time by piping the test through `grep`, or piping it through `sort`,
+// before passing it to `proof errors`.
+errors = (function () {
+  // TODO Shouldn't `test` be `assertion`?
+  return function () {
+    var backlog, failed, offset, prefix, queue;
+    process.stdin.resume();
+    queue = [];
+    failed = {};
+    prefix = "";
+    backlog = {};
+    offset = 2;
+    return parse(process.stdin, function (event) {
+      var _results;
+      if (event.type === "run") {
+        backlog[event.file] = [
+          {
+            type: "out",
+            line: ""
+          }, {
+            type: "out",
+            line: ">--"
+          }, {
+            type: "out",
+            line: ""
+          }
+        ];
+      }
+      if (failed[event.file]) {
+        failed[event.file].events.push(event);
+        if (event.type === "test" && event.ok) {
+          delete failed[event.file];
+        }
+      } else if ((event.type === "bail") || (event.type === "test" && !event.ok) || (event.type === "exit" && event.code)) {
+        queue.push(failed[event.file] = {
+          events: backlog[event.file].concat([event])
+        });
+        if (event.type === "test") {
+          backlog[event.file].length = 3;
+        } else {
+          delete backlog[event.file];
+        }
+      } else if (event.type === "test") {
+        backlog[event.file].length = 3;
+      } else if (event.type === "exit") {
+        delete backlog[event.file];
+      } else if (event.type !== "eof") {
+        backlog[event.file].push(event);
+      } else if (event.type === "eof" && offset !== 2) {
+        process.stdout.write("\n");
+        process.exit(1);
+      }
+      _results = [];
+      while (queue.length && queue[0].events.length) {
+        event = queue[0].events.shift();
+        if (offset-- > 0) {
+          continue;
+        }
+        switch (event.type) {
+          case "bail":
+            _results.push(process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": Bail Out!\n"));
+            break;
+          case "test":
+            if (event.ok) {
+              _results.push(queue.shift());
+            } else {
+              _results.push(process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": " + event.message + "\n"));
+            }
+            break;
+          case "err":
+          case "out":
+            process.stdout.write("" + event.line + "\n");
+            _results.push(prefix = "");
+            break;
+          case "exit":
+            if (event.code) {
+              process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": exited with code " + event.code + "\n");
+              prefix = "\n\n";
+            }
+            _results.push(queue.shift());
+            break;
+          default:
+            _results.push(void 0);
+        }
+      }
+      return _results;
+    });
+  };
+})();
+
+parser = {
+  plan: function (plan) {
+    var expected, match;
+    if (match = /^1..(\d+)$/.exec(plan)) {
+      expected = match[1];
+    }
+    if (expected) {
+      expected = parseInt(expected, 10);
+    }
+    if (!isNaN(expected)) {
+      return {
+        expected: parseInt(match[1], 10)
+      };
+    }
+  },
+  bailout: function (bailout) {
+    var match, message;
+    if (match = /^Bail out!(?:\s+(.*))?$/.exec(bailout)) {
+      message = match[1];
+      return {
+        message: message
+      };
+    }
+  },
+  assertion: function (assert) {
+    var comment, failed, match, message, ok, skip, todo, _ref1, _ref2, _ref3;
+    if (match = /^(not\s+)?ok\s+\d+\s*(.*?)\s*$/.exec(assert)) {
+      _ref1 = match.slice(1), failed = _ref1[0], message = _ref1[1];
+      ok = !(failed != null);
+      _ref2 = [null, false, false], comment = _ref2[0], skip = _ref2[1], todo = _ref2[2];
+      if (message != null) {
+        _ref3 = message.split(/\s+#\s+/, 2), message = _ref3[0], comment = _ref3[1];
+        if (comment != null) {
+          if (skip = (match = /^skip\s(.*)$/i.exec(comment)) != null) {
+            comment = match[1];
+          }
+          if (todo = (match = /^todo\s(.*)$/i.exec(comment)) != null) {
+            comment = match[1];
+          }
+        }
+      }
+      return {
+        ok: ok,
+        message: message,
+        comment: comment,
+        skip: skip,
+        todo: todo
+      };
+    }
+  }
+};
+
+extend = function () {
+  var destination, key, source, sources, value, _i, _len;
+  destination = arguments[0], sources = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+  for (_i = 0, _len = sources.length; _i < _len; _i++) {
+    source = sources[_i];
+    for (key in source) {
+      value = source[key];
+      destination[key] = value;
+    }
+  }
+  return destination;
+};
+
+parse = function (stream, callback) {
+  var count, done, out, programs;
+  programs = {};
+  out = [""][0];
+  count = 0;
+  done = false;
+  stream.setEncoding("utf8");
+  stream.on("end", function () {
+    if (!done) {
+      return process.exit(1);
+    }
+  });
+  return stream.on("data", function (chunk) {
+    var code, event, expected, file, line, lines, match, program, rest, time, type, _i, _len, _ref1, _results;
+    out += chunk;
+    lines = out.split(/\n/);
+    out = lines.pop();
+    _results = [];
+    for (_i = 0, _len = lines.length; _i < _len; _i++) {
+      line = lines[_i];
+      count++;
+      if (!(match = /^(\d+)\s+(\w+)\s+([^\s]+)\s*(.*)$/.exec(line))) {
+        throw new Error("cannot parse line " + count);
+      }
+      _ref1 = match.slice(1), time = _ref1[0], type = _ref1[1], file = _ref1[2], rest = _ref1[3];
+      time = parseInt(time);
+      program = programs[file] || (programs[file] = {
+        passed: 0,
+        actual: 0
+      });
+      switch (type) {
+        case "test":
+          event = parser.assertion(rest);
+          program.actual++;
+          if (event.ok) {
+            program.passed++;
+          }
+          _results.push(callback(extend(event, program, {
+            time: time,
+            file: file,
+            type: type
+          })));
+          break;
+        case "run":
+          program.start = time;
+          _results.push(callback(extend(program, {
+            time: time,
+            type: type,
+            file: file
+          })));
+          break;
+        case "plan":
+          expected = parseInt(rest, 10);
+          _results.push(callback(extend(program, {
+            time: time,
+            file: file,
+            type: type,
+            expected: expected
+          })));
+          break;
+        case "bail":
+          event = parser.bailout(rest);
+          program.bailed = true;
+          _results.push(callback(extend(event, program, {
+            time: time,
+            file: file,
+            type: type
+          })));
+          break;
+        case "exit":
+          code = parseInt(rest, 10);
+          if (isNaN(code)) {
+            throw new Error("cannot read exit code " + code + " on line " + count);
+          }
+          _results.push(callback(extend({}, program, {
+            code: code,
+            file: file,
+            type: type,
+            time: time
+          })));
+          break;
+        case "err":
+        case "out":
+          _results.push(callback({
+            time: time,
+            type: type,
+            file: file,
+            line: rest
+          }));
+          break;
+        case "eof":
+          callback({
+            time: time,
+            type: type
+          });
+          _results.push(done = true);
+          break;
+        default:
+          throw new Error("unknown type " + type);
+      }
+    }
+    return _results;
+  });
+};
+
+run = function () {
+  var dirname, displayed, emit, execute, failures, i, key, next, parallel, program, programs, seen, value, _i, _j, _len, _results;
+  programs = argv;
+  parallel = {};
+  seen = {};
+  for (_i = 0, _len = programs.length; _i < _len; _i++) {
+    program = programs[_i];
+    if (seen[program]) {
+      throw new Error("programs cannot be run twice in a test run: " + program);
+    }
+    seen[program] = true;
+    if (/\s+/.test(program)) {
+      throw new Error("program names cannot contain spaces: " + program);
+    }
+    dirname = /^(.*)\/.*/.exec(program)[1];
+    parallel[dirname] || (parallel[dirname] = {
+      programs: [],
+      time: 0,
+      running: true
+    });
+    parallel[dirname].programs.push(program);
+  }
+  parallel = (function () {
+    var _results;
+    _results = [];
+    for (key in parallel) {
+      value = parallel[key];
+      _results.push(value);
+    }
+    return _results;
+  })();
+  failures = [];
+  displayed = 0;
+  emit = function (file, type, message) {
+    message = message != null ? " " + message : "";
+    type = ("" + type + "      ").slice(0, 4);
+    return process.stdout.write("" + (+new Date()) + " " + type + " " + file + message + "\n");
+  };
+  execute = function (program, index) {
+    var bailed, err, out, test;
+    emit(program, "run");
+    test = spawn(program);
+    bailed = false;
+    err = "";
+    test.stderr.setEncoding("utf8");
+    test.stderr.on("data", function (chunk) {
+      var line, lines, _j, _len1, _results;
+      err += chunk;
+      lines = err.split(/\n/);
+      err = lines.pop();
+      _results = [];
+      for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
+        line = lines[_j];
+        _results.push(emit(program, "err", line));
+      }
+      return _results;
+    });
+    out = "";
+    test.stdout.setEncoding("utf8");
+    test.stdout.on("data", function (chunk) {
+      var line, lines, plan, _j, _len1, _results;
+      out += chunk;
+      lines = out.split(/\n/);
+      out = lines.pop();
+      _results = [];
+      for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
+        line = lines[_j];
+        if (bailed) {
+          _results.push(emit(program, "out", line));
+        } else if (parser.assertion(line)) {
+          _results.push(emit(program, "test", line));
+        } else if (plan = parser.plan(line)) {
+          _results.push(emit(program, "plan", plan.expected));
+        } else if (parser.bailout(line)) {
+          _results.push(emit(program, "bail", line));
+        } else {
+          _results.push(emit(program, "out", line));
+        }
+      }
+      return _results;
+    });
+    return test.on("exit", function (code) {
+      var time;
+      emit(program, "exit", code);
+      parallel[index].time = time = 0;
+      if (parallel[index].programs.length) {
+        return execute(parallel[index].programs.shift(), index);
+      } else if (next < parallel.length) {
+        parallel[index].running = false;
+        if (displayed === index) {
+          displayed = next + 1;
+        }
+        index = next++;
+        return execute(parallel[index].programs.shift(), index);
+      } else {
+        return emit("*", "eof");
+      }
+    });
+  };
+  next = options.processes || 1;
+  _results = [];
+  for (i = _j = 0; 0 <= next ? _j < next : _j > next; i = 0 <= next ? ++_j : --_j) {
+    if (parallel[i]) {
+      _results.push(execute(parallel[i].programs.shift(), i));
+    } else {
+      _results.push(void 0);
+    }
+  }
+  return _results;
+};
+
+create = function () {
+  var argument, async, directory, executable, file, harness, harnessFile, inspect, isHarness, name, output, plan, resolvedHarness, signature, _i, _j, _len, _len1, _ref1;
+  signature = [];
+  plan = 0;
+  async = "";
+  harness = "./proof";
+  for (_i = 0, _len = argv.length; _i < _len; _i++) {
+    argument = argv[_i];
+    if (argument === "_") {
+      async = ", _";
+    } else if (/^t(?:est)?\//.test(argument)) {
+      name = argument;
+    } else if (/^\./.test(argument)) {
+      harness = argument;
+    } else if (/^\d+/.test(argument)) {
+      plan = parseInt(argument, 10);
+    } else {
+      signature.push(argument);
+    }
+  }
+  try {
+    if (fs.statSync(name)) {
+      die("test file already exists: " + name);
+    }
+  } catch (e) {
+    if (e.code !== "ENOENT") {
+      throw e;
+    }
+  }
+  directory = path.dirname(name);
+  file = path.basename(name);
+  isHarness = new RegExp("^" + (path.basename(harness)));
+  _ref1 = fs.readdirSync(path.resolve(directory, path.dirname(harness)));
+  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+    harnessFile = _ref1[_j];
+    if (isHarness.test(harnessFile)) {
+      resolvedHarness = harnessFile;
+      break;
+    }
+  }
+  if (!resolvedHarness) {
+    die("cannot find harness " + harness);
+  }
+  executable = async || path.extname(resolvedHarness)[0] === "_" ? "_coffee" : "coffee";
+  fs.writeFileSync(name, "#!/usr/bin/env " + executable + "\nrequire(\"" + harness + "\") 0, (context) ->\n  process.stdout.write JSON.stringify Object.keys context\n  process.stdout.write \"\\n\"\n", "utf8");
+  fs.chmodSync(name, 0x1ed);
+  output = "";
+  inspect = spawn(name);
+  inspect.stderr.setEncoding("utf8");
+  inspect.stderr.on("data", function (chunk) {
+    return process.stdout.write(chunk);
+  });
+  inspect.stdout.setEncoding("utf8");
+  inspect.stdout.on("data", function (chunk) {
+    return output += chunk;
+  });
+  return inspect.on("exit", function (code) {
+    var arg, missing, _k, _len2;
+    fs.unlinkSync(name);
+    if (code !== 0) {
+      say(output);
+      die("cannot generate inspection program");
+    }
+    json = JSON.parse(output.split(/\n/)[1]);
+    missing = [];
+    for (_k = 0, _len2 = signature.length; _k < _len2; _k++) {
+      arg = signature[_k];
+      if (json.indexOf(arg) === -1) {
+        missing.push(arg);
+      }
+    }
+    if (missing.length) {
+      die("harness does not provide " + (missing.join(", ")) + "\ntry: " + (json.join(", ")));
+    }
+    fs.writeFileSync(name, "#!/usr/bin/env " + executable + "\nrequire(\"" + harness + "\") " + plan + ", ({ " + (signature.join(", ")) + " }" + async + ") ->\n\n  # Here be dragons.\n", "utf8");
+    return fs.chmodSync(name, 0x1ed);
+  });
+};
+
+// Verbose usage specific to each action.
+options = {
+  create: "usage: proof create [test] [harness] [<parameter>...] [_] [count]\n\ntest:\n  Name of the test.\nharness:\n  Name and path to test harness relative to test file. By default the\n  generator will look for a source file with a base name of `./proof`\n  relative to the test file. The file is expected to have an extension of\n  one of the Proof supported languages, either `.coffee`, `._coffee`, `.js`\n  or `._js`.\nparameter:\n  One or more parameters to extract from the test context.\n_:\n  Test is a Streamline.js test, so pass in an underscore.\nexpected:\n  The number of tests expected.",
+  json: "usage: proof json [<test>...]",
+  errors: "usage: proof progress [<test>...]",
+  progress: "usage: proof progress [<test>...]\n\noptions:\n  -d,   --digits    [count]     number of timing digits to display \n  -w,   --width     [count]     width in characters of progress display",
+  run: "usage: proof run [options] [<test>...]\n\noptions:\n  -p,   --processes [count]     number of processes to run"
+};
+
+argv = process.argv.slice(2);
+
+// Choose an option based on an action name.
+if (opts = options[argv[0]]) {
+  (function () {
+    var action, usage, _ref1;
+    action = argv.shift();
+    // If we can't figure out what the user wants, we print usage and die.
+    usage = function () {
+      console.log(opts);
+      return process.exit(1);
+    };
+    // Extract the action specific options from the command line arguments. We
+    // parse our usage text to get our long and short option names.
+    _ref1 = (function () {
+      // Options, option names.
+      var conv, converter, flag, full, length, long, match, name, opt, param, short, _i, _len, _ref1, _ref2, _ref3;
+      _ref1 = [{}, {}, {}], options = _ref1[0], flag = _ref1[1], full = _ref1[2];
+      // Map option descriptions to conversion functions. We use the arity of
+      // the conversion function to determine if an option takes a parameter.
+      converter = {
+        count: function (name, next) {
+          return !isNaN(this[name] = parseInt(next, 10));
+        },
+        path: function (name, next) {
+          return this[name] = next;
+        },
+        none: function (name) {
+          return (this[name] = !this[name]) != null;
+        }
+      };
+      // Split out usage text and grep for long and short option names. Create a
+      // few maps of names to converters.
+      _ref2 = opts.split(/\n/);
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        opt = _ref2[_i];
+        if (match = /\s*(?:(-\w),)?\s*(--\w+)\s*(?:\[([^\]]+)\])?/.exec(opt)) {
+          _ref3 = match.slice(1), short = _ref3[0], long = _ref3[1], param = _ref3[2];
+          flag[short] = flag[long] = converter[param];
+          full[short] = long;
+        }
+      }
+      // Pull options off the front of argv. Convert the option parameter, if it
+      // takes a parameter.
+      while (conv = flag[argv[0]]) {
+        name = argv.shift();
+        name = (full[name] || name).substring(2);
+        length = conv.length - 1;
+        if (argv.length < length) {
+          usage();
+        }
+        if (!conv.apply(options, [name].concat(argv.splice(0, length)))) {
+          usage();
+        }
+      }
+      // Return the options and the remaining arguments.
+      return [options, argv];
+    })(), options = _ref1[0], argv = _ref1[1];
+    return {
+      create: create,
+      piped: piped,
+      json: json,
+      run: run,
+      progress: progress,
+      errors: errors
+    }[action]();
+  })();
+} else {
+  (function () {
+    var executable, found, parts;
+    path = require("path");
+    if (argv.length && !/[-.\/]/.test(argv[0])) {
+      executable = "proof-" + (argv.shift());
+    } else {
+      executable = "proof-default";
+    }
+    parts = process.env.PATH.split(process.platform === "win32" ? ";" : ":");
+    found = function (error, stat) {
+      var child;
+      if (error) {
+        if (error.code !== "ENOENT") {
+          throw error;
+        }
+        parts.shift();
+        if (parts.length) {
+          return fs.stat(path.resolve(parts[0], executable), found);
+        } else {
+          throw new Error("Cannot find executable " + executable + ".");
+        }
+      } else {
+        child = spawn(path.resolve(parts[0], executable), argv);
+        process.stdin.resume();
+        process.stdin.on("data", function (buffer) {
+          return child.stdin.write(buffer);
+        });
+        child.stdout.on("data", function (buffer) {
+          return process.stdout.write(buffer);
+        });
+        child.stderr.on("data", function (buffer) {
+          return process.stderr.write(buffer);
+        });
+        return child.on("exit", function (code) {
+          return process.exit(code);
+        });
+      }
+    };
+    return fs.stat(path.resolve(parts[0], executable), found);
+  })();
+}
