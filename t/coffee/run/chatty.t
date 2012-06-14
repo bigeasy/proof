@@ -1,6 +1,6 @@
 #!/usr/bin/env coffee
 
-test = require "../../lib/proof"
+test = require "../../../lib/proof"
 
 test 1, ->
   console.error "Test initated. Initial status go."

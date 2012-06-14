@@ -1,5 +1,5 @@
 #!/usr/bin/env _coffee
-require("../../lib/proof") 1, (_) ->
+require("../../../lib/proof") 1, (_) ->
   fs = require "fs"
   {exec} = require "child_process"
 
