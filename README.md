@@ -630,27 +630,36 @@ suit your project's needs.
 
 Changes for each release.
 
-### Release X &mdash; 
+### Version 0.0.5
 
- * Exiting with a non-zero exit code from `proof errors` if errors are detected.
-   #25.
+ * Extracting context into callback parameters. #14.
+ * Step-like asynchronous flow utility. #14.
+ * Pipeline scaffolding. #18.
+ * Build CoffeeScript with Makefile. #32.
+ * `proof-errors` non-zero exit. #34.
+ * `UNTIDY` alias for `PROOF_NO_CLEANUP`. #29.
 
-### Release 0.0.4 &mdash; May 12th, 2012
+### Version 0.0.4 - Sun May 13 19:43:30 UTC 2012
 
  * Showing standard error and standard output prior to a failed test or a bail
    out in failed assertions display. #24.
 
-### Release 0.0.3 &mdash; May 12th, 2012
-
+### Version 0.0.3 - Sun May 13 17:24:09 UTC 2012
+ 
+ * `proof errors` displays bail outs. #20.
  * Created `proof errors` to display the failed assertions of a failed test run.
    #5.
+ * Fail on when passed tests exceed expected tests. #6.
  * Correctly reporting tests that fail before they start, like failure to
    compile. #8.
  * Set width of progress display using `--width` option. #19.
  * Set width of progress timing display using `--digits` option. #16.
  * Fixed spelling in documentation and comments, cleanup documentation. #10. #9.
-
-### Release 0.0.2 &mdash; May 9th, 2012
+ * Abend when test is specified twice in a run. #4.
+ * Spell check `README.md`.
+ 
+### Version 0.0.2 - Wed May  9 03:52:57 UTC 2012
 
  * Correctly summing assertions. #13.
  * Failed assertions no longer repeat message. #11.
+ * Initial release.
