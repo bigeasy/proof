@@ -3,7 +3,7 @@ fs      = require "fs"
 {exec}  = require "child_process"
 module.exports = require("../../../lib/proof") (_) ->
   tmp = "#{__dirname}/tmp"
-  @cleanup _, (_) ->
+  @cleanup_ _, (_) ->
     try
       fs.unlink "#{tmp}/#{file}", _ for file in fs.readdir tmp, _
       fs.rmdir tmp, _

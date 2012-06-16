@@ -5,7 +5,7 @@ require("../../../lib/proof") 1, (_) ->
 
   program = "#{__dirname}/example.sh"
 
-  @cleanup _, (_) ->
+  @cleanup_ _, (_) ->
     try
       fs.unlink program, _
     catch e
