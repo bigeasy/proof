@@ -632,6 +632,11 @@ Changes for each release.
 
 ### Version 0.0.5
 
+ * Exit non-zero if actual does not equal expxected. #46.
+ * Hide `Test` private members. #45.
+ * Using JavaScript flows everywhere. #44. #43. #41. #40.
+ * Orgnaize tests by language. #42.
+ * Convert to JavaScript. #37.
  * Extracting context into callback parameters. #14.
  * Step-like asynchronous flow utility. #14.
  * Pipeline scaffolding. #18.
