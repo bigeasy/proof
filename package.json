@@ -1,12 +1,17 @@
 {   "name":             "proof"
 ,   "description":      "A UNIX way test non-framework for the lazy programmer."
-,   "keywords":         [ "test", "unit", "tap" ]
-,   "version":          "0.0.4"
-,   "author":           "Alan Gutierrez"
+,   "keywords":         [ "test", "unit", "tap", "assert", "tdd" ]
+,   "version":          "0.0.5"
+,   "author":           "Alan Gutierrez <alan@prettyrobots.com>"
 ,   "directories":      { "lib" : "./lib" }
+,   "repository":       "https://github.com/bigeasy/proof"
+,   "homepage":         "https://github.com/bigeasy/proof"
 ,   "devDependencies":  { "coffee-script": ">=1.1.3" }
 ,   "scripts" :
     { "test": "(bin/proof run t/*/*/*.t | tee .proof.out | bin/proof progress) || (bin/proof errors < .proof.out)" }
 ,   "main":             "./lib/proof"
-,   "bin":              { "proof": "./bin/proof" }
+,   "bin":              { "proof": "./bin/proof"
+                        , "proof-getopt": "./bin/proof-getopt"
+                        , "proof-default": "./bin/proof-default"
+                        }
 }
