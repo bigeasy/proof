@@ -630,7 +630,7 @@ suit your project's needs.
 
 Changes for each release.
 
-### Version 0.0.5
+### Version 0.0.5 - Sat Jun 16 10:01:21 UTC 2012
 
  * Exit non-zero if actual does not equal expxected. #46.
  * Hide `Test` private members. #45.
