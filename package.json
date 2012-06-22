@@ -8,7 +8,7 @@
 ,   "homepage":         "https://github.com/bigeasy/proof"
 ,   "devDependencies":  { "coffee-script": ">=1.1.3" }
 ,   "scripts" :
-    { "test": "(bin/proof run t/*/*/*.t | tee .proof.out | bin/proof progress) || (bin/proof errors < .proof.out)" }
+    { "test": "(bin/proof run t/*/*.t t/*/*/*.t | tee .proof.out | bin/proof progress) || (bin/proof errors < .proof.out)" }
 ,   "main":             "./lib/proof"
 ,   "bin":              { "proof": "./bin/proof"
                         , "proof-getopt": "./bin/proof-getopt"
