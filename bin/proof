@@ -588,6 +588,7 @@ parse = function (stream, callback) {
 };
 
 run = function () {
+  options.processes || (options.processes = [1]);
   var dirname, displayed, emit, execute, failures, i, key, next, parallel, program, programs, seen, value, _i, _j, _len, _results;
   programs = argv;
   parallel = {};
@@ -690,7 +691,7 @@ run = function () {
       }
     });
   };
-  next = options.processes[0] || 1;
+  next = options.processes[0];
   _results = [];
   for (i = _j = 0; 0 <= next ? _j < next : _j > next; i = 0 <= next ? ++_j : --_j) {
     if (parallel[i]) {
@@ -792,7 +793,7 @@ options =
 argv = process.argv.slice(2);
 
 // Choose an option based on an action name.
-if (opts = options[argv[0]]) {
+if ((opts = options[argv[0]]) != null) {
   (function () {
     action = argv.shift();
     options = getopt(opts, argv);
