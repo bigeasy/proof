@@ -828,17 +828,7 @@ if ((opts = options[argv[0]]) != null) {
           abend("cannot find executable: " + executable);
         }
       } else {
-        child = spawn(path.resolve(parts[0], executable), argv);
-        process.stdin.resume();
-        process.stdin.on("data", function (buffer) {
-          return child.stdin.write(buffer);
-        });
-        child.stdout.on("data", function (buffer) {
-          return process.stdout.write(buffer);
-        });
-        child.stderr.on("data", function (buffer) {
-          return process.stderr.write(buffer);
-        });
+        child = spawn(path.resolve(parts[0], executable), argv, { customFds: [ 0, 1, 2 ] });
         return child.on("exit", function (code) {
           return process.exit(code);
         });
