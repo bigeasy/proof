@@ -1,12 +1,94 @@
 #!/usr/bin/env node
 
-var argv, blue, create, die, errors, extend, fs, gray, green, json, options,
-    opts, parse, parser, path, piped, progress, red, run, say, spawn, _ref;
+/*
+usage: proof create [test] [harness] [<parameter>...] [_] [count]
+
+test:
+  Name of the test.
+harness:
+  Name and path to test harness relative to test file. By default the
+  generator will look for a source file with a base name of `./proof`
+  relative to the test file. The file is expected to have an extension of
+  one of the Proof supported languages, either `.coffee`, `._coffee`, `.js`
+  or `._js`.
+parameter:
+  One or more parameters to extract from the test context.
+_:
+  Test is a Streamline.js test, so pass in an underscore.
+expected:
+  The number of tests expected.
+--
+usage: proof json [<test>...]
+---
+usage: proof progress [<test>...]
+
+    -d,   --digits    [count]     number of timing digits to display
+    -w,   --width     [count]     width in characters of progress display
+---
+usage: proof run [options] [<test>...]
+
+    -p,   --processes [count]     number of processes to run
+---
+*/
+
+var action, argv, blue, create, die, errors, extend, fs, gray, green, json, options,
+    opts, parse, parser, path, progress, red, run, say, spawn, _ref, overwrite;
 
 var fs = require("fs")
   , path = require("path")
   , spawn = require("child_process").spawn
-  , __slice = [].slice;
+  , __slice = [].slice
+  ;
+
+function usage () {
+  var lines, i, I;
+  lines = fs.readFileSync(__filename, "utf8").split(/\n/).slice(3);
+  lines = lines.slice(0, lines.indexOf("*/"));
+  for (i = 0, I = lines.length; i < I; i++) {
+    if (!lines[i].indexOf("usage: proof " + action)) {
+      break;
+    }
+  }
+  lines = lines.slice(i);
+  lines = lines.slice(0, lines.indexOf("---"));
+  console.log(lines.join("\n"));
+  console.log("");
+}
+
+function abend (message, use) {
+  if (overwrite) console.log("");
+  console.error("error: " + message);
+  if (use) usage();
+  process.exit(1);
+}
+
+function getopt (pat, argv) {
+  var opts = {}, arg, i = 0, $, arg, opt, l, alts;
+  while (!(i >= argv.length || (argv[i] == "-" && argv.shift()) || !/^--?[^-]/.test(argv[i]))) {
+    arg = argv.shift();
+    arg = /^(--[^=]+)=(.*)$/.exec(arg) || /^(-[^-])(.+)$/.exec(arg) || [false, arg, true];
+    alts = pat.replace(arg[1], "").replace(/-[^,],--[^|]+\|/g, '').split("|");
+    if ((l = alts.length - 1) != 1) abend((l ? "ambiguous: " : "unknown option: ") + arg[1], true);
+    opt = (arg[1] + /,([^:]*)/.exec(alts[0])[1]).replace(/^(-[^-]+)?--/, '');
+    if (($ = /(:+)$/.exec(alts[0]))) {
+      if (!opts[opt]) opts[opt] = [];
+      if ($[1].length == 1 || (argv.length && argv[0][0] != "-")) {
+        if (!arg[0]) {
+          if (!argv.length) abend("missing argument for: " + (arg[1][1] != "-" ? arg[1] : "--" + opt), true);
+          arg[2] = argv.shift();
+        } 
+      }
+    } else if (arg[0]) {
+      if (arg[1][1] != "-") {
+        argv.unshift("-" + arg[2]);
+      } else {
+        abend("option does not take value: " + (arg[1][1] != "-" ? arg[1] : "--" + opt), true);
+      }
+    } 
+    opts[opt].push(arg[2]);
+  }
+  return opts;
+}
 
 function say () {
   var splat;
@@ -86,7 +168,7 @@ progress = (function () {
       str = ("000" + str).slice(-4);
     }
     str = ("      " + str).replace(/(\d{3})$/, ".$1");
-    return str.slice(-(options.digits + 1));
+    return str.slice(-(options.digits[0] + 1));
   };
   // Update our progress bar. The `terminal` parameter is either `\n` if we're
   // done displaying the progress for this test, or `\r` to reset the cursor for
@@ -103,21 +185,21 @@ progress = (function () {
     // Format summary.
     summary = "(" + program.passed + "/" + program.expected + ") " + (time(program));
     color = program.color, icon = program.icon, file = program.file, status = program.status;
-    dots = fill(".", options.width - 6 - file.length - summary.length - status.length);
+    dots = fill(".", options.width[0] - 6 - file.length - summary.length - status.length);
     return " " + (color(icon)) + " " + file + " " + dots + " " + summary + " " + (color(status)) + terminal;
   };
   return function () {
     var displayed, durations, programs;
     // Default witdth.
-    options.width || (options.width = 76);
+    options.width || (options.width = [76]);
     // Default timing digits, or a reaonable amount if the user is being
     // unreasonable.
-    options.digits || (options.digits = 4);
-    if (options.digits < 4) {
-      options.digits = 4;
+    options.digits || (options.digits = [4]);
+    if (options.digits[0] < 4) {
+      options.digits[0] = 4;
     }
-    if (options.digits > 10) {
-      options.digits = 10;
+    if (options.digits[0] > 10) {
+      options.digits[0] = 10;
     }
     // Consume test output from standard input.
     process.stdin.resume();
@@ -192,8 +274,9 @@ progress = (function () {
         // Format summary.
         stats = "(" + summary.passed + "/" + summary.expected + ") " + (time(summary));
         color = summary.color, icon = summary.icon, file = summary.file, status = summary.status;
-        dots = fill(" ", options.width - 6 - summary.file.length - stats.length - status.length);
+        dots = fill(" ", options.width[0] - 6 - summary.file.length - stats.length - status.length);
         process.stdout.write(" " + (color(' ')) + " " + dots + " " + file + " " + stats + " " + (color(status)) + "\n");
+        overwrite = false;
         if (summary.passed !== summary.expected) {
           return process.exit(1);
         }
@@ -206,7 +289,8 @@ progress = (function () {
           case "test":
             extend(programs[event.file], event);
             if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] !== "true") {
-              return process.stdout.write(bar(programs[event.file], "\r"));
+              overwrite = true;
+              process.stdout.write(bar(programs[event.file], "\r"));
             }
             break;
           case "bail":
@@ -219,7 +303,8 @@ progress = (function () {
               displayed = null;
             }
             program = extend(programs[event.file], event);
-            return process.stdout.write(bar(program, "\n"));
+            overwrite = false;
+            process.stdout.write(bar(program, "\n"));
         }
       }
     });
@@ -419,7 +504,7 @@ parse = function (stream, callback) {
       line = lines[_i];
       count++;
       if (!(match = /^(\d+)\s+(\w+)\s+([^\s]+)\s*(.*)$/.exec(line))) {
-        throw new Error("cannot parse line " + count);
+        abend("cannot parse runner output at line " + count + ": invalid syntax");
       }
       _ref1 = match.slice(1), time = _ref1[0], type = _ref1[1], file = _ref1[2], rest = _ref1[3];
       time = parseInt(time);
@@ -469,7 +554,7 @@ parse = function (stream, callback) {
         case "exit":
           code = parseInt(rest, 10);
           if (isNaN(code)) {
-            throw new Error("cannot read exit code " + code + " on line " + count);
+            abend("cannot parse runner test exit code at line " + count + ": exit code " + rest);
           }
           _results.push(callback(extend({}, program, {
             code: code,
@@ -495,7 +580,7 @@ parse = function (stream, callback) {
           _results.push(done = true);
           break;
         default:
-          throw new Error("unknown type " + type);
+          abend("cannot parse runner output at line " + count + ": unknown line type " + type);
       }
     }
     return _results;
@@ -503,6 +588,7 @@ parse = function (stream, callback) {
 };
 
 run = function () {
+  options.processes || (options.processes = [1]);
   var dirname, displayed, emit, execute, failures, i, key, next, parallel, program, programs, seen, value, _i, _j, _len, _results;
   programs = argv;
   parallel = {};
@@ -510,11 +596,11 @@ run = function () {
   for (_i = 0, _len = programs.length; _i < _len; _i++) {
     program = programs[_i];
     if (seen[program]) {
-      throw new Error("programs cannot be run twice in a test run: " + program);
+      abend("a program must only run once in a test run: " + program);
     }
     seen[program] = true;
     if (/\s+/.test(program)) {
-      throw new Error("program names cannot contain spaces: " + program);
+      abend("program names cannot contain spaces: " + program);
     }
     dirname = /^(.*)\/.*/.exec(program)[1];
     parallel[dirname] || (parallel[dirname] = {
@@ -535,10 +621,14 @@ run = function () {
   })();
   failures = [];
   displayed = 0;
+  // Happens often enough that we shouldn't freak out.
+  process.stdout.on("error", function (error) {
+    if (error.code == "EPIPE")  process.exit(1);
+  });
   emit = function (file, type, message) {
     message = message != null ? " " + message : "";
     type = ("" + type + "      ").slice(0, 4);
-    return process.stdout.write("" + (+new Date()) + " " + type + " " + file + message + "\n");
+    process.stdout.write("" + (+new Date()) + " " + type + " " + file + message + "\n");
   };
   execute = function (program, index) {
     var bailed, err, out, test;
@@ -601,7 +691,7 @@ run = function () {
       }
     });
   };
-  next = options.processes || 1;
+  next = options.processes[0];
   _results = [];
   for (i = _j = 0; 0 <= next ? _j < next : _j > next; i = 0 <= next ? ++_j : --_j) {
     if (parallel[i]) {
@@ -692,76 +782,23 @@ create = function () {
   });
 };
 
-// Verbose usage specific to each action.
-options = {
-  create: "usage: proof create [test] [harness] [<parameter>...] [_] [count]\n\ntest:\n  Name of the test.\nharness:\n  Name and path to test harness relative to test file. By default the\n  generator will look for a source file with a base name of `./proof`\n  relative to the test file. The file is expected to have an extension of\n  one of the Proof supported languages, either `.coffee`, `._coffee`, `.js`\n  or `._js`.\nparameter:\n  One or more parameters to extract from the test context.\n_:\n  Test is a Streamline.js test, so pass in an underscore.\nexpected:\n  The number of tests expected.",
-  json: "usage: proof json [<test>...]",
-  errors: "usage: proof progress [<test>...]",
-  progress: "usage: proof progress [<test>...]\n\noptions:\n  -d,   --digits    [count]     number of timing digits to display \n  -w,   --width     [count]     width in characters of progress display",
-  run: "usage: proof run [options] [<test>...]\n\noptions:\n  -p,   --processes [count]     number of processes to run"
+// Options for our getopt like options parser.
+options =
+{ json: ""
+, progress: "-d,--digits:|-w,--width:|"
+, run: "-p,--processes:|"
+, errors: ""
 };
 
 argv = process.argv.slice(2);
 
 // Choose an option based on an action name.
-if (opts = options[argv[0]]) {
+if ((opts = options[argv[0]]) != null) {
   (function () {
-    var action, usage, _ref1;
     action = argv.shift();
-    // If we can't figure out what the user wants, we print usage and die.
-    usage = function () {
-      console.log(opts);
-      return process.exit(1);
-    };
-    // Extract the action specific options from the command line arguments. We
-    // parse our usage text to get our long and short option names.
-    _ref1 = (function () {
-      // Options, option names.
-      var conv, converter, flag, full, length, long, match, name, opt, param, short, _i, _len, _ref1, _ref2, _ref3;
-      _ref1 = [{}, {}, {}], options = _ref1[0], flag = _ref1[1], full = _ref1[2];
-      // Map option descriptions to conversion functions. We use the arity of
-      // the conversion function to determine if an option takes a parameter.
-      converter = {
-        count: function (name, next) {
-          return !isNaN(this[name] = parseInt(next, 10));
-        },
-        path: function (name, next) {
-          return this[name] = next;
-        },
-        none: function (name) {
-          return (this[name] = !this[name]) != null;
-        }
-      };
-      // Split out usage text and grep for long and short option names. Create a
-      // few maps of names to converters.
-      _ref2 = opts.split(/\n/);
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        opt = _ref2[_i];
-        if (match = /\s*(?:(-\w),)?\s*(--\w+)\s*(?:\[([^\]]+)\])?/.exec(opt)) {
-          _ref3 = match.slice(1), short = _ref3[0], long = _ref3[1], param = _ref3[2];
-          flag[short] = flag[long] = converter[param];
-          full[short] = long;
-        }
-      }
-      // Pull options off the front of argv. Convert the option parameter, if it
-      // takes a parameter.
-      while (conv = flag[argv[0]]) {
-        name = argv.shift();
-        name = (full[name] || name).substring(2);
-        length = conv.length - 1;
-        if (argv.length < length) {
-          usage();
-        }
-        if (!conv.apply(options, [name].concat(argv.splice(0, length)))) {
-          usage();
-        }
-      }
-      // Return the options and the remaining arguments.
-      return [options, argv];
-    })(), options = _ref1[0], argv = _ref1[1];
+    options = getopt(opts, argv);
     return {
       create: create,
-      piped: piped,
       json: json,
       run: run,
       progress: progress,
@@ -788,20 +825,10 @@ if (opts = options[argv[0]]) {
         if (parts.length) {
           return fs.stat(path.resolve(parts[0], executable), found);
         } else {
-          throw new Error("Cannot find executable " + executable + ".");
+          abend("cannot find executable: " + executable);
         }
       } else {
-        child = spawn(path.resolve(parts[0], executable), argv);
-        process.stdin.resume();
-        process.stdin.on("data", function (buffer) {
-          return child.stdin.write(buffer);
-        });
-        child.stdout.on("data", function (buffer) {
-          return process.stdout.write(buffer);
-        });
-        child.stderr.on("data", function (buffer) {
-          return process.stderr.write(buffer);
-        });
+        child = spawn(path.resolve(parts[0], executable), argv, { customFds: [ 0, 1, 2 ] });
         return child.on("exit", function (code) {
           return process.exit(code);
         });
