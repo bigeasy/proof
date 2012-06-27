@@ -167,8 +167,13 @@ progress = (function () {
     if (str.length < 4) {
       str = ("000" + str).slice(-4);
     }
-    str = ("      " + str).replace(/(\d{3})$/, ".$1");
-    return str.slice(-(options.digits[0] + 1));
+    str = str.replace(/(\d{3})$/, ".$1");
+    var fit = ("        " + str).slice(-(+options.digits[0] + 1));
+    if (fit.length < str.length) {
+      options.digits[0] = str.length - 1;
+      return str;
+    }
+    return fit;
   };
   // Update our progress bar. The `terminal` parameter is either `\n` if we're
   // done displaying the progress for this test, or `\r` to reset the cursor for
