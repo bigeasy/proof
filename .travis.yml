@@ -13,5 +13,5 @@ branches:
 # build output.
 
 before_install:
-  - npm install coffee-script streamline
+  - npm install
   - make
