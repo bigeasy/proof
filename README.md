@@ -630,6 +630,17 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.6 - Wed Jun 27 17:08:41 UTC 2012
+
+ * Added `TIMELESS` environment variable switch to disable timeouts. #60.
+ * Fix named callbacks. #57.
+ * Ensure that step finished before next step begins when generated callback is
+   called. #50.
+ * Restore animation through inherited stdio. #38.
+ * `getopt` like option parser. #49.
+ * Nicer error messages. #17.
+ * Named cleanup functions. #48.
+
 ### Version 0.0.5 - Sat Jun 16 10:01:21 UTC 2012
 
  * Exit non-zero if actual does not equal expxected. #46.
@@ -637,7 +648,7 @@ Changes for each release.
  * Using JavaScript flows everywhere. #44. #43. #41. #40.
  * Orgnaize tests by language. #42.
  * Convert to JavaScript. #37.
- * Extracting context into callback parameters. #14.
+ * Extracting context into callback parameters. #39.
  * Step-like asynchronous flow utility. #14.
  * Pipeline scaffolding. #18.
  * Build CoffeeScript with Makefile. #32.
