@@ -6,6 +6,7 @@
 ,   "directories":      { "lib" : "./lib" }
 ,   "repository":       "https://github.com/bigeasy/proof"
 ,   "homepage":         "https://github.com/bigeasy/proof"
+,   "dependencies":     {}
 ,   "devDependencies":  { "coffee-script": ">=1.1.3", "streamline": "~0.3.0" }
 ,   "scripts" :
     { "test": "(bin/proof run t/*/*.t t/*/*/*.t | tee .proof.out | bin/proof progress) || (bin/proof errors < .proof.out)" }
