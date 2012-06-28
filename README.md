@@ -630,6 +630,13 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.7 - Wed Jun 27 18:22:41 UTC 2012
+
+ * Fixed `this` binding error in `bailout`. #68.
+ * Development dependencies in `pacakage.json` only. #66.
+ * Populated `.npmignore`. #67.
+ * Increase digit width to fit. #26.
+
 ### Version 0.0.6 - Wed Jun 27 17:08:41 UTC 2012
 
  * Added `TIMELESS` environment variable switch to disable timeouts. #60.
