@@ -678,21 +678,39 @@ run = function () {
       }
       return _results;
     });
-    return test.on("exit", function (code) {
-      var time;
-      emit(program, "exit", code);
-      parallel[index].time = time = 0;
-      if (parallel[index].programs.length) {
-        return execute(parallel[index].programs.shift(), index);
-      } else if (next < parallel.length) {
-        parallel[index].running = false;
-        if (displayed === index) {
-          displayed = next + 1;
+    test.on("exit", function (code) {
+      var count = 1;
+
+      if (test.stdout.readable) {
+        count++;
+        test.stdout.once("end", exit);
+      }
+
+      if (test.stderr.readable) {
+        count++;
+        test.stderr.once("end", exit);
+      }
+
+      exit();
+
+      function exit () {
+        var time;
+        if (--count == 0) {
+          emit(program, "exit", code);
+          parallel[index].time = time = 0;
+          if (parallel[index].programs.length) {
+            execute(parallel[index].programs.shift(), index);
+          } else if (next < parallel.length) {
+            parallel[index].running = false;
+            if (displayed === index) {
+              displayed = next + 1;
+            }
+            index = next++;
+            execute(parallel[index].programs.shift(), index);
+          } else {
+            emit("*", "eof");
+          }
         }
-        index = next++;
-        return execute(parallel[index].programs.shift(), index);
-      } else {
-        return emit("*", "eof");
       }
     });
   };
