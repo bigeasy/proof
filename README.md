@@ -630,6 +630,10 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.8 - Thu Jun 28 21:05:46 UTC 2012
+
+ * Wait on pending output before exit. #72.
+
 ### Version 0.0.7 - Wed Jun 27 18:22:41 UTC 2012
 
  * Fixed `this` binding error in `bailout`. #68.
