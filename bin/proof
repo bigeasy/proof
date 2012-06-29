@@ -925,7 +925,7 @@ if ((opts = options[argv[0]]) != null) {
   (function () {
     action = argv.shift();
     options = getopt(opts, argv);
-    if (options.help[0]) abend(0, true);
+    if (options.help && options.help[0]) abend(0, true);
     return {
       create: create,
       json: json,
