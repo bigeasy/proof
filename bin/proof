@@ -19,15 +19,105 @@ expected:
   The number of tests expected.
 --
 usage: proof json [<test>...]
+
+  Display proof output as JSON.
+
+options:
+
+    -h,   --help                  display this usage information
+
+invocation:
+
+  If no proof runner output files are given, the JSON formatter listens
+  for proof runner output on STDIN.
+
+  `proof json` exits successfully, with an exit code of zero, regardless
+  of failures in the proof runner output. It exists with a non-zero exit
+  code only if it cannot parse the test runner output.
+
+description:
+
+  `proof json` converts proof unified test output into a JSON string for
+  use with JavaScript utilities of your own creation; Node.js command
+  line utilities or web applications.
 ---
-usage: proof progress [<test>...]
+usage: proof progress [options] [<files>...]
+
+  Display proof output using a colorized progress meter.
+
+options:
 
     -d,   --digits    [count]     number of timing digits to display
+    -h,   --help                  display this usage information
+    -M,   --monochrome            do not display color
     -w,   --width     [count]     width in characters of progress display
+
+invocation:
+
+  If no proof runner output files are given, the progress meter listen
+  for proof runner output on STDIN.
+
+  If there are no errors, `proof progress` exits with a zero exit code,
+  otherwise it returns a non-zero exit code.
+
+description:
+
+  `proof progress` displays a colorful, animated report of test
+  progress. Output from `proof run` can be piped to `proof progress` to
+  display the progress of a test run as it is running. Using a utility
+  like `tee`, you can both pipe `proof run` output to `proof progress`
+  and save it to file for later reporting.
 ---
 usage: proof run [options] [<test>...]
 
+  Run test programs and emit unified runner output.
+
+options:
+
+    -h,   --help                  display this usage information
     -p,   --processes [count]     number of processes to run
+
+invocation:
+
+  Runs zero or more tests emitting unified test output.
+
+  `proof run` exits successfully, with an exit code of zero, regardless
+  of test failures or abnormal exits.
+
+description:
+
+  The `proof run` runs zero or more test programs, gathering their
+  output and emitting unified test output to STDOUT. It does not perform
+  an error reporting itself. 
+
+  The test programs must emit valid Perl Test::Harness output.
+
+  The output can be saved to file or piped back into proof with one of
+  the other proof commands to report progress or emit alternate formats.
+---
+usage: proof errors [options] [<test>...]
+
+  Display output of failed assertions.
+
+options:
+
+    -h,   --help                  display this usage information
+    -M,   --monochrome            do not display color
+    -p,   --processes [count]     number of processes to run
+
+invocation:
+
+  If no proof runner output files are given, the error reporter listens
+  for proof runner output on STDIN.
+
+  If there are no errors, `proof errors` exits with a zero exit code,
+  otherwise it returns a non-zero exit code.
+
+description:
+
+  `proof errors` displays failure assertions and failure conditions in
+  context, with the program output and error output that preceded and
+  follow the failure.
 ---
 */
 
@@ -57,9 +147,9 @@ function usage () {
 
 function abend (message, use) {
   if (overwrite) console.log("");
-  console.error("error: " + message);
+  if (message) console.error("error: " + message);
   if (use) usage();
-  process.exit(1);
+  process.exit(message ? 1 : 0);
 }
 
 function getopt (pat, argv) {
@@ -822,10 +912,10 @@ create = function () {
 
 // Options for our getopt like options parser.
 options =
-{ json: ""
-, progress: "-d,--digits:|-w,--width:|-M,--monochrome|"
-, run: "-p,--processes:|"
-, errors: "-M,--monochrome|"
+{ json: "-h,--help|"
+, progress: "-d,--digits:|-w,--width:|-M,--monochrome|-h,--help|"
+, run: "-p,--processes:|-h,--help|"
+, errors: "-M,--monochrome|-h,--help|"
 };
 
 argv = process.argv.slice(2);
@@ -835,6 +925,7 @@ if ((opts = options[argv[0]]) != null) {
   (function () {
     action = argv.shift();
     options = getopt(opts, argv);
+    if (options.help[0]) abend(0, true);
     return {
       create: create,
       json: json,
