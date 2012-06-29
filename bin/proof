@@ -520,7 +520,7 @@ parse = function (stream, callback) {
     for (_i = 0, _len = lines.length; _i < _len; _i++) {
       line = lines[_i];
       count++;
-      if (!(match = /^(\d+)\s+(\w+)\s+([^\s]+)\s*(.*)$/.exec(line))) {
+      if (!(match = /^(\d+)\s+(\w+)\s+([^\s]+)\s?(.*)$/.exec(line))) {
         abend("cannot parse runner output at line " + count + ": invalid syntax");
       }
       _ref1 = match.slice(1), time = _ref1[0], type = _ref1[1], file = _ref1[2], rest = _ref1[3];
