@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "ok 1 gerg"
+echo "0..2"
+echo "ok 2 blurgh"
