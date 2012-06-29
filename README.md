@@ -630,6 +630,20 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.9 - Fri Jun 29 13:59:21 UTC 2012
+
+ * Preserve leading whitespace in output parsing. #27.
+ * Usage messages for all commands. #23.
+ * Nested control flow. #51.
+ * Detect variables leaked to the global namespace. #54.
+ * Variable argument say. #30.
+ * Create `die` as alias of `bailout`. #31.
+ * Use inspector for recursive dump of `say` and `bailout`. #33.
+ * Report failure if actual tests exceed expected tests. #77
+ * Add switch to `proof progress` to disable colorization. #76. 
+ * Detect tests without plans. #75.
+ * Display compilation error output. #22.
+
 ### Version 0.0.8 - Thu Jun 28 21:05:46 UTC 2012
 
  * Wait on pending output before exit. #72.
