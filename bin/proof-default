@@ -1,6 +1,6 @@
 #!/bin/bash
 
-opts=`proof-getopt -o p:d:w: -l processes:,digits:,width: -- "$@"`
+opts=`proof-getopt -o p:d:w:M -l processes:,digits:,width:,monochrome -- "$@"`
 
 if [ $? -ne 0 ]; then
   echo "unrecognized option"
@@ -15,6 +15,7 @@ progress=()
 while [ $1 != "--" ];  do
   case "$1" in
     -p|--p*) run+=(--processes "$2"); shift;;
+    -M|--m*) progress+=(--monochrome);;
     -w|--w*) progress+=(--width "$2"); shift;;
     -d|--d*) progress+=(--digits "$2"); shift;;
   esac

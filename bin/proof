@@ -70,8 +70,8 @@ function getopt (pat, argv) {
     alts = pat.replace(arg[1], "").replace(/-[^,],--[^|]+\|/g, '').split("|");
     if ((l = alts.length - 1) != 1) abend((l ? "ambiguous: " : "unknown option: ") + arg[1], true);
     opt = (arg[1] + /,([^:]*)/.exec(alts[0])[1]).replace(/^(-[^-]+)?--/, '');
+    if (!opts[opt]) opts[opt] = [];
     if (($ = /(:+)$/.exec(alts[0]))) {
-      if (!opts[opt]) opts[opt] = [];
       if ($[1].length == 1 || (argv.length && argv[0][0] != "-")) {
         if (!arg[0]) {
           if (!argv.length) abend("missing argument for: " + (arg[1][1] != "-" ? arg[1] : "--" + opt), true);
@@ -141,21 +141,26 @@ function json () {
   });
 };
 
-colorize = (function () {
+function colorization (options) {
+  if (!options.monochrome) options.monochrome = [ false ];
   function colorize (color) {
     return function (text) { return "" + color + text + "\u001B[0m" };
   };
+  function monochrome (text) { return text }
+  if (options.monochrome[0]) return {
+    red: monochrome, green: monochrome, blue: monochrome, gray: monochrome
+  }
   return {
     red: colorize("\u001B[31m"),
     green: colorize("\u001B[32m"),
     blue: colorize("\u001B[34m"),
     gray: colorize("\u001B[38;5;244m")
   };
-})();
+}
 
 // Generate progress reporting, something to watch as the tests are run.
 progress = (function () {
-  var bar, fill, time;
+  var bar, fill, time, colorize;
   // Visual cue for table layout.
   fill = function (filler, count) {
     return Array(Math.max(count + 1, 0)).join(filler);
@@ -180,7 +185,7 @@ progress = (function () {
   // to overwrite the line.
   bar = function (program, terminal) {
     var color, dots, file, icon, status, summary;
-    if (program.expected == null || program.passed < program.actual || program.bailed || ((program.code != null) && program.code)) {
+    if (program.actual > program.expected || program.expected == null || program.passed < program.actual || program.bailed || ((program.code != null) && program.code)) {
       extend(program, {
         status: "Failure",
         color: colorize.red,
@@ -195,6 +200,7 @@ progress = (function () {
   };
   return function () {
     var displayed, durations, programs;
+    colorize = colorization(options);
     // Default witdth.
     options.width || (options.width = [76]);
     // Default timing digits, or a reaonable amount if the user is being
@@ -341,6 +347,7 @@ errors = (function () {
   // TODO Shouldn't `test` be `assertion`?
   return function () {
     var backlog, failed, offset, prefix, queue, planned;
+    var colorize = colorization(options);
     process.stdin.resume();
     queue = [];
     failed = {};
@@ -816,9 +823,9 @@ create = function () {
 // Options for our getopt like options parser.
 options =
 { json: ""
-, progress: "-d,--digits:|-w,--width:|"
+, progress: "-d,--digits:|-w,--width:|-M,--monochrome|"
 , run: "-p,--processes:|"
-, errors: ""
+, errors: "-M,--monochrome|"
 };
 
 argv = process.argv.slice(2);
