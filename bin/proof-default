@@ -1,6 +1,6 @@
 #!/bin/bash
 
-opts=`proof-getopt -o p:d:w:M -l processes:,digits:,width:,monochrome -- "$@"`
+opts=`proof-getopt -o p:d:w:Mh -l processes:,digits:,width:,monochrome,help -- "$@"`
 
 if [ $? -ne 0 ]; then
   echo "unrecognized option"
@@ -8,6 +8,35 @@ if [ $? -ne 0 ]; then
 fi
 
 eval set -- "$opts"
+
+read -r -d '' USAGE <<'EOF'
+usage: proof default [options] [<files>...]
+
+  Run tests and display progress a colorized progress meter.
+
+options:
+
+    -d,   --digits    [count]     number of timing digits to display
+    -h,   --help                  display this usage information
+    -M,   --monochrome            do not display color
+    -p,   --processes [count]     number of processes to run
+    -w,   --width     [count]     width in characters of progress display
+
+invocation:
+
+  If there are no errors, `proof` exits with a zero exit code, otherwise it
+  returns a non-zero exit code.
+
+description:
+
+  `proof` runs a collection of tests and displays a colorful, animated
+  report of test progress. Output from `proof run` can be piped to
+  `proof progress` to display the progress of a test run as it is
+  running. Using a utility like `tee`, you can both pipe `proof run`
+  output to `proof progress` and save it to file for later reporting.
+
+.
+EOF
 
 run=()
 progress=()
@@ -18,6 +47,7 @@ while [ $1 != "--" ];  do
     -M|--m*) progress+=(--monochrome);;
     -w|--w*) progress+=(--width "$2"); shift;;
     -d|--d*) progress+=(--digits "$2"); shift;;
+    -h|--h*) echo "$USAGE" | sed '$d'; exit;;
   esac
   shift;
 done
