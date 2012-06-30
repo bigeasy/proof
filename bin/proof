@@ -366,7 +366,7 @@ progress = (function () {
           summary.time = Math.max(summary.time, program.time);
         }
         summary.file = "tests (" + tests.passed + "/" + tests.actual + ") assertions";
-        extend(summary, summary.passed === summary.expected && !summary.code && !summary.planless ? {
+        extend(summary, !program.bailed && summary.actual == summary.expected && summary.passed === summary.expected && !summary.code && !summary.planless ? {
           icon: "\u2713",
           status: "Success",
           color: colorize.green
@@ -381,9 +381,7 @@ progress = (function () {
         dots = fill(" ", options.width[0] - 6 - summary.file.length - stats.length - status.length);
         process.stdout.write(" " + (color(' ')) + " " + dots + " " + file + " " + stats + " " + (color(status)) + "\n");
         overwrite = false;
-        if (summary.passed !== summary.expected) {
-          return process.exit(1);
-        }
+        if (summary.status == "Failure") process.exit(1);
       } else {
         // Otherwise update duration.
         programs[event.file].duration = event.time - event.start;
