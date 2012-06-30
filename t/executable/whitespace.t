@@ -16,7 +16,7 @@ read -r -d '' VAR <<EOF
 EOF
 
 if [ "$(echo "$VAR" | sed -e 1d)" == "$(echo "$out" | sed -e 's/[0-9]/X/g')" ]; then
-  echo "ok 1 whitespace"
+  echo "ok 1 whitespace progress"
 else
   echo "not ok 1 whitespace progress"
 fi
@@ -31,7 +31,7 @@ read -r -d '' VAR <<EOF
 EOF
 
 if [ "$(echo "$VAR" | sed -e 1d)" == "$out" ]; then
-  echo "ok 1 planless errors"
+  echo "ok 1 whitespace errors"
 else
   echo "not ok 1 whitespace errors"
 fi
