@@ -3,4 +3,4 @@ test = require "../../../lib/proof"
 
 streamlined = (callback) -> callback(null, true)
 
-test 1, (_) -> @ok streamlined(_), "test streamline"
+test 1, (ok, _) -> ok streamlined(_), "test streamline"
