@@ -1,4 +1,6 @@
 #!/usr/bin/env _coffee
 require("../../../lib/proof") 2, (_) ->
-  e = @throws "asynchronous", _, (_) -> throw new Error("asynchronous")
-  @equal e.message, "asynchronous", "returned"
+  throw new Error("asynchronous")
+, (error, equal, ok) ->
+  if ok error, "thrown"
+    equal(error.message, "asynchronous", "returned")

@@ -2,4 +2,4 @@
 
 test = require "../../../lib/proof"
 
-test 1, -> @ok true, "test truth"
+test 1, (ok) -> ok true, "test truth"
