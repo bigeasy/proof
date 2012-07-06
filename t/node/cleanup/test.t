@@ -6,16 +6,16 @@ var fs = require("fs")
   ;
 
 require("../../../lib/proof")(
-1, function cleanup (callback) {
-        fs.unlink(program, callback());
+1, function cleanup (async) {
+        fs.unlink(program, async());
 }, function cleanup (error) {
         if (error && error.code != "ENOENT") throw error;
-}, function (callback) {
-        fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", callback());
-}, function (callback) {
-        fs.chmod(program, 0755, callback());
-}, function (callback, equal) {
-        exec(program, callback());
+}, function (async) {
+        fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", async());
+}, function (async) {
+        fs.chmod(program, 0755, async());
+}, function (async, equal) {
+        exec(program, async());
 }, function (error, equal) {
         equal(error.code, 1, "exit code")
 });
