@@ -1,15 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-echo "1..1"
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-proof="$DIR/../../bin/proof"
-out=$($proof run t/foo.t t/foo.t 2>&1 >&-)
-
-echo "#" "$out"
-if [ "$out" == "error: a program must only run once in a test run: t/foo.t" ]; then
-  echo "ok 1 doubles"
-else
-  echo "not ok 1 doubles"
-fi
+require('./proof')(2, function (async, equal) {
+  var fs = require('fs'), path = require('path');
+  async(function (proof, execute) {
+    execute('node', [ proof, 'run', 't/node/run/minimal.t', 't/node/run/minimal.t' ], '', async());
+  }, function (code, stdout, stderr) {
+    equal(code, 1, 'non-zero exit');
+    equal(stderr.replace(/\\/g, '/'), 'error: a program must only run once in a test run: t/node/run/minimal.t\n', 'invalid exit code');
+  });
+});
