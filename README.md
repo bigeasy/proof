@@ -630,7 +630,7 @@ suit your project's needs.
 
 Changes for each release.
 
-### Version 0.0.11 -
+### Version 0.0.11 - Sun Jul  8 05:24:13 UTC 2012
 
  * Extract Cadence control flow library. #97. #90. #52.
  * Convert to closure style removing `Test` class. #91.
