@@ -1,5 +1,6 @@
 .DS_Store
 .AppleDouble
+bin/proof.cmd
 node_modules/*
 vendor/*
 t/*

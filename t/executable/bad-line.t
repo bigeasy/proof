@@ -1,15 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-echo "1..1"
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-proof="$DIR/../../bin/proof"
-out=$(echo "%t" | $proof progress 2>&1 >&-)
-
-echo "#" "$out"
-if [ "$out" == "error: cannot parse runner output at line 1: invalid syntax" ]; then
-  echo "ok 1 invalid line"
-else
-  echo "not ok 1 invalid line"
-fi
+require('./proof')(2, function (async, equal, execute) {
+  var path = require('path'), stderr = [];
+  async(function () {
+    execute('node', [ path.resolve(__dirname, '..', '..', 'bin', 'proof'), 'progress' ], '%t\n', async());
+  }, function (code, stdout, stderr) {
+    equal(code, 1, 'non-zero exit');
+    equal(stderr, 'error: cannot parse runner output at line 1: invalid syntax\n', 'invalid syntax');
+  });
+});

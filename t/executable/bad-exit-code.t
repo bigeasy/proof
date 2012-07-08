@@ -1,15 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-echo "1..1"
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-proof="$DIR/../../bin/proof"
-out=$(cat "$DIR/fixtures/bad-error-code.out" | $proof progress 2>&1 >&-)
-
-echo "#" "$out"
-if [ "$out" == "error: cannot parse runner test exit code at line 5: exit code X" ]; then
-  echo "ok 1 exit code"
-else
-  echo "not ok 1 exit code"
-fi
+require('./proof')(2, function (async, equal) {
+  var fs = require('fs'), path = require('path');
+  async(function (execute, proof) {
+    var stream = fs.createReadStream(__dirname + '/fixtures/bad-error-code.out');
+    execute('node', [ proof, 'progress' ], stream, async());
+  }, function (code, stdout, stderr) {
+    equal(code, 1, 'non-zero exit');
+    equal(stderr, 'error: cannot parse runner test exit code at line 5: exit code X\n', 'invalid exit code');
+  });
+});
