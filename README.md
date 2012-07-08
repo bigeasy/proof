@@ -630,6 +630,10 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.12 - Sun Jul  8 05:58:51 UTC 2012
+
+ * Upgrade to Cadence 0.0.2. #100.
+
 ### Version 0.0.11 - Sun Jul  8 05:24:13 UTC 2012
 
  * Extract Cadence control flow library. #97. #90. #52.
