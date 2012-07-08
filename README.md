@@ -630,6 +630,16 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.11 -
+
+ * Extract Cadence control flow library. #97. #90. #52.
+ * Convert to closure style removing `Test` class. #91.
+ * The `fail` method will print a `not ok`. #94.
+ * `UNTIDY` is working again. #92.
+ * Removed the Streamline.js specific `throws` and `cleanup_` functions. #93.
+ * Removed the implicit `context` argument that was used with structured
+   assignment in CoffeeScript tests. #80.
+
 ### Version 0.0.10 - Sat Jun 30 16:41:44 UTC 2012
 
  * `proof progress` exits non-zero for any failure. #87.
