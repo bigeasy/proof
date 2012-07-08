@@ -630,6 +630,10 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.10 - Sat Jun 30 16:41:44 UTC 2012
+
+ * `proof progress` exits non-zero for any failure. #87.
+
 ### Version 0.0.9 - Fri Jun 29 13:59:21 UTC 2012
 
  * Preserve leading whitespace in output parsing. #27.
