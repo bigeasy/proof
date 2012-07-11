@@ -127,6 +127,8 @@ var action, argv, blue, create, die, errors, extend, fs, gray, green, json, opti
 var fs = require("fs")
   , path = require("path")
   , spawn = require("child_process").spawn
+  , arguable = require('arguable')
+  , cadence = require('cadence')()
   , __slice = [].slice
   ;
 
@@ -149,7 +151,10 @@ function abend (message, use) {
   if (overwrite) console.log("");
   if (message) console.error("error: " + message);
   if (use) usage();
-  process.exit(message ? 1 : 0);
+  process.on('exit', function () {
+    process.exit(message ? 1 : 0)
+  });
+  throw new Abend(message);
 }
 
 function getopt (pat, argv) {
@@ -381,7 +386,9 @@ progress = (function () {
         dots = fill(" ", options.width[0] - 6 - summary.file.length - stats.length - status.length);
         process.stdout.write(" " + (color(' ')) + " " + dots + " " + file + " " + stats + " " + (color(status)) + "\n");
         overwrite = false;
-        if (summary.status == "Failure") process.exit(1);
+        if (summary.status == "Failure") {
+          process.on("exit", function () { process.exit(1) });
+        }
       } else {
         // Otherwise update duration.
         programs[event.file].duration = event.time - event.start;
@@ -390,7 +397,7 @@ progress = (function () {
             return programs[event.file].expected = event.expected;
           case "test":
             extend(programs[event.file], event);
-            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] !== "true") {
+            if (false && event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] !== "true") {
               overwrite = true;
               process.stdout.write(bar(programs[event.file], "\r"));
             }
@@ -483,7 +490,7 @@ errors = (function () {
         backlog[event.file].push(event);
       } else if (event.type === "eof" && offset !== 2) {
         process.stdout.write("\n");
-        process.exit(1);
+        process.on('exit', function () { process.exit(1) });
       }
       while (queue.length && queue[0].events.length) {
         event = queue[0].events.shift();
@@ -587,8 +594,21 @@ extend = function () {
   return destination;
 };
 
+function Abend () { Error.call(this) }
+
 parse = function (stream, callback) {
-  var count, done, out, programs;
+  function abender (forward) {
+    return function () {
+      try {
+        if (!abended) forward.apply(this, arguments);
+      } catch (e) {
+        if (!(e instanceof Abend)) throw e;
+        abended = true;
+        stream.destroy();
+      }
+    }
+  }
+  var count, done, out, programs, abended;
   programs = {};
   out = [""][0];
   count = 0;
@@ -599,10 +619,10 @@ parse = function (stream, callback) {
       return process.exit(1);
     }
   });
-  return stream.on("data", function (chunk) {
+  return stream.on("data", abender(function (chunk) {
     var code, event, expected, file, line, lines, match, program, rest, time, type, _i, _len, _ref1, _results;
     out += chunk;
-    lines = out.split(/\n/);
+    lines = out.split(/\r?\n/);
     out = lines.pop();
     _results = [];
     for (_i = 0, _len = lines.length; _i < _len; _i++) {
@@ -689,32 +709,72 @@ parse = function (stream, callback) {
       }
     }
     return _results;
-  });
+  }));
 };
 
+// To do this right, we'd read through the Windows registry, but we really
+// don't want to go digging into it a this point. Not that difficult, since
+// there are command line utilities we can invoke to get a list of file
+// associations.
+function shebang (program, parameters, options, callback) {
+  var buffer, first, $;
+  options || (options = {});
+  if (process.platform.indexOf('win')) callback(null, spawn(program, parameters, options));
+  else {
+    switch (path.extname(program)) {
+    case '.exe':
+    case '.bat':
+    case '.cmd':
+      pathSearch(program, function (error, resolved) {
+        callback(null, spawn(resolved, parameters, options));
+      });
+      break;
+    default:
+      buffer = fs.readFileSync(program);
+      if (buffer[0] == 0x23 && buffer[1] == 0x21
+          && (first = buffer.toString().split(/\n/).shift())) {
+        if ($ = /^#!\/usr\/bin\/env\s+(\S+)/.exec(first)) {
+          parameters.unshift(program);
+          program = $[1];
+        } else if ($ = /^#!\/.*\/(.*)/.exec(first)) {
+          parameters.unshift(program);
+          program = $[1];
+        }
+        pathSearch(program, function (error, resolved) {
+          shebang(resolved, parameters, options, callback);
+          //callback(null, spawn(resolved + '.cmd', parameters, options));
+        });
+      } else {
+        callback(null, spawn(program, parameters, options));
+      }
+    }
+  }
+}
+
 run = function () {
+try {
   options.processes || (options.processes = [1]);
   var dirname, displayed, emit, execute, failures, i, key, next, parallel, program, programs, seen, value, _i, _j, _len, _results;
-  programs = argv;
   parallel = {};
   seen = {};
-  for (_i = 0, _len = programs.length; _i < _len; _i++) {
-    program = programs[_i];
-    if (seen[program]) {
-      abend("a program must only run once in a test run: " + program);
+  argv.forEach(function (glob) {
+    if (/\s+/.test(glob)) {
+      abend("program names cannot contain spaces: " + glob);
     }
-    seen[program] = true;
-    if (/\s+/.test(program)) {
-      abend("program names cannot contain spaces: " + program);
-    }
-    dirname = /^(.*)\/.*/.exec(program)[1];
-    parallel[dirname] || (parallel[dirname] = {
-      programs: [],
-      time: 0,
-      running: true
+    arguable.glob(process.cwd(), [ glob ])[0].files.forEach(function (program) {
+      if (seen[program]) {
+        abend("a program must only run once in a test run: " + program);
+      }
+      seen[program] = true;
+      dirname = path.dirname(program);
+      parallel[dirname] || (parallel[dirname] = {
+        programs: [],
+        time: 0,
+        running: true
+      });
+      parallel[dirname].programs.push(program);
     });
-    parallel[dirname].programs.push(program);
-  }
+  });
   parallel = (function () {
     var _results;
     _results = [];
@@ -740,83 +800,85 @@ run = function () {
       , testing // after a test is emitted, any plans are just stdout
       ;
     emit(program, "run");
-    test = spawn(program);
-    bailed = false;
-    err = "";
-    test.stderr.setEncoding("utf8");
-    test.stderr.on("data", function (chunk) {
-      var line, lines, _j, _len1, _results;
-      err += chunk;
-      lines = err.split(/\n/);
-      err = lines.pop();
-      _results = [];
-      for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
-        line = lines[_j];
-        _results.push(emit(program, "err", line));
-      }
-      return _results;
-    });
-    out = "";
-    test.stdout.setEncoding("utf8");
-    test.stdout.on("data", function (chunk) {
-      var line, lines, plan, _j, _len1, _results;
-      out += chunk;
-      lines = out.split(/\n/);
-      out = lines.pop();
-      for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
-        line = lines[_j];
-        if (bailed) {
-          emit(program, "out", line);
-        } else if (parser.assertion(line)) {
-          testing = true;
-          emit(program, "test", line);
-        } else if (!testing && (plan = parser.plan(line))) {
-          emit(program, "plan", plan.expected);
-        } else if (parser.bailout(line)) {
-          testing = true;
-          emit(program, "bail", line);
-        } else {
-          emit(program, "out", line);
+    shebang(program, [], {}, function (error, test) {
+      bailed = false;
+      err = "";
+      test.stderr.setEncoding("utf8");
+      test.stderr.on("data", function (chunk) {
+        var line, lines, _j, _len1, _results;
+        err += chunk;
+        lines = err.split(/\n/);
+        err = lines.pop();
+        _results = [];
+        for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
+          line = lines[_j];
+          _results.push(emit(program, "err", line));
         }
-      }
-      return _results;
-    });
-    test.on("exit", function (code) {
-      var count = 1;
-
-      if (test.stdout.readable) {
-        count++;
-        test.stdout.once("end", exit);
-      }
-
-      if (test.stderr.readable) {
-        count++;
-        test.stderr.once("end", exit);
-      }
-
-      exit();
-
-      function exit () {
-        var time;
-        if (--count == 0) {
-          emit(program, "exit", code);
-          parallel[index].time = time = 0;
-          if (parallel[index].programs.length) {
-            execute(parallel[index].programs.shift(), index);
-          } else if (next < parallel.length) {
-            parallel[index].running = false;
-            if (displayed === index) {
-              displayed = next + 1;
-            }
-            index = next++;
-            execute(parallel[index].programs.shift(), index);
+        return _results;
+      });
+      out = "";
+      test.stdout.setEncoding("utf8");
+      test.stdout.on("data", function (chunk) {
+        var line, lines, plan, _j, _len1, _results;
+        out += chunk;
+        lines = out.split(/\n/);
+        out = lines.pop();
+        for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
+          line = lines[_j];
+          if (bailed) {
+            emit(program, "out", line);
+          } else if (parser.assertion(line)) {
+            testing = true;
+            emit(program, "test", line);
+          } else if (!testing && (plan = parser.plan(line))) {
+            emit(program, "plan", plan.expected);
+          } else if (parser.bailout(line)) {
+            testing = true;
+            emit(program, "bail", line);
           } else {
-            emit("*", "eof");
+            emit(program, "out", line);
           }
         }
-      }
+        return _results;
+      });
+      var version = process.versions.node.split('.');
+      test.on(version[0] == 0 && version[1] < 7 ? "exit" : "close", function (code) {
+        var count = 1;
+
+        if (test.stdout.readable) {
+          count++;
+          test.stdout.once("end", exit);
+        }
+
+        if (test.stderr.readable) {
+          count++;
+          test.stderr.once("end", exit);
+        }
+
+        exit();
+
+        function exit () {
+          var time;
+          if (--count == 0) {
+            emit(program, "exit", code);
+            parallel[index].time = time = 0;
+            if (parallel[index].programs.length) {
+              execute(parallel[index].programs.shift(), index);
+            } else if (next < parallel.length) {
+              parallel[index].running = false;
+              if (displayed === index) {
+                displayed = next + 1;
+              }
+              index = next++;
+              execute(parallel[index].programs.shift(), index);
+            } else {
+              emit("*", "eof");
+            }
+          }
+        }
+      });
     });
-  };
+  }
   next = options.processes[0];
   _results = [];
   for (i = _j = 0; 0 <= next ? _j < next : _j > next; i = 0 <= next ? ++_j : --_j) {
@@ -827,6 +889,9 @@ run = function () {
     }
   }
   return _results;
+} catch (e) {
+  if (!(e instanceof Abend)) throw e;
+}
 };
 
 create = function () {
@@ -879,13 +944,13 @@ create = function () {
   inspect = spawn(name);
   inspect.stderr.setEncoding("utf8");
   inspect.stderr.on("data", function (chunk) {
-    return process.stdout.write(chunk);
+    process.stdout.write(chunk);
   });
   inspect.stdout.setEncoding("utf8");
   inspect.stdout.on("data", function (chunk) {
-    return output += chunk;
+    output += chunk;
   });
-  return inspect.on("exit", function (code) {
+  return inspect.on("close", function (code) {
     var arg, missing, _k, _len2;
     fs.unlinkSync(name);
     if (code !== 0) {
@@ -918,6 +983,35 @@ options =
 
 argv = process.argv.slice(2);
 
+function pathSearch (executable, callback) {
+  var parts, env = {}, resolved = [];
+  parts = process.env.PATH.split(process.platform === "win32" ? ";" : ":");
+  parts.push(__dirname);
+  Object.keys(process.env).forEach(function (key) { env[key.toUpperCase()] = process.env[key] });
+  parts.forEach(function (part) {
+    resolved.push(path.resolve(part, executable + '.bat'));
+    resolved.push(path.resolve(part, executable + '.cmd'));
+    resolved.push(path.resolve(part, executable + '.exe'));
+    resolved.push(path.resolve(part, executable));
+  });
+  cadence(function (cadence) {
+    cadence(function shift () {
+      if (resolved.length) return resolved.shift();
+      else abend("cannot find executable: " + executable);
+    }, function (resolved) {
+      fs.stat(resolved, cadence()); 
+    }, function (error, shift) {
+      cadence(shift)();
+    }, function (stat, resolved, shift) {
+      if (stat.isFile()) {
+        return resolved;
+      } else {
+        cadence(shift); 
+      }
+    });
+  })(callback);
+}
+
 // Choose an option based on an action name.
 if ((opts = options[argv[0]]) != null) {
   (function () {
@@ -934,33 +1028,16 @@ if ((opts = options[argv[0]]) != null) {
   })();
 } else {
   (function () {
-    var executable, found, parts;
-    path = require("path");
+    var executable, parts, env = {}, path = require("path");
     if (argv.length && !/[-.\/]/.test(argv[0])) {
       executable = "proof-" + (argv.shift());
     } else {
       executable = "proof-default";
     }
-    parts = process.env.PATH.split(process.platform === "win32" ? ";" : ":");
-    found = function (error, stat) {
-      var child;
-      if (error) {
-        if (error.code !== "ENOENT") {
-          throw error;
-        }
-        parts.shift();
-        if (parts.length) {
-          return fs.stat(path.resolve(parts[0], executable), found);
-        } else {
-          abend("cannot find executable: " + executable);
-        }
-      } else {
-        child = spawn(path.resolve(parts[0], executable), argv, { customFds: [ 0, 1, 2 ] });
-        return child.on("exit", function (code) {
-          return process.exit(code);
-        });
-      }
-    };
-    return fs.stat(path.resolve(parts[0], executable), found);
+    pathSearch(executable, function (error, resolved) {
+      shebang(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
+        child.on("exit", function (code) { process.exit(code) })
+      });
+    });
   })();
 }

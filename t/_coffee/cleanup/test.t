@@ -1,5 +1,5 @@
 #!/usr/bin/env _coffee
-require("../../../lib/proof") 1, (async, equal) ->
+require("../../../lib/proof") 1, (async, ok) ->
   fs = require "fs"
   {exec} = require "child_process"
 
@@ -13,9 +13,4 @@ require("../../../lib/proof") 1, (async, equal) ->
 
   async (_) ->
     fs.writeFile program, "#!/bin/bash\nexit 1\n", "utf8", _
-    fs.chmod program, 0o755, _
-
-    try
-      exec program, _
-    catch e
-      equal e.code, 1, "exit code"
+    ok true, "wrote"

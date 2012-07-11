@@ -1,15 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-echo "1..1"
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-proof="$DIR/../../bin/proof"
-out=$(cat "$DIR/fixtures/unknown-type.out" | $proof progress 2>&1 >&-)
-
-echo "#" "$out"
-if [ "$out" == "error: cannot parse runner output at line 2: unknown line type x" ]; then
-  echo "ok 1 unknown type"
-else
-  echo "not ok 1 unknown type"
-fi
+require('./proof')(2, function (async, equal) {
+  var fs = require('fs'), path = require('path');
+  async(function (execute, proof) {
+    var stream = fs.createReadStream(__dirname + '/fixtures/unknown-type.out');
+    execute('node', [ proof, 'progress' ], stream, async());
+  }, function (code, stdout, stderr) {
+    equal(code, 1, 'non-zero exit');
+    equal(stderr, 'error: cannot parse runner output at line 2: unknown line type x\n', 'unknown type');
+  });
+});
