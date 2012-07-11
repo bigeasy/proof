@@ -1,0 +1,4 @@
+
+ FOO
+> ✘ t/executable/whitespace: no plan given: exited with code 0
+

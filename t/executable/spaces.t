@@ -1,15 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-echo "1..1"
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-proof="$DIR/../../bin/proof"
-out=$($proof run 't/a b.t' 2>&1 >&-)
-
-echo "#" "$out"
-if [ "$out" == "error: program names cannot contain spaces: t/a b.t" ]; then
-  echo "ok 1 spaces"
-else
-  echo "not ok 1 spaces"
-fi
+require('./proof')(2, function (async, equal) {
+  var path = require('path'), stderr = [];
+  async(function (proof, execute) {
+    execute('node', [ proof, 'run', 't/a b.t' ], '', async());
+  }, function (code, stdout, stderr) {
+    equal(code, 1, 'non-zero exit');
+    equal(stderr, 'error: program names cannot contain spaces: t/a b.t\n', 'invalid syntax');
+  });
+});

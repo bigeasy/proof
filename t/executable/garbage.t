@@ -1,39 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-echo "1..2"
+var spawn = require('child_process').spawn, fs = require('fs');
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-PATH="$DIR/../../bin":$PATH
-out=$(proof -M 't/executable/garbage')
-
-# Without the dot, leading whitespace is stripped. I cannot find anyone saying
-# that it's supposed to do that, but it does.
-read -r -d '' VAR <<EOF
-.
- ✘ t/executable/garbage ................................ (X/X) X.XXX Failure
-                                  tests (X/X) assertions (X/X) X.XXX Failure
-EOF
-
-if [ "$(echo "$VAR" | sed -e 1d)" == "$(echo "$out" | sed -e 's/[0-9]/X/g')" ]; then
-  echo "ok 1 garbage progress"
-else
-  echo "not ok 1 garbage progress"
-  echo "$out"
-fi
-
-out=$(proof run 't/executable/garbage' | proof errors -M)
-
-read -r -d '' VAR <<EOF
-.
-
-> ✘ t/executable/garbage: no plan given: exited with code 1
-EOF
-
-if [ "$(echo "$VAR" | sed -e 1d)" == "$out" ]; then
-  echo "ok 1 garbage errors"
-else
-  echo "not ok 1 garbage errors"
-  echo "$VAR"
-  echo "$out"
-fi
+require('./proof')(4, function (async, equal) {
+  async(function () {
+    fs.readFile(__dirname + '/fixtures/garbage-progress.txt', 'utf8', async());
+  }, function (expected, execute, proof) {
+    execute('node', [ proof,  '-M', 't/executable/garbage' ], '', async());
+  }, function (code, stdout, stderr, expected) {
+    equal(code, 1, 'bailed progress exit code');
+    equal(stdout.replace(/\d/g, 'X').replace(/\\/g, '/'), expected.replace(/\r/g, ''), 'bailed progress message');
+  }, function () {
+    fs.readFile(__dirname + '/fixtures/garbage-errors.txt', 'utf8', async());
+  }, function (expected, execute, proof) {
+    var run = spawn('node', [ proof, 'run', 't/executable/garbage' ]);
+    execute('node', [ proof, 'errors', '-M', 't/executable/garbage' ], run.stdout, async());
+  }, function (code, stdout, stderr, expected) {
+    equal(code, 1, 'bailed errors exit code');
+    equal(stdout.replace(/\\/g, '/'), expected.replace(/\r/g, ''), 'bailed errors message');
+  });
+});

@@ -7,15 +7,11 @@ var fs = require("fs")
 
 require("../../../lib/proof")(
 1, function cleanup (async) {
-        fs.unlink(program, async());
+  fs.unlink(program, async());
 }, function cleanup (error) {
-        if (error && error.code != "ENOENT") throw error;
+  if (error && error.code != "ENOENT") throw error;
 }, function (async) {
-        fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", async());
-}, function (async) {
-        fs.chmod(program, 0755, async());
-}, function (async, equal) {
-        exec(program, async());
-}, function (error, equal) {
-        equal(error.code, 1, "exit code")
+  fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", async());
+}, function (ok) {
+  ok(true, "cleanup");   
 });

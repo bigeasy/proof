@@ -1,5 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env node
 
-echo "ok 1 gerg"
-echo "0..2"
-echo "ok 2 blurgh"
+console.log('ok 1 gerg');
+console.log('0..2');
+console.log('ok 2 blurgh');
