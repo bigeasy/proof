@@ -993,6 +993,7 @@ options =
 , progress: "-d,--digits:|-w,--width:|-M,--monochrome|-h,--help|"
 , run: "-p,--processes:|-h,--help|"
 , errors: "-M,--monochrome|-h,--help|"
+, platform: ""
 };
 
 argv = process.argv.slice(2);
@@ -1026,6 +1027,13 @@ function pathSearch (executable, callback) {
   })(callback);
 }
 
+function platform () {
+  argv.forEach(function (platform) {
+    if (process.platform == platform) process.exit(0);
+  });
+  process.exit(1);
+}
+
 // Choose an option based on an action name.
 if ((opts = options[argv[0]]) != null) {
   (function () {
@@ -1037,7 +1045,8 @@ if ((opts = options[argv[0]]) != null) {
       json: json,
       run: run,
       progress: progress,
-      errors: errors
+      errors: errors,
+      platform: platform
     }[action]();
   })();
 } else {
