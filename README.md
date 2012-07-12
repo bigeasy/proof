@@ -630,6 +630,12 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.14 &mdash; Thu Jul 12 01:50:03 UTC 2012
+
+ * Platform detection program. #102.
+ * Animate Windows. #103.
+ * Print summary on `run` and `plan`. #28.
+
 ### Version 0.0.13 &mdash; Wed Jul 11 22:43:24 UTC 2012
 
  * Run on Windows. #101. #99. #98. #47.
