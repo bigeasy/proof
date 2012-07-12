@@ -398,21 +398,21 @@ progress = (function () {
             extend(programs[event.file], event);
             if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
               overwrite = true;
-              process.stdout.write(bar(programs[event.file], "\r"));
+              process.stdout.write(bar(programs[event.file], '\033[0G'));
             }
             break;
           case "plan":
             programs[event.file].expected = event.expected;
             if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
               overwrite = true;
-              process.stdout.write(bar(programs[event.file], "\r"));
+              process.stdout.write(bar(programs[event.file], '\033[0G'));
             }
             break;
           case "test":
             extend(programs[event.file], event);
             if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
               overwrite = true;
-              process.stdout.write(bar(programs[event.file], "\r"));
+              process.stdout.write(bar(programs[event.file], '\033[0G'));
             }
             break;
           case "bail":
