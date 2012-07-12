@@ -9,7 +9,7 @@ require('./proof')(4, function (async, equal) {
     execute('node', [ proof,  '-M', 't/executable/bailout' ], '', async());
   }, function (code, stdout, stderr, expected) {
     equal(code, 1, 'bailed progress exit code');
-    equal(stdout.replace(/\d/g, 'X').replace(/\\/g, '/'),
+    equal(stdout.replace(/[\d?]/g, 'X').replace(/\\/g, '/'),
           expected.replace(/\r/g, ''), 'bailed progress message');
   }, function () {
     fs.readFile(__dirname + '/fixtures/bailout-errors.txt', 'utf8', async());
