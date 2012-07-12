@@ -255,13 +255,13 @@ function colorization (options) {
 
 // Generate progress reporting, something to watch as the tests are run.
 progress = (function () {
-  var bar, fill, time, colorize;
+  var colorize;
   // Visual cue for table layout.
-  fill = function (filler, count) {
+  function fill (filler, count) {
     return Array(Math.max(count + 1, 0)).join(filler);
   };
   // Format time.
-  time = function (program) {
+  function time (program) {
     var str;
     str = "" + (program.time - program.start);
     if (str.length < 4) {
@@ -278,9 +278,9 @@ progress = (function () {
   // Update our progress bar. The `terminal` parameter is either `\n` if we're
   // done displaying the progress for this test, or `\r` to reset the cursor for
   // to overwrite the line.
-  bar = function (program, terminal) {
+  function bar (program, terminal) {
     var color, dots, file, icon, status, summary;
-    if (program.actual > program.expected || program.expected == null || program.passed < program.actual || program.bailed || ((program.code != null) && program.code)) {
+    if (!(program.expected == '?' && program.type == 'run') && ((program.actual > program.expected || program.expected == '?' || program.passed < program.actual || program.bailed || ((program.code != null) && program.code)))) {
       extend(program, {
         status: "Failure",
         color: colorize.red,
@@ -322,6 +322,7 @@ progress = (function () {
         if ((_ref1 = programs[_name = event.file]) == null) {
           programs[_name] = {
             actual: 0,
+            expected: '?',
             color: colorize.green,
             file: event.file,
             start: Number.MAX_VALUE,
@@ -353,13 +354,13 @@ progress = (function () {
             summary.code = program.code;
           }
           tests.actual++;
-          if (program.expected === program.passed) {
+          if (program.expected == program.passed) {
             tests.passed++;
           }
           summary.count++;
           summary.actual += program.actual || 0;
           summary.passed += program.passed || 0;
-          if (program.expected == null) {
+          if (program.expected == '?') {
             summary.planless = true;
           } else {
             summary.expected += program.expected;
@@ -393,11 +394,23 @@ progress = (function () {
         // Otherwise update duration.
         programs[event.file].duration = event.time - event.start;
         switch (event.type) {
+          case "run":
+            extend(programs[event.file], event);
+            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
+              overwrite = true;
+              process.stdout.write(bar(programs[event.file], "\r"));
+            }
+            break;
           case "plan":
-            return programs[event.file].expected = event.expected;
+            programs[event.file].expected = event.expected;
+            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
+              overwrite = true;
+              process.stdout.write(bar(programs[event.file], "\r"));
+            }
+            break;
           case "test":
             extend(programs[event.file], event);
-            if (false && event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] !== "true") {
+            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
               overwrite = true;
               process.stdout.write(bar(programs[event.file], "\r"));
             }
@@ -406,7 +419,8 @@ progress = (function () {
             if (event.file === displayed) {
               displayed = null;
             }
-            return programs[event.file].bailed = true;
+            programs[event.file].bailed = true;
+            break;
           case "exit":
             if (event.file === displayed) {
               displayed = null;
