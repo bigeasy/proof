@@ -630,6 +630,10 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.15 &mdash; Fri Jul 13 17:00:01 UTC 2012
+
+ * Upgrade to Cadence 0.0.5. #104.
+
 ### Version 0.0.14 &mdash; Thu Jul 12 01:50:03 UTC 2012
 
  * Platform detection program. #102.
