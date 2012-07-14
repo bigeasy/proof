@@ -90,59 +90,167 @@ language the test is written in. By convention, the test directory is named
 
 Minimal unit test.
 
-```coffeescript
-#!/usr/bin/env coffee
-require("proof") 1, -> @ok true, "true is true"
+```javascript
+#!/usr/bin/env node
+require('proof')(1, function (ok) {
+  ok(true, 'true is true');
+});
 ```
 
 The first argument to test is the number of tests to expect. If to many
 or too few tests are run, the test runner will detect it and report it.
 
-The call to `require("proof")` returns a function. You can call
+The call to `require('proof')` returns a function. You can call
 it immediately. That makes your test preamble quick and to the point.
 
 This is analogous to the above.
 
-```coffeescript
-#!/usr/bin/env coffee
-test = require "proof"
+```javascript
+#!/usr/bin/env node
+var test = require('proof');
 
-test 1, ->
-  @ok true, "true is true"
+test(1, function (ok) {
+  ok(true, 'true is true');
+});
 ```
 
 Here's a test with two assertions.
 
-```coffeescript
-#!/usr/bin/env coffee
-require("proof") 2, ->
-  @ok true, "true is true"
-  @equal 2 + 2, 4, "test addition"
+```javascript
+#!/usr/bin/env node
+require('proof')(2, function (ok, equal) {
+  ok(true, 'true is true');
+  equal(2 + 2, 4, 'test addition');
+});
 ```
 
 You can see that the second argument to `test` is your program. All of the
 assertions in [`require("assert")`](http://nodejs.org/api/assert.html) are
-available to your test function. They are bound to `this` so you can get to them
-using the `@` operator in CoffeeScript.
+available to your test function, all you need to do is ask for them in your
+function arguments. Proof with give them to you as you need them.
 
-### Streamline Auto-Detected
+### Step by Step Asynchronous Tests
 
-Minimal streamlined unit test. Simply add a callback parameter to your callback
-and your test is called asynchronously.
+Proof has a built in control flow library ala Step, that simplifies testing of
+asynchronous code. Most of the time, you're going to simply want to step through
+a series of calls and bail out on the slightest error. Proof is ergnomoically
+optimized for this common case.
+
+```javascript
+#!/usr/bin/env node
+var fs = require('fs');
+
+require('proof')(1, function (async) {
+  
+  fs.readFile(__filename, async());
+
+}, function (body, ok) {
+
+  ok(/proof/.test(body), 'found proof'); 
+
+});
+```
+
+For basic asynchronous testing, there's no need to nest your code into a temple
+of doom. The control flow library is there to keep your control flow shallow.
+
+When you do need to some serious asynchronous spelukning, Proof also supports
+supports complicated asynchronous concepts like parallelism and branching.
+
+```javascript
+#!/usr/bin/env node
+var fs = require('fs');
+
+// Antidisestablishmentarianism
+
+require('proof')(1, function (async) {
+
+  var tree = [ __dirname ], count; 
+  
+  async(function nextDirectory () {
+    
+    if (tree.length) return tree.shift();
+    else async(null, count);
+
+  }, function (directory) {
+
+    fs.readdir(directory, async());
+
+  }, function nextEntry (list, directory, nextDirectory) {
+
+    if (list.length) return path.resolve(directory, file);
+    else async(nextDirectory)();
+
+  }, function (file) {
+
+    fs.stat(file, async());
+
+  }, function (stat, file, nextEntry) {
+
+    if (stat.isDirectory()) {
+      tree.push(file);
+      async(nextEntry)();
+    } else {
+      fs.readFile(file, 'utf8', async());
+    }
+
+  }, function (body, nextEntry) {
+
+    if (/Antidisestablishmentarianism/.test(body)) count++;
+    async(nextEntry)();
+
+  });
+
+}, function (count) {
+  
+  ok(count, 1, 'one file contains possible seditious and blasphemous language');  
+
+});
+```
+
+The test above walks through the test directory asynchronously, looking for the
+word "Antidisestablishmentarianism" in the files it encounters. The above test
+proceeds through the directory tree serially, using named functions as branch
+labels to repeatedly visit each directory and file.
+
+### CoffeeScript and Streamline Friendly
+
+If you want to use your favorite alternative langauge, simply change your
+shebang line. You can use Coffee, Streamline with the Proof tap scaffolding.
 
 ```coffeescript
 #!/usr/bin/env _coffee
 fs   = require "fs"
-require("proof") 1, (_) ->
+require("proof") 1, (ok, _) ->
     found = /test/.test(fs.readFile(__filename, "utf8", _))
-    @ok found, "found the word test"
+    ok found, "found the word test"
 ```
 
-When you give a test a callback with a single parameter, it calls that function
-with a `function (error) {}`. This is the callback function is required by
-Streamline.js.
+When you're test function requests `_` in its parameter list, you'll get a
+callback that works with Streamline. No shims for Streamline.js code. Proof is
+Streamline.js friendly.
 
-No shims for Streamline.js code. Proof is Streamline.js friendly.
+### Shebang all the Langauges
+
+Actually, you an use any langauge with Proof. Emit TAP. Proof will report it.
+
+```bash
+#/bin/bash
+
+echo "1..1"
+
+true && echo "ok 1 truth is true"
+```
+
+You can use Proof to test your next C project, one that that has a dozens of
+little test programs that emit simple TAP.
+
+You can use other languages to verify the integrity of your JavaScript library.
+
+In [Timezone](https://github.com/bigeasy/timezone), for example, I verify that
+my  JavaScript time zone compiler correctly parses the IANA Timezone database
+using Ruby's `strftime` implementation. I wrote a Ruby program that emits TAP
+and tests each clock transition in the database.
 
 ### Create More Tests More Frequently With Harnesses
 
@@ -160,69 +268,27 @@ the supported languages, either `.coffee`, `._coffee`, `.js` or `._js`.
 In the harness you create a context `Object` and stuff it with useful bits and
 pieces for your test. 
 
-```coffeescript
-context = {}
-context.example = { firstName: "Alan", lastName: "Gutierrez" }
-context.model = require("../../lib/model")
-module.exports = require("proof") context
+```javascript
+module.exports = require('proof')(function () {
+  context = {}
+  context.example = { firstName: "Alan", lastName: "Gutierrez" }
+  context.model = require("../../lib/model")
+  return context;
+});
 ```
 
-You would place the above in a file named `proof.coffee`, for example.
+You would place the above in a file named `proof.js`, for example.
 
 Now you can write tests with a mere two lines of preamble. The common setup for
 the tests in your test suite is in your harness.
 
-```coffeescript
-#!/usr/bin/env coffee
-require("./proof") 2, ({ example, model }) ->
-  @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
-  @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"
+```javascript
+#!/usr/bin/env node
+require('./proof')(2, function (example, model, equal) {
+  equal(model.fullName(exmaple), "Alan Gutierrez", "full name");
+  equal(model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first");
+});
 ```
-
-### Auto-Generate Test Skeletons From Harnesses
-
-Once you have a harness, you can use `proof create` to generate tests based on
-your harness.
-
-```
-$ proof create t/model/formats.t model example
-$
-```
-
-You'll have a new test harness. The execute bit is set. It is ready to go.
-
-```coffeescript
-#!/usr/bin/env coffee
-require("./proof") 0, ({ example, model }) ->
-
-  # Here be dragons.
-```
-
-Now you can write your test.
-
-Proof assumes that you've created a harness in the target directory named
-`proof.js`, `proof._js`, `proof.coffee` or `proof._coffee`. You might decide to
-have different name or path for your harness, or you might want to use
-streamline, or specify a starting number of tests. Just type it out and proof
-will figure it out.
-
-```
-$ proof create t/model/formats.t 2 db ../db-harness _
-$
-```
-
-Would generate.
-
-```coffeescript
-#!/usr/bin/env _coffee
-require("./proof") 2, ({ db }, _) ->
-
-  # Here be dragons.
-```
-
-If your harness is written in Streamline.js or you provide an underscore on the
-command then, then Proof uses `_coffee` as the executable in the shebang line.
-Otherwise it uses `coffee`.
 
 ### Asynchronous Harnesses
 
@@ -233,44 +299,45 @@ instead of an object to the require method in your harness.
 The callback function will itself get a callback that is used to return an
 object that is given to the test program.
 
-```coffeescript
-#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module.exports = require("proof") (callback) ->
-  fs.readFile "./configuration.json", "utf8", (error, file) ->
-    if error
-      callback error
-    else
-      mysql = new mysql.Database(JSON.stringify file)
-      mysql.connect (error, connection) ->
-        if error
-          callback error
-        else
-          callback null, { connection }
-```
+```javascript
+#!/usr/bin/env node
 
-Or streamlined.
+var mysql = require('mysql'), fs = require('fs');
 
-```coffeescript
-#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module.exports = require("proof") (_) ->
-  file = fs.readFile "./configuration.json", "utf8", _
-  mysql = new mysql.Database(JSON.stringify file)
-  conneciton = mysql.connect _
-  { connection }
+module.exports = require('proof')(function (async) {
+
+  fs.readFile('./configuration.json', 'utf8', async());
+
+}, function (file) {
+
+  var db = new mysql.Database(JSON.stringify(file));
+  db.connect(async());
+
+}, function (connection) {
+
+  return { connection: connection };
+
+});
 ```
 
 The test itself is no more complicated.
 
-```coffeescript
+```javascript
 #!/usr/bin/env _coffee
-require("./proof") 1, ({ connection }, _) ->
-  results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
-  @equal 12, results[0].num, "employee count"
-  connection.close()
+require('./proof')(1, function (connection, async) {
+
+  async(function () {
+
+    connection.sql("SELECT COUNT(*) AS num FROM Employee", async());
+
+  }, function (results) {
+
+    equal(12, results[0].num, "employee count");
+
+    connection.close(async());
+
+  });
+});
 ```
 
 Note that, you can use asynchronous harnesses with synchronous tests, and create
@@ -284,56 +351,59 @@ assertions of the same named defined in the
 [assert](http://nodejs.org/api/assert.html) Node.js module, except that they
 print a message to `stdout`, instead of throwing an exception.
 
-```coffeescript
-#!/usr/bin/env coffee
-require("proof") 3, ->
-  @ok true, "truth works"
-  @equal 1 + 1, 2, "math works"
-  @deepEqual "a b".split(/\s/), [ "a", "b" ], "strings work"
+```javascript
+#!/usr/bin/env node
+require('proof')(3, funciton (ok, equal, deepEqual) {
+  ok(true, 'truth works');
+  equal(1 + 1, 2, 'math works');
+  deepEqual('a b'.split(/\s/), [ "a", "b" ], 'strings work');
+});
 ```
 
-Proof also defines a `throws` assertion, one that supports Streamline.js. It is
-different from the Node.js `throws`.
+Proof does not define a `throws` assertion. Instead, it uses the asynchronous
+control flow to test assertions.
 
-When used with or without Streamline.js, the block comes last.
+When a step function in the control flow starts with the argument `error`, it
+indicates that this is an error handling step.
 
-```coffeescript
-#!/usr/bin/env coffee
-require ("proof") 1, ->
-  @throws "oops", -> throw new Error "oops"
+```javascript
+#!/usr/bin/env node
+require('proof')(1, function () {
+
+  throw new Error('oops');
+
+}, function (error, equal) {
+  
+  equal(error.message, 'oops', 'error thrown');
+  
+});
 ```
 
-The expected exception message is used as the assertion message by default. You
-can also provide an explicit assertion message.
+If no error is thrown, the assertion is not test, the count of passed tests is
+wrong and the test fails.
 
-```coffeescript
-#!/usr/bin/env coffee
-require ("proof") 1, ->
-  @throws "oops", "exception thrown", -> throw new Error "oops"
+You can test asynchrnonous error the same way.
+
+```javascript
+#!/usr/bin/env node
+
+var fs = require('fs');
+
+require('proof')(1, function (async, say) {
+
+  say('testing file not found'); // be chatty, why not?
+  fs.readFile(__dirname + '/i-do-not-exist.txt', async());
+
+}, function (error, equals) {
+
+  equals(error.code, 'ENOENT', 'file does not exist');
+
+});
 ```
 
-With Streamline.js, you define a callback with an underscore, and pass in the
-underscore before the callback.
-
-```coffeescript
-#!/usr/bin/env _coffee
-require ("proof") 1, (_) ->
-  @throws "oops", _, (_) -> throw new Error "oops"
-```
-
-Here's a practical example of a Streamline.js `throws` assertion.
-
-```coffeescript
-#!/usr/bin/env _coffee
-require ("proof") 1, (_) ->
-  fs = require "fs"
-  error = @throws /not defined/, "failed open message", _, (_) ->
-    fs.open("./missing", "r", _)
-  @equal error?.code, "ENOENT", "failed open code"
-```
-
-As you can see, the `throws` method returns the caught exception. With it, you
-can assert that additional exception properties are set correctly.
+Try not to worry about failure being inferred from count. It is actually really
+easy to see what what went wrong with a test with you keep your tests programs
+unit focused.
 
 ### Exception Handling
 
@@ -344,15 +414,28 @@ releasing system resources, such as memory, sockets and file handles.
 Here's a test that opens a file handle, then closes it like a good citizen.
 
 ```coffeescript
-#!/usr/bin/env _coffee
-require("./proof") 1, ({ fs, tmp }, _) ->
-  fs.open(__filename, "r", _)
+#!/usr/bin/env node
 
-  buffer = new Buffer(2)
-  fs.read(fd, buffer, 0, buffer.length, 0, _)
-  @equal buffer.readInt16BE(0), 0x2321, "shebang magic number"
+require('./proof')(1, function (async) {
 
-  fs.close(fd, _)
+  var buffer = new Buffer(2), fs = require('fs');
+
+  async(function () {
+
+    fs.open(__filename, "r", async());
+
+  }, function (fd) {
+
+    fs.read(fd, buffer, 0, buffer.length, 0, async());
+
+  }, function (equal) {
+
+    equal(buffer.readInt16BE(0), 0x2321, 'shebang magic number');
+  
+    fs.close(fd, async())
+
+  });
+});
 ```
 
 But, what if there is a catastrophic error? Let's say that in the code above,
@@ -398,52 +481,79 @@ the kids like to say. You must be able to run a cleanup function over and over
 again and get the same results.  If a cleanup function deletes a temporary file,
 for example, it can't complain if the temporary file has already been deleted.
 
-```coffeescript
-#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-{exec}  = require "child_process"
-module.exports = require("proof") (_) ->
-  tmp = "#{__dirname}/tmp"
-  @cleanup _, (_) ->
-    try
-      fs.unlink "#{tmp}/#{file}", _ for file in fs.readdir tmp, _
-      fs.rmdir tmp, _
-    catch e
-      throw e if e.code isnt "ENOENT"
-  fs.mkdir tmp, 0755, _
-  { fs, exec, tmp }
+```javascript
+#!/usr/bin/env node
+
+var mysql = require('mysql'), fs = require('fs');
+
+module.exports = require('proof')(function (async) {
+  var tmp = __dirname + '/tmp';
+
+  async(function cleanup () { // named cleanup, so run again at exit
+
+    // nested async delete of tmp directory and contents.
+    async(function () {
+      fs.readdir(tmp, async());
+    }, function (error) {
+      if (error.code == 'ENOENT') async(); // done
+      else throw error; // unexpected
+    }, function (list) {
+      list.forEach(function (file) {
+        fs.unlink(path.resolve(tmp, file), async());
+      });
+    }, function () {
+      fs.rmdir(tmp, async());
+    }
+
+  }, function () {
+
+    // create a new tmp directory for our test
+    fs.mkdir(tmp, 0755, async());
+
+  }, function () {
+
+    // give our test the tmp directory
+    return { tmp: tmp };
+
+  })
+});
 ```
 
-When we register a cleanup function, the cleanup function is called immediately
-upon registration. Cleanup functions are run at the start of a test to cleanup
-in case our last test run exited abnormally. As long as the test does not exit
+When we register a cleanup function, the cleanup function is called upon
+registration. Cleanup functions are run at the start of a test to cleanup in
+case our last test run exited abnormally. As long as the test does not exit
 abnormally, the cleanup function is called again at exit.
 
 In the harness above, we register a cleanup function that deletes files in a
 temporary directory, then deletes the temporary directory. If the directory
 doesn't exist, that's okay, we catch the `ENOENT` exception and return. Because
-the cleanup function is called immediately when we pass it to `@cleanup`, we're
-assured a clean slate. We call `fs.mkdir` without checking to see if it already
-exists. We know that it doesn't.
+the cleanup function is called when we pass it to `async`, we're assured a clean
+slate. We call `fs.mkdir` without checking to see if it already exists. We know
+that it doesn't.
 
 Now we can use our temporary directory in a test. The test doesn't have to
 perform any housekeeping. We can write test after test in the same suite, each
 one making use of this temporary directory, because it is cleaned up after or
 before every run.
 
-```coffeescript
-#!/usr/bin/env _coffee
-require("./proof") 1, ({ fs, exec, tmp }, _) ->
-  program = "#{tmp}/example.sh"
+```javascript
+#!/usr/bin/env node
 
-  fs.writeFile program, "#!/bin/bash\nexit 1\n", "utf8", _
-  fs.chmod program, 0755, _
+var fs = require('fs'), exec = require('child_process').exec;
 
-  try
-    exec program, _
-  catch e
-    @equal e.code, 1, "exit code"
+require('./proof')(1, function (tmp, async) {
+  var program = tmp + '/example.sh'
+
+  async(function () {
+    fs.writeFile(program, '#!/bin/bash\nexit 1\n', 'utf8', async());
+  }, function () {
+    fs.chmod(program, 0755, async());
+  }, function () {
+    exec(program, async());
+  }, function (error, equal) {
+    equal(error.code, 1, 'exit code');
+  });
+});
 ```
 
 In the test above, we create a bash program to to test that error codes work
@@ -454,26 +564,29 @@ Tests can register cleanup functions too. It is generally easier to keep them in
 the harnesses, but its fine to use them in tests as well.
 
 ```coffeescript
-#!/usr/bin/env _coffee
-require("proof") 1, (_) ->
-  fs = require "fs"
-  {exec} = require "child_process"
+#!/usr/bin/env node
 
-  program = "#{__dirname}/example.sh"
+var fs = require('fs'), exec = require('child_process').exec;
 
-  @cleanup _, (_) ->
-    try
-      fs.unlink program, _
-    catch e
-      throw e if e.code isnt "ENOENT"
+require('./proof')(1, function (tmp, async) ->
+  var program = __dirname + '/example.sh'
 
-  fs.writeFile program, "#!/bin/bash\nexit 1\n", "utf8", _
-  fs.chmod program, 0755, _
-
-  try
-    exec program, _
-  catch e
-    @equal e.code, 1, "exit code"
+  async(function cleanup() {
+    async(function () {
+      fs.unlink(program, async());
+    }, function (error) {
+      if (error.code != 'ENOENT') throw error;
+    });
+  }, function () {
+    fs.writeFile(program, '#!/bin/bash\nexit 1\n', 'utf8', async());
+  }, function () {
+    fs.chmod(program, 0755, async());
+  }, function () {
+    exec(program, async());
+  }, function (error, equal) {
+    equal(error.code, 1, 'exit code');
+  });
+});
 ```
 
 Here our test creates a temporary file in the same directory as the test,
@@ -483,9 +596,9 @@ write to it.
 
 A useful pattern falls out of cleanup before. You may want to skip cleanup at
 exit so you can inspect the file output of a test. If so, you can set the
-environment variable `PROOF_NO_CLEANUP=1` before running an individual test. It
-will cleanup before the test but not after. Now you can go through an edit,
-test, inspect cycle and watch how the output changes.
+environment variable `UNTIDY=1` before running an individual test. It will
+cleanup before the test but not after. Now you can go through an edit, test,
+inspect cycle and watch how the output changes.
 
 We count on cleanup before a test to allow us to keep running our tests until
 they pass, without having us have to stop and cleanup cruft after each because a
