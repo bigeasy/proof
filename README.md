@@ -1,6 +1,15 @@
 # Proof &#x2713; [![Build Status](https://secure.travis-ci.org/bigeasy/proof.png?branch=master)](http://travis-ci.org/bigeasy/proof)
 
-A test non-framework for CoffeeScript and Streamlined CoffeeScript.
+A cross-platform UNIX way test non-framework for JavaScript.
+
+## Questions?
+
+If you have a general question, please ask it. I've created a [version 0.2.0
+release tracking issue](https://github.com/bigeasy/proof/issues/96) to notify
+you of updates. Use it to discuss what version 0.2.0 should be.
+
+Please ask questions in the issue, on the Node.js listserv or come find me, in
+IRC on freenode as `prettyrobots`, I'm there most of the time.
 
 ## Philosophy
 
