@@ -1,6 +1,15 @@
 # Proof &#x2713; [![Build Status](https://secure.travis-ci.org/bigeasy/proof.png?branch=master)](http://travis-ci.org/bigeasy/proof)
 
-A test non-framework for CoffeeScript and Streamlined CoffeeScript.
+A cross-platform UNIX way test non-framework for JavaScript.
+
+## Questions?
+
+If you have a general question, please ask it. I've created a [version 0.2.0
+release tracking issue](https://github.com/bigeasy/proof/issues/96) to notify
+you of updates. Use it to discuss what version 0.2.0 should be.
+
+Please ask questions in the issue, on the Node.js listserv or come find me, in
+IRC on freenode as `prettyrobots`, I'm there most of the time.
 
 ## Philosophy
 
@@ -413,7 +422,7 @@ releasing system resources, such as memory, sockets and file handles.
 
 Here's a test that opens a file handle, then closes it like a good citizen.
 
-```coffeescript
+```javascript
 #!/usr/bin/env node
 
 require('./proof')(1, function (async) {
@@ -563,7 +572,7 @@ was missed.
 Tests can register cleanup functions too. It is generally easier to keep them in
 the harnesses, but its fine to use them in tests as well.
 
-```coffeescript
+```javascript
 #!/usr/bin/env node
 
 var fs = require('fs'), exec = require('child_process').exec;
@@ -634,8 +643,8 @@ You can run a test with the proof test runner to get gaudy console output with
 colors and non-ASCII characters (approximated below).
 
 <pre>
-$ proof t/logic/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
+$ proof t/logic/minimal.t
+ &#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
                                       tests (1/1) assertions (2/2) 0.230 Success
 $
 </pre>
@@ -644,9 +653,9 @@ Each test you pass to the test runner is will be run by the test runner. Tests
 in separate suites are run in parallel.
 
 <pre>
-$ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
- &#x2713; t/regex/minimal.t.coffee ................................ (2/2) 0.331 Success
+$ proof t/logic/minimal.t t/regex/minimal.t
+ &#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
+ &#x2713; t/regex/minimal.t ....................................... (2/2) 0.331 Success
                                       tests (2/2) assertions (4/4) 0.561 Success
 $
 </pre>
@@ -656,10 +665,10 @@ $
 As above.
 
 <pre>
-$ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee t/regex/complex.t.coffee
- &#x2713; t/logic/minimal.t.coffee ................................ (2/2) 0.230 Success
- &#x2713; t/regex/minimal.t.coffee ................................ (2/2) 0.331 Success
- &#x2713; t/regex/complex.t.coffee ................................ (2/2) 1.045 Success
+$ proof t/logic/minimal.t t/regex/minimal.t t/regex/complex.t
+ &#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
+ &#x2713; t/regex/minimal.t ....................................... (2/2) 0.331 Success
+ &#x2713; t/regex/complex.t ....................................... (2/2) 1.045 Success
                                       tests (3/3) assertions (6/6) 1.606 Success
 $
 </pre>
@@ -678,10 +687,10 @@ If you design your tests so that they can run in any order, then you can run an
 entire suite of tests with globbing.
 
 <pre>
-$ proof t/*/*.t.coffee
- &#x2713; t/logic/minimal.t.coffee ................................ (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ................................ (2/2)  .331 Success
- &#x2713; t/regex/complex.t.coffee ................................ (2/2) 1.045 Success
+$ proof t/*/*.t
+ &#x2713; t/logic/minimal.t ....................................... (2/2)  .230 Success
+ &#x2713; t/regex/minimal.t ....................................... (2/2)  .331 Success
+ &#x2713; t/regex/complex.t ....................................... (2/2) 1.045 Success
                                       tests (3/3) assertions (6/6) 1.606 Success
 $
 </pre>
