@@ -752,25 +752,46 @@ suit your project's needs.
 
 Changes for each release.
 
-### Version 0.0.15 &mdash; Fri Jul 13 17:00:01 UTC 2012
+### Version 0.0.16
+
+Sun Dec  9 17:25:16 UTC 2012
+
+ * Unclutter root of project directory. #118. #119.
+ * Progress runner exits with success when no input is given. #114.
+ * Unclutter package.json. #114.
+ * Add Node.js 0.8 to Travis CI build. #117.
+ * Add source language file suffix to test program files. #115.
+ * Rewrite `README.md`. #85. #107. #108.
+
+### Version 0.0.15
+
+Fri Jul 13 17:00:01 UTC 2012
 
  * Upgrade to Cadence 0.0.5. #104.
 
-### Version 0.0.14 &mdash; Thu Jul 12 01:50:03 UTC 2012
+### Version 0.0.14
+
+Thu Jul 12 01:50:03 UTC 2012
 
  * Platform detection program. #102.
  * Animate Windows. #103.
  * Print summary on `run` and `plan`. #28.
 
-### Version 0.0.13 &mdash; Wed Jul 11 22:43:24 UTC 2012
+### Version 0.0.13
+
+Wed Jul 11 22:43:24 UTC 2012
 
  * Run on Windows. #101. #99. #98. #47.
 
-### Version 0.0.12 &mdash; Sun Jul  8 05:58:51 UTC 2012
+### Version 0.0.12
+
+Sun Jul  8 05:58:51 UTC 2012
 
  * Upgrade to Cadence 0.0.2. #100.
 
-### Version 0.0.11 &mdash; Sun Jul  8 05:24:13 UTC 2012
+### Version 0.0.11
+
+Sun Jul  8 05:24:13 UTC 2012
 
  * Extract Cadence control flow library. #97. #90. #52.
  * Convert to closure style removing `Test` class. #91.
@@ -780,11 +801,15 @@ Changes for each release.
  * Removed the implicit `context` argument that was used with structured
    assignment in CoffeeScript tests. #80.
 
-### Version 0.0.10 &mdash; Sat Jun 30 16:41:44 UTC 2012
+### Version 0.0.10
+
+Sat Jun 30 16:41:44 UTC 2012
 
  * `proof progress` exits non-zero for any failure. #87.
 
-### Version 0.0.9 &mdash; Fri Jun 29 13:59:21 UTC 2012
+### Version 0.0.9
+
+Fri Jun 29 13:59:21 UTC 2012
 
  * Preserve leading whitespace in output parsing. #27.
  * Usage messages for all commands. #23.
@@ -798,18 +823,24 @@ Changes for each release.
  * Detect tests without plans. #75.
  * Display compilation error output. #22.
 
-### Version 0.0.8 &mdash; Thu Jun 28 21:05:46 UTC 2012
+### Version 0.0.8
+
+Thu Jun 28 21:05:46 UTC 2012
 
  * Wait on pending output before exit. #72.
 
-### Version 0.0.7 &mdash; Wed Jun 27 18:22:41 UTC 2012
+### Version 0.0.7
+
+Wed Jun 27 18:22:41 UTC 2012
 
  * Fixed `this` binding error in `bailout`. #68.
  * Development dependencies in `pacakage.json` only. #66.
  * Populated `.npmignore`. #67.
  * Increase digit width to fit. #26.
 
-### Version 0.0.6 &mdash; Wed Jun 27 17:08:41 UTC 2012
+### Version 0.0.6
+
+Wed Jun 27 17:08:41 UTC 2012
 
  * Added `TIMELESS` environment variable switch to disable timeouts. #60.
  * Fix named callbacks. #57.
@@ -820,7 +851,9 @@ Changes for each release.
  * Nicer error messages. #17.
  * Named cleanup functions. #48.
 
-### Version 0.0.5 &mdash; Sat Jun 16 10:01:21 UTC 2012
+### Version 0.0.5
+
+Sat Jun 16 10:01:21 UTC 2012
 
  * Exit non-zero if actual does not equal expxected. #46.
  * Hide `Test` private members. #45.
@@ -834,12 +867,16 @@ Changes for each release.
  * `proof-errors` non-zero exit. #34.
  * `UNTIDY` alias for `PROOF_NO_CLEANUP`. #29.
 
-### Version 0.0.4 &mdash; Sun May 13 19:43:30 UTC 2012
+### Version 0.0.4
+
+Sun May 13 19:43:30 UTC 2012
 
  * Showing standard error and standard output prior to a failed test or a bail
    out in failed assertions display. #24.
 
-### Version 0.0.3 &mdash; Sun May 13 17:24:09 UTC 2012
+### Version 0.0.3
+
+Sun May 13 17:24:09 UTC 2012
  
  * `proof errors` displays bail outs. #20.
  * Created `proof errors` to display the failed assertions of a failed test run.
@@ -853,7 +890,9 @@ Changes for each release.
  * Abend when test is specified twice in a run. #4.
  * Spell check `README.md`.
  
-### Version 0.0.2 &mdash; Wed May  9 03:52:57 UTC 2012
+### Version 0.0.2
+
+Wed May  9 03:52:57 UTC 2012
 
  * Correctly summing assertions. #13.
  * Failed assertions no longer repeat message. #11.
