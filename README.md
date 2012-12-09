@@ -752,6 +752,17 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.16
+
+Sun Dec  9 17:25:16 UTC 2012
+
+ * Unclutter root of project directory. #118. #119.
+ * Progress runner exits with success when no input is given. #114.
+ * Unclutter package.json. #114.
+ * Add Node.js 0.8 to Travis CI build. #117.
+ * Add source language file suffix to test program files. #115.
+ * Rewrite `README.md`. #85. #107. #108.
+
 ### Version 0.0.15
 
 Fri Jul 13 17:00:01 UTC 2012
