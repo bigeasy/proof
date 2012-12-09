@@ -12,7 +12,6 @@
     { "test": "(node bin/proof run t/*/*.t.* t/*/*/*.t.* | tee .proof.out | node bin/proof progress) || (node bin/proof errors < .proof.out)" }
 ,   "main":             "./lib/proof"
 ,   "bin":              { "proof": "./bin/proof"
-                        , "proof-getopt": "./bin/proof-getopt"
                         , "proof-default": "./bin/proof-default"
                         }
 }

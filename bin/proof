@@ -622,19 +622,21 @@ parse = function (stream, callback) {
       }
     }
   }
-  var count, done, out, programs, abended;
+  var count, data, done, out, programs, abended;
   programs = {};
   out = [""][0];
   count = 0;
   done = false;
   stream.setEncoding("utf8");
   stream.on("end", function () {
-    if (!done) {
-      return process.exit(1);
+    if (data && !done) {
+      process.exit(1);
+      say(data, done);
     }
   });
   return stream.on("data", abender(function (chunk) {
     var code, event, expected, file, line, lines, match, program, rest, time, type, _i, _len, _ref1, _results;
+    data = true;
     out += chunk;
     lines = out.split(/\r?\n/);
     out = lines.pop();
