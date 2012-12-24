@@ -1,0 +1,3 @@
+
+> ✘ t/executable/abundant: expected 2 tests but got 3: exited with code 0
+

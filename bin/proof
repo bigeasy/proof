@@ -280,7 +280,7 @@ progress = (function () {
   // to overwrite the line.
   function bar (program, terminal) {
     var color, dots, file, icon, status, summary;
-    if (!(program.expected == '?' && program.type == 'run') && ((program.actual > program.expected || program.expected == '?' || program.passed < program.actual || program.bailed || ((program.code != null) && program.code)))) {
+    if (!(program.expected == '?' && program.type == 'run') && ((program.actual > program.expected || program.expected == '?' || program.passed < program.actual || program.bailed || ((program.code != null) && (program.code || program.actual != program.expected))))) {
       extend(program, {
         status: "Failure",
         color: colorize.red,
@@ -485,7 +485,7 @@ errors = (function () {
         if (event.type === "test" && event.ok) delete failed[event.file];
       } else if ((event.type === "bail") ||
                  (event.type === "test" && !(event.ok && planned)) ||
-                 (event.type === "exit" && (event.code || !planned))) {
+                 (event.type === "exit" && (event.code || !planned || (event.expected != event.actual)))) {
         queue.push(failed[event.file] = {
           events: backlog[event.file].concat([event])
         });
@@ -531,8 +531,16 @@ errors = (function () {
             prefix = "";
             break;
           case "exit":
-            if (event.code || !planned) {
-              process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + (planned ? "" : ": no plan given") + ": exited with code " + event.code +  "\n");
+            if (event.code || !planned || (event.actual != event.expected)) {
+              var line = [];
+              line.push("> " + (colorize.red("\u2718")) + " " + event.file);
+              if (!planned) {
+                line.push(": no plan given");
+              } else if (event.actual != event.expected) {
+                line.push(": expected " + event.expected + " test" + (event.expected == 1 ? "" : "s")  + " but got " + event.actual);
+              }
+              line.push(": exited with code " + event.code);
+              process.stdout.write(line.join("") +  "\n");
               prefix = "\n\n";
             }
             queue.shift();
