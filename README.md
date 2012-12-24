@@ -879,8 +879,7 @@ Sun May 13 19:43:30 UTC 2012
 Sun May 13 17:24:09 UTC 2012
  
  * `proof errors` displays bail outs. #20.
- * Created `proof errors` to display the failed assertions of a failed test run.
-   #5.
+ * Created `proof errors` to display the failed assertions of a failed test run. #5.
  * Fail on when passed tests exceed expected tests. #6.
  * Correctly reporting tests that fail before they start, like failure to
    compile. #8.

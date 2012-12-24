@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+console.log('1..2');
+console.log('ok 1 one');
