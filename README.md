@@ -752,6 +752,12 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.17
+
+Mon Feb 18 07:42:56 UTC 2013
+
+ * Report missing tests from errors/progress runners. #121.
+
 ### Version 0.0.16
 
 Sun Dec  9 17:25:16 UTC 2012
