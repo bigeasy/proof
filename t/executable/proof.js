@@ -14,7 +14,7 @@ function execute (program, parameters, input, callback) {
   } else if (input != null) {
     input.pipe(proc.stdin);
   }
-  proc.on('exit', function (code) {
+  proc.on('close', function (code) {
     function drained () {
       if (++count == 3) {
         callback(null, code, stdout.join(''), stderr.join(''));
