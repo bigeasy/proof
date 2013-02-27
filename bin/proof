@@ -1019,19 +1019,19 @@ function pathSearch (executable, callback) {
     resolved.push(path.resolve(part, executable + '.exe'));
     resolved.push(path.resolve(part, executable));
   });
-  cadence(function (cadence) {
-    cadence(function shift () {
+  cadence(function (async) {
+    async(function shift () {
       if (resolved.length) return resolved.shift();
       else abend("cannot find executable: " + executable);
     }, function (resolved) {
-      fs.stat(resolved, cadence()); 
+      fs.stat(resolved, async()); 
     }, function (error, shift) {
-      cadence(shift)();
+      async(shift)();
     }, function (stat, resolved, shift) {
       if (stat.isFile()) {
         return resolved;
       } else {
-        cadence(shift); 
+        async(shift); 
       }
     });
   })(callback);
