@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 /*
+
+___ create _ usage: en_US ___
 usage: proof create [test] [harness] [<parameter>...] [_] [count]
 
 test:
@@ -17,7 +19,8 @@ _:
   Test is a Streamline.js test, so pass in an underscore.
 expected:
   The number of tests expected.
---
+
+___ json _ usage: en_US ___
 usage: proof json [<test>...]
 
   Display proof output as JSON.
@@ -40,7 +43,8 @@ description:
   `proof json` converts proof unified test output into a JSON string for
   use with JavaScript utilities of your own creation; Node.js command
   line utilities or web applications.
----
+
+___ progress _ usage: en_US ___
 usage: proof progress [options] [<files>...]
 
   Display proof output using a colorized progress meter.
@@ -67,7 +71,8 @@ description:
   display the progress of a test run as it is running. Using a utility
   like `tee`, you can both pipe `proof run` output to `proof progress`
   and save it to file for later reporting.
----
+
+___ run _ usage: en_US ___
 usage: proof run [options] [<test>...]
 
   Run test programs and emit unified runner output.
@@ -75,7 +80,7 @@ usage: proof run [options] [<test>...]
 options:
 
     -h,   --help                  display this usage information
-    -p,   --processes [count]     number of processes to run
+    -p,   --processes <count>     number of processes to run
 
 invocation:
 
@@ -94,7 +99,8 @@ description:
 
   The output can be saved to file or piped back into proof with one of
   the other proof commands to report progress or emit alternate formats.
----
+
+___ errors _ usage: en_US ___
 usage: proof errors [options] [<test>...]
 
   Display output of failed assertions.
@@ -103,7 +109,7 @@ options:
 
     -h,   --help                  display this usage information
     -M,   --monochrome            do not display color
-    -p,   --processes [count]     number of processes to run
+    -p,   --processes <count>     number of processes to run
 
 invocation:
 
@@ -118,11 +124,12 @@ description:
   `proof errors` displays failure assertions and failure conditions in
   context, with the program output and error output that preceded and
   follow the failure.
----
+
+___ usage ___
 */
 
-var action, argv, blue, create, die, errors, extend, fs, gray, green, json, options,
-    opts, parse, parser, path, progress, red, run, say, spawn, _ref, overwrite;
+var action, argv, blue, create, errors, extend, fs, gray, green, json,
+    opts, parse, parser, path, red, spawn, _ref, overwrite;
 
 var fs = require("fs")
   , path = require("path")
@@ -157,34 +164,6 @@ function abend (message, use) {
   throw new Abend(message);
 }
 
-function getopt (pat, argv) {
-  var opts = {}, arg, i = 0, $, arg, opt, l, alts;
-  while (!(i >= argv.length || (argv[i] == "-" && argv.shift()) || !/^--?[^-]/.test(argv[i]))) {
-    arg = argv.shift();
-    arg = /^(--[^=]+)=(.*)$/.exec(arg) || /^(-[^-])(.+)$/.exec(arg) || [false, arg, true];
-    alts = pat.replace(arg[1], "").replace(/-[^,],--[^|]+\|/g, '').split("|");
-    if ((l = alts.length - 1) != 1) abend((l ? "ambiguous: " : "unknown option: ") + arg[1], true);
-    opt = (arg[1] + /,([^:]*)/.exec(alts[0])[1]).replace(/^(-[^-]+)?--/, '');
-    if (!opts[opt]) opts[opt] = [];
-    if (($ = /(:+)$/.exec(alts[0]))) {
-      if ($[1].length == 1 || (argv.length && argv[0][0] != "-")) {
-        if (!arg[0]) {
-          if (!argv.length) abend("missing argument for: " + (arg[1][1] != "-" ? arg[1] : "--" + opt), true);
-          arg[2] = argv.shift();
-        } 
-      }
-    } else if (arg[0]) {
-      if (arg[1][1] != "-") {
-        argv.unshift("-" + arg[2]);
-      } else {
-        abend("option does not take value: " + (arg[1][1] != "-" ? arg[1] : "--" + opt), true);
-      }
-    } 
-    opts[opt].push(arg[2]);
-  }
-  return opts;
-}
-
 function say () {
   var splat;
   splat = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
@@ -199,6 +178,27 @@ function die () {
   }
   return process.exit(1);
 };
+
+function validator (callback) {
+  if (typeof callback != "function") throw new Error("no callback");
+  return function (forward) { return check(callback, forward) }
+}
+
+function check (callback, forward) {
+  if (typeof callback != "function") throw new Error("no callback");
+  if (typeof forward != "function") throw new Error("no forward");
+  return function (error) {
+    if (error) {
+      callback(error);
+    } else {
+      try {
+        forward.apply(null, __slice.call(arguments, 1));
+      } catch (error) {
+        callback(error);
+      }
+    }
+  }
+}
 
 function json () {
   var object = {};
@@ -237,12 +237,12 @@ function json () {
 };
 
 function colorization (options) {
-  if (!options.monochrome) options.monochrome = [ false ];
+  if (!options.params.monochrome) options.params.monochrome = false;
   function colorize (color) {
     return function (text) { return "" + color + text + "\u001B[0m" };
   };
   function monochrome (text) { return text }
-  if (options.monochrome[0]) return {
+  if (options.params.monochrome) return {
     red: monochrome, green: monochrome, blue: monochrome, gray: monochrome
   }
   return {
@@ -254,7 +254,7 @@ function colorization (options) {
 }
 
 // Generate progress reporting, something to watch as the tests are run.
-progress = (function () {
+function progress (options) {
   var colorize;
   // Visual cue for table layout.
   function fill (filler, count) {
@@ -268,9 +268,9 @@ progress = (function () {
       str = ("000" + str).slice(-4);
     }
     str = str.replace(/(\d{3})$/, ".$1");
-    var fit = ("        " + str).slice(-(+options.digits[0] + 1));
+    var fit = ("        " + str).slice(-(+options.params.digits + 1));
     if (fit.length < str.length) {
-      options.digits[0] = str.length - 1;
+      options.params.digits = str.length - 1;
       return str;
     }
     return fit;
@@ -290,149 +290,148 @@ progress = (function () {
     // Format summary.
     summary = "(" + program.passed + "/" + (program.expected || 0) + ") " + (time(program));
     color = program.color, icon = program.icon, file = program.file, status = program.status;
-    dots = fill(".", options.width[0] - 6 - file.length - summary.length - status.length);
+    dots = fill(".", options.params.width - 6 - file.length - summary.length - status.length);
     return " " + (color(icon)) + " " + file + " " + dots + " " + summary + " " + (color(status)) + terminal;
-  };
-  return function () {
-    var displayed, durations, programs;
-    colorize = colorization(options);
-    // Default witdth.
-    options.width || (options.width = [76]);
-    // Default timing digits, or a reaonable amount if the user is being
-    // unreasonable.
-    options.digits || (options.digits = [4]);
-    if (options.digits[0] < 4) {
-      options.digits[0] = 4;
-    }
-    if (options.digits[0] > 10) {
-      options.digits[0] = 10;
-    }
-    // Consume test output from standard input.
-    process.stdin.resume();
-    durations = {};
-    displayed = null;
-    programs = {};
-    return parse(process.stdin, function (event) {
-      var color, dots, file, icon, program, stats, status, summary, tests, _name, _ref1;
-      // Display the output if nothing else is being displayed.
-      displayed || (displayed = event.file);
-      // If the type is run, we're starting up a new test, create a new program
-      // structure to gather the test output.
-      if (event.type === "run") {
-        if ((_ref1 = programs[_name = event.file]) == null) {
-          programs[_name] = {
-            actual: 0,
-            expected: '?',
-            color: colorize.green,
-            file: event.file,
-            start: Number.MAX_VALUE,
-            status: "Success",
-            time: 0,
-            passed: 0,
-            icon: "\u2713"
-          };
-        }
-      }
-      // At the end of all tests, we print our summary, otherwise we print.
-      if (event.type === "eof") {
-        summary = {
+  }
+
+  var displayed, durations, programs;
+  colorize = colorization(options);
+  // Default width.
+  options.params.width || (options.params.width = 76);
+  // Default timing digits, or a reasonable amount if the user is being
+  // unreasonable.
+  options.params.digits || (options.params.digits = 4);
+  if (options.params.digits < 4) {
+    options.params.digits = 4;
+  }
+  if (options.params.digits > 10) {
+    options.params.digits = 10;
+  }
+  // Consume test output from standard input.
+  process.stdin.resume();
+  durations = {};
+  displayed = null;
+  programs = {};
+  return parse(process.stdin, function (event) {
+    var color, dots, file, icon, program, stats, status, summary, tests, _name, _ref1;
+    // Display the output if nothing else is being displayed.
+    displayed || (displayed = event.file);
+    // If the type is run, we're starting up a new test, create a new program
+    // structure to gather the test output.
+    if (event.type === "run") {
+      if ((_ref1 = programs[_name = event.file]) == null) {
+        programs[_name] = {
           actual: 0,
-          passed: 0,
-          expected: 0,
-          time: 0,
+          expected: '?',
+          color: colorize.green,
+          file: event.file,
           start: Number.MAX_VALUE,
-          count: 0,
-          code: 0
-        };
-        tests = {
-          actual: 0,
-          passed: 0
-        };
-        for (file in programs) {
-          program = programs[file];
-          if (program.code) {
-            summary.code = program.code;
-          }
-          tests.actual++;
-          if (program.expected == program.passed) {
-            tests.passed++;
-          }
-          summary.count++;
-          summary.actual += program.actual || 0;
-          summary.passed += program.passed || 0;
-          if (program.expected == '?') {
-            summary.planless = true;
-          } else {
-            summary.expected += program.expected;
-          }
-          if (!program.time) {
-            continue;
-          }
-          summary.start = Math.min(summary.start, program.start);
-          summary.time = Math.max(summary.time, program.time);
-        }
-        summary.file = "tests (" + tests.passed + "/" + tests.actual + ") assertions";
-        extend(summary, !program.bailed && summary.actual == summary.expected && summary.passed === summary.expected && !summary.code && !summary.planless ? {
-          icon: "\u2713",
           status: "Success",
-          color: colorize.green
-        } : {
-          icon: "\u2718",
-          status: "Failure",
-          color: colorize.red
-        });
-        // Format summary.
-        stats = "(" + summary.passed + "/" + summary.expected + ") " + (time(summary));
-        color = summary.color, icon = summary.icon, file = summary.file, status = summary.status;
-        dots = fill(" ", options.width[0] - 6 - summary.file.length - stats.length - status.length);
-        process.stdout.write(" " + (color(' ')) + " " + dots + " " + file + " " + stats + " " + (color(status)) + "\n");
-        overwrite = false;
-        if (summary.status == "Failure") {
-          process.on("exit", function () { process.exit(1) });
-        }
-      } else {
-        // Otherwise update duration.
-        programs[event.file].duration = event.time - event.start;
-        switch (event.type) {
-          case "run":
-            extend(programs[event.file], event);
-            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
-              overwrite = true;
-              process.stdout.write(bar(programs[event.file], '\033[0G'));
-            }
-            break;
-          case "plan":
-            programs[event.file].expected = event.expected;
-            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
-              overwrite = true;
-              process.stdout.write(bar(programs[event.file], '\033[0G'));
-            }
-            break;
-          case "test":
-            extend(programs[event.file], event);
-            if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
-              overwrite = true;
-              process.stdout.write(bar(programs[event.file], '\033[0G'));
-            }
-            break;
-          case "bail":
-            if (event.file === displayed) {
-              displayed = null;
-            }
-            programs[event.file].bailed = true;
-            break;
-          case "exit":
-            if (event.file === displayed) {
-              displayed = null;
-            }
-            program = extend(programs[event.file], event);
-            overwrite = false;
-            process.stdout.write(bar(program, "\n"));
-        }
+          time: 0,
+          passed: 0,
+          icon: "\u2713"
+        };
       }
-    });
-  };
-})();
+    }
+    // At the end of all tests, we print our summary, otherwise we print.
+    if (event.type === "eof") {
+      summary = {
+        actual: 0,
+        passed: 0,
+        expected: 0,
+        time: 0,
+        start: Number.MAX_VALUE,
+        count: 0,
+        code: 0
+      };
+      tests = {
+        actual: 0,
+        passed: 0
+      };
+      for (file in programs) {
+        program = programs[file];
+        if (program.code) {
+          summary.code = program.code;
+        }
+        tests.actual++;
+        if (program.expected == program.passed) {
+          tests.passed++;
+        }
+        summary.count++;
+        summary.actual += program.actual || 0;
+        summary.passed += program.passed || 0;
+        if (program.expected == '?') {
+          summary.planless = true;
+        } else {
+          summary.expected += program.expected;
+        }
+        if (!program.time) {
+          continue;
+        }
+        summary.start = Math.min(summary.start, program.start);
+        summary.time = Math.max(summary.time, program.time);
+      }
+      summary.file = "tests (" + tests.passed + "/" + tests.actual + ") assertions";
+      extend(summary, !program.bailed && summary.actual == summary.expected && summary.passed === summary.expected && !summary.code && !summary.planless ? {
+        icon: "\u2713",
+        status: "Success",
+        color: colorize.green
+      } : {
+        icon: "\u2718",
+        status: "Failure",
+        color: colorize.red
+      });
+      // Format summary.
+      stats = "(" + summary.passed + "/" + summary.expected + ") " + (time(summary));
+      color = summary.color, icon = summary.icon, file = summary.file, status = summary.status;
+      dots = fill(" ", options.params.width - 6 - summary.file.length - stats.length - status.length);
+      process.stdout.write(" " + (color(' ')) + " " + dots + " " + file + " " + stats + " " + (color(status)) + "\n");
+      overwrite = false;
+      if (summary.status == "Failure") {
+        process.on("exit", function () { process.exit(1) });
+      }
+    } else {
+      // Otherwise update duration.
+      programs[event.file].duration = event.time - event.start;
+      switch (event.type) {
+        case "run":
+          extend(programs[event.file], event);
+          if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
+            overwrite = true;
+            process.stdout.write(bar(programs[event.file], '\033[0G'));
+          }
+          break;
+        case "plan":
+          programs[event.file].expected = event.expected;
+          if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
+            overwrite = true;
+            process.stdout.write(bar(programs[event.file], '\033[0G'));
+          }
+          break;
+        case "test":
+          extend(programs[event.file], event);
+          if (event.file === displayed && process.stdout.isTTY && process.env["TRAVIS"] != "true") {
+            overwrite = true;
+            process.stdout.write(bar(programs[event.file], '\033[0G'));
+          }
+          break;
+        case "bail":
+          if (event.file === displayed) {
+            displayed = null;
+          }
+          programs[event.file].bailed = true;
+          break;
+        case "exit":
+          if (event.file === displayed) {
+            displayed = null;
+          }
+          program = extend(programs[event.file], event);
+          overwrite = false;
+          process.stdout.write(bar(program, "\n"));
+      }
+    }
+  });
+}
 
 // Problem with errors is that output can be interleaved, so we need to gather
 // up the lines of output after a failed assertion, or else the output of other
@@ -452,104 +451,96 @@ progress = (function () {
 // long running test are interleaved, then we might want to view the tests one
 // at a time by piping the test through `grep`, or piping it through `sort`,
 // before passing it to `proof errors`.
-errors = (function () {
-  // TODO Shouldn't `test` be `assertion`?
-  return function () {
-    var backlog, failed, offset, prefix, queue, planned;
-    var colorize = colorization(options);
-    process.stdin.resume();
-    queue = [];
-    failed = {};
-    prefix = "";
-    backlog = {};
-    offset = 2;
-    return parse(process.stdin, function (event) {
-      var _results;
-      if (event.type === "run") {
-        planned = false;
-        backlog[event.file] = [
-          {
-            type: "out",
-            line: ""
-          }, {
-            type: "out",
-            line: ">--"
-          }, {
-            type: "out",
-            line: ""
-          }
-        ];
-      }
-      if (failed[event.file]) {
-        failed[event.file].events.push(event);
-        if (event.type === "test" && event.ok) delete failed[event.file];
-      } else if ((event.type === "bail") ||
-                 (event.type === "test" && !(event.ok && planned)) ||
-                 (event.type === "exit" && (event.code || !planned || (event.expected != event.actual)))) {
-        queue.push(failed[event.file] = {
-          events: backlog[event.file].concat([event])
-        });
-        if (event.type === "test") {
-          backlog[event.file].length = 3;
-        } else {
-          delete backlog[event.file];
+function errors (options) {
+  var queue = [], failed = {}, prefix = "", backlog = {}, offset = 2,
+      colorize = colorization(options);
+  process.stdin.resume();
+  parse(process.stdin, function (event) {
+    var _results;
+    if (event.type === "run") {
+      planned = false;
+      backlog[event.file] = [
+        {
+          type: "out",
+          line: ""
+        }, {
+          type: "out",
+          line: ">--"
+        }, {
+          type: "out",
+          line: ""
         }
-      } else if (event.type === "plan") {
-        planned = true;
-      } else if (event.type === "test") {
+      ];
+    }
+    if (failed[event.file]) {
+      failed[event.file].events.push(event);
+      if (event.type === "test" && event.ok) delete failed[event.file];
+    } else if ((event.type === "bail") ||
+               (event.type === "test" && !(event.ok && planned)) ||
+               (event.type === "exit" && (event.code || !planned || (event.expected != event.actual)))) {
+      queue.push(failed[event.file] = {
+        events: backlog[event.file].concat([event])
+      });
+      if (event.type === "test") {
         backlog[event.file].length = 3;
-      } else if (event.type === "exit") {
+      } else {
         delete backlog[event.file];
-      } else if (event.type !== "eof") {
-        backlog[event.file].push(event);
-      } else if (event.type === "eof" && offset !== 2) {
-        process.stdout.write("\n");
-        process.on('exit', function () { process.exit(1) });
       }
-      while (queue.length && queue[0].events.length) {
-        event = queue[0].events.shift();
-        if (offset-- > 0) {
-          continue;
-        }
-        switch (event.type) {
-          case "bail":
-            process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": Bail Out!\n");
-            break;
-          case "test":
-            if (!planned) {
-              process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": no plan given: " + event.message + "\n");
-              planned = true;
-            } else if (event.ok) {
-              queue.shift();
-            } else {
-              process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": " + event.message + "\n");
-            }
-            break;
-          case "err":
-          case "out":
-            process.stdout.write("" + event.line + "\n");
-            prefix = "";
-            break;
-          case "exit":
-            if (event.code || !planned || (event.actual != event.expected)) {
-              var line = [];
-              line.push("> " + (colorize.red("\u2718")) + " " + event.file);
-              if (!planned) {
-                line.push(": no plan given");
-              } else if (event.actual != event.expected) {
-                line.push(": expected " + event.expected + " test" + (event.expected == 1 ? "" : "s")  + " but got " + event.actual);
-              }
-              line.push(": exited with code " + event.code);
-              process.stdout.write(line.join("") +  "\n");
-              prefix = "\n\n";
-            }
+    } else if (event.type === "plan") {
+      planned = true;
+    } else if (event.type === "test") {
+      backlog[event.file].length = 3;
+    } else if (event.type === "exit") {
+      delete backlog[event.file];
+    } else if (event.type !== "eof") {
+      backlog[event.file].push(event);
+    } else if (event.type === "eof" && offset !== 2) {
+      process.stdout.write("\n");
+      process.on('exit', function () { process.exit(1) });
+    }
+    while (queue.length && queue[0].events.length) {
+      event = queue[0].events.shift();
+      if (offset-- > 0) {
+        continue;
+      }
+      switch (event.type) {
+        case "bail":
+          process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": Bail Out!\n");
+          break;
+        case "test":
+          if (!planned) {
+            process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": no plan given: " + event.message + "\n");
+            planned = true;
+          } else if (event.ok) {
             queue.shift();
-            break;
-        }
+          } else {
+            process.stdout.write("> " + (colorize.red("\u2718")) + " " + event.file + ": " + event.message + "\n");
+          }
+          break;
+        case "err":
+        case "out":
+          process.stdout.write("" + event.line + "\n");
+          prefix = "";
+          break;
+        case "exit":
+          if (event.code || !planned || (event.actual != event.expected)) {
+            var line = [];
+            line.push("> " + (colorize.red("\u2718")) + " " + event.file);
+            if (!planned) {
+              line.push(": no plan given");
+            } else if (event.actual != event.expected) {
+              line.push(": expected " + event.expected + " test" + (event.expected == 1 ? "" : "s")  + " but got " + event.actual);
+            }
+            line.push(": exited with code " + event.code);
+            process.stdout.write(line.join("") +  "\n");
+            prefix = "\n\n";
+          }
+          queue.shift();
+          break;
       }
-    });
-  };
-})();
+    }
+  });
+}
 
 parser = {
   plan: function (plan) {
@@ -775,9 +766,9 @@ function shebang (program, parameters, options, callback) {
   }
 }
 
-run = function () {
+function run (options) {
 try {
-  options.processes || (options.processes = [1]);
+  options.params.processes || (options.params.processes = 1);
   var dirname, displayed, emit, execute, failures, i, key, next, parallel, program, programs, seen, value, _i, _j, _len, _results;
   parallel = {};
   seen = {};
@@ -903,7 +894,7 @@ try {
       });
     });
   }
-  next = options.processes[0];
+  next = options.params.processes;
   _results = [];
   for (i = _j = 0; 0 <= next ? _j < next : _j > next; i = 0 <= next ? ++_j : --_j) {
     if (parallel[i]) {
@@ -997,15 +988,6 @@ create = function () {
   });
 };
 
-// Options for our getopt like options parser.
-options =
-{ json: "-h,--help|"
-, progress: "-d,--digits:|-w,--width:|-M,--monochrome|-h,--help|"
-, run: "-p,--processes:|-h,--help|"
-, errors: "-M,--monochrome|-h,--help|"
-, platform: ""
-};
-
 argv = process.argv.slice(2);
 
 function pathSearch (executable, callback) {
@@ -1044,33 +1026,29 @@ function platform () {
   process.exit(1);
 }
 
-// Choose an option based on an action name.
-if ((opts = options[argv[0]]) != null) {
-  (function () {
-    action = argv.shift();
-    options = getopt(opts, argv);
-    if (options.help && options.help[0]) abend(0, true);
-    return {
-      create: create,
-      json: json,
-      run: run,
-      progress: progress,
-      errors: errors,
-      platform: platform
-    }[action]();
-  })();
-} else {
-  (function () {
-    var executable, parts, env = {}, path = require("path");
-    if (argv.length && !/[-.\/]/.test(argv[0])) {
-      executable = "proof-" + (argv.shift());
-    } else {
-      executable = "proof-default";
-    }
+function main (options) {
+  ({
+    create: create,
+    json: json,
+    run: run,
+    progress: progress,
+    errors: errors,
+    platform: platform
+  })[options.command](options);
+}
+
+function abended (usage, message) {
+  if (!usage) {
+    var executable = argv.length && !/[-.\/]/.test(argv[0]) ? "proof-" + (argv.shift())
+                                                            : "proof-default";
     pathSearch(executable, function (error, resolved) {
       shebang(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
         child.on("exit", function (code) { process.exit(code) })
       });
     });
-  })();
+  }
 }
+
+arguable.parse('en_US', __filename, process.argv.slice(2), main, abended);
+
+/* vim: set ft=javascript: */

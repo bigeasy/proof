@@ -2,6 +2,7 @@
 
 /*
 
+___ usage: en_US ___
 usage: proof default [options] [<files>...]
 
   Run tests and display progress a colorized progress meter.
@@ -27,39 +28,31 @@ description:
   running. Using a utility like `tee`, you can both pipe `proof run`
   output to `proof progress` and save it to file for later reporting.
 
-:usage
+___ usage ___
 
 */
 
 var arguable = require('arguable')
-  , options
-  , spawn = require('child_process').spawn
-  , progress = {}, run = {};
+  , spawn = require('child_process').spawn;
 
-try {
-  options = arguable.parse(__filename, 'default', process.argv.slice(2))
-} catch (e) {
-  console.error('error: ' + e.message);
-  console.error(e.usage);
-  process.exit(1);
-}
-
-if (options.help) {
-  console.log(options.$usage);
-} else {
-  options.$given.forEach(function (name) {
+function main (options) {
+  var progress = {}, run = {};
+  options.given.forEach(function (name) {
     if ("help" == name) {
-      console.log(options.$usage);
+      options.usage();
     } else if (/^(monochrome|width|digits)$/.test(name)) {
       progress[name] = options[name]; 
     } else {
       run[name] = options[name]; 
     }
   });
-
   progress = spawn('node', arguable.flatten(__dirname + '/proof', 'progress', progress), { customFds: [ -1, 1, 2 ] });
-  run = spawn('node', arguable.flatten(__dirname + '/proof', 'run', run, options.$argv), { customFds: [ -1, -1, 2 ] });
+  run = spawn('node', arguable.flatten(__dirname + '/proof', 'run', run, options.args), { customFds: [ -1, -1, 2 ] });
   run.stdout.pipe(progress.stdin);
 
   progress.on('exit', function (code) { process.exit(code) });
 }
+
+arguable.parse('en_US', __filename, process.argv.slice(2), main);
+
+/* vim: set ft=javascript: */
