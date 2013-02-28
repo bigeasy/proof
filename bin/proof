@@ -2,24 +2,6 @@
 
 /*
 
-___ create _ usage: en_US ___
-usage: proof create [test] [harness] [<parameter>...] [_] [count]
-
-test:
-  Name of the test.
-harness:
-  Name and path to test harness relative to test file. By default the
-  generator will look for a source file with a base name of `./proof`
-  relative to the test file. The file is expected to have an extension of
-  one of the Proof supported languages, either `.coffee`, `._coffee`, `.js`
-  or `._js`.
-parameter:
-  One or more parameters to extract from the test context.
-_:
-  Test is a Streamline.js test, so pass in an underscore.
-expected:
-  The number of tests expected.
-
 ___ json _ usage: en_US ___
 usage: proof json [<test>...]
 
@@ -100,6 +82,14 @@ description:
   The output can be saved to file or piped back into proof with one of
   the other proof commands to report progress or emit alternate formats.
 
+___ strings ___
+
+  spaces:
+    program names cannot contain spaces: %s
+
+  once:
+    a program must only run once in a test run: %s
+
 ___ errors _ usage: en_US ___
 usage: proof errors [options] [<test>...]
 
@@ -132,6 +122,7 @@ var action, argv, blue, create, errors, extend, fs, gray, green, json,
     opts, parse, parser, path, red, spawn, _ref, overwrite;
 
 var fs = require("fs"),
+    util = require("util"),
     path = require("path"),
     spawn = require("child_process").spawn,
     arguable = require('arguable'),
@@ -535,42 +526,31 @@ function errors (options) {
 
 parser = {
   plan: function (plan) {
-    var expected, match;
-    if (match = /^1..(\d+)$/.exec(plan)) {
-      expected = match[1];
-    }
-    if (expected) {
-      expected = parseInt(expected, 10);
-    }
-    if (!isNaN(expected)) {
-      return {
-        expected: parseInt(match[1], 10)
-      };
+    var $;
+    if ($ = /^1..(\d+)$/.exec(plan)) {
+      return { expected: parseInt($[1], 10) };
     }
   },
   bailout: function (bailout) {
-    var match, message;
-    if (match = /^Bail out!(?:\s+(.*))?$/.exec(bailout)) {
-      message = match[1];
-      return {
-        message: message
-      };
+    var $;
+    if ($ = /^Bail out!(?:\s+(.*))?$/.exec(bailout)) {
+      return { message: $[1] };
     }
   },
   assertion: function (assert) {
-    var comment, failed, match, message, ok, skip, todo, _ref1, _ref2, _ref3;
-    if (match = /^(not\s+)?ok\s+\d+\s*(.*?)\s*$/.exec(assert)) {
-      _ref1 = match.slice(1), failed = _ref1[0], message = _ref1[1];
-      ok = !(failed != null);
-      _ref2 = [null, false, false], comment = _ref2[0], skip = _ref2[1], todo = _ref2[2];
+    var $, failed, message, ok, comment, skip, todo;
+    if ($ = /^(not\s+)?ok\s+\d+\s*(.*?)\s*$/.exec(assert)) {
+      failed = $[1], message = $[2];
+      ok = !failed;
+      comment = null, skip = false, todo = false;
       if (message != null) {
-        _ref3 = message.split(/\s+#\s+/, 2), message = _ref3[0], comment = _ref3[1];
+        $ = message.split(/\s+#\s+/, 2), message = $[0], comment = $[1];
         if (comment != null) {
-          if (skip = (match = /^skip\s(.*)$/i.exec(comment)) != null) {
-            comment = match[1];
+          if (skip = ($ = /^skip\s(.*)$/i.exec(comment)) != null) {
+            comment = $[1];
           }
-          if (todo = (match = /^todo\s(.*)$/i.exec(comment)) != null) {
-            comment = match[1];
+          if (todo = ($ = /^todo\s(.*)$/i.exec(comment)) != null) {
+            comment = $[1];
           }
         }
       }
@@ -585,18 +565,13 @@ parser = {
   }
 };
 
-extend = function () {
-  var destination, key, source, sources, value, _i, _len;
-  destination = arguments[0], sources = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-  for (_i = 0, _len = sources.length; _i < _len; _i++) {
-    source = sources[_i];
-    for (key in source) {
-      value = source[key];
-      destination[key] = value;
-    }
-  }
+function extend (destination) {
+  var destination, sources = __slice.call(arguments, 1);
+  sources.forEach(function (source) {
+    for (key in source) destination[key] = source[key]
+  });
   return destination;
-};
+}
 
 function Abend () { Error.call(this) }
 
@@ -633,7 +608,7 @@ function parse (stream, callback) {
     }
   });
   stream.on("data", abender(function (chunk) {
-    var code, event, expected, file, line, lines, $, program, rest, time, type;
+    var $, code, event, expected, file, line, lines, program, rest, time, type;
     data = true;
     out += chunk;
     lines = out.split(/\r?\n/);
@@ -765,79 +740,60 @@ function shebang (program, parameters, options, callback) {
 }
 
 function run (options) {
-try {
-  options.params.processes || (options.params.processes = 1);
-  var dirname, displayed, emit, execute, failures, i, key, next, parallel, program, programs, seen, value, _i, _j, _len, _results;
-  parallel = {};
-  seen = {};
+  var displayed = 0, failures = [], seen = {}, parallel = {}, i, next;
+  if (!options.params.processes) options.params.processes = 1;
   argv.forEach(function (glob) {
+    var dirname;
     if (/\s+/.test(glob)) {
-      abend("program names cannot contain spaces: " + glob);
+      options.abend("spaces", glob);
     }
     arguable.glob(process.cwd(), [ glob ])[0].files.forEach(function (program) {
       if (seen[program]) {
-        abend("a program must only run once in a test run: " + program);
+        options.abend("once", program);
       }
       seen[program] = true;
       dirname = path.dirname(program);
-      parallel[dirname] || (parallel[dirname] = {
-        programs: [],
-        time: 0,
-        running: true
-      });
+      if (!parallel[dirname]) {
+        parallel[dirname] = {
+          programs: [],
+          time: 0,
+          running: true
+        };
+      }
       parallel[dirname].programs.push(program);
     });
   });
-  parallel = (function () {
-    var _results;
-    _results = [];
-    for (key in parallel) {
-      value = parallel[key];
-      _results.push(value);
-    }
-    return _results;
-  })();
-  failures = [];
-  displayed = 0;
+  parallel = Object.keys(parallel).map(function (key) { return parallel[key] });
   // Happens often enough that we shouldn't freak out.
   process.stdout.on("error", function (error) {
     if (error.code == "EPIPE")  process.exit(1);
   });
-  emit = function (file, type, message) {
+  function emit (file, type, message) {
     message = message != null ? " " + message : "";
     type = ("" + type + "      ").slice(0, 4);
     process.stdout.write("" + (+new Date()) + " " + type + " " + file + message + "\n");
-  };
-  execute = function (program, index) {
-    var bailed, err, out, test
-      , testing // after a test is emitted, any plans are just stdout
-      ;
+  }
+  function execute (program, index) {
+    var bailed, err, out, test,
+        testing; // after a test is emitted, any plans are just stdout
     emit(program, "run");
     shebang(program, [], {}, function (error, test) {
       bailed = false;
       err = "";
       test.stderr.setEncoding("utf8");
       test.stderr.on("data", function (chunk) {
-        var line, lines, _j, _len1, _results;
         err += chunk;
-        lines = err.split(/\n/);
+        var lines = err.split(/\n/);
         err = lines.pop();
-        _results = [];
-        for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
-          line = lines[_j];
-          _results.push(emit(program, "err", line));
-        }
-        return _results;
+        lines.forEach(function (line) { emit(program, "err", line) });
       });
       out = "";
       test.stdout.setEncoding("utf8");
       test.stdout.on("data", function (chunk) {
-        var line, lines, plan, _j, _len1, _results;
         out += chunk;
-        lines = out.split(/\n/);
+        var lines = out.split(/\n/);
         out = lines.pop();
-        for (_j = 0, _len1 = lines.length; _j < _len1; _j++) {
-          line = lines[_j];
+        lines.forEach(function (line) {
           if (bailed) {
             emit(program, "out", line);
           } else if (parser.assertion(line)) {
@@ -851,8 +807,7 @@ try {
           } else {
             emit(program, "out", line);
           }
-        }
-        return _results;
+        });
       });
       var version = process.versions.node.split('.');
       test.on(version[0] == 0 && version[1] < 7 ? "exit" : "close", function (code) {
@@ -893,98 +848,12 @@ try {
     });
   }
   next = options.params.processes;
-  _results = [];
-  for (i = _j = 0; 0 <= next ? _j < next : _j > next; i = 0 <= next ? ++_j : --_j) {
+  for (i = 0; i < next; i++) {
     if (parallel[i]) {
-      _results.push(execute(parallel[i].programs.shift(), i));
-    } else {
-      _results.push(void 0);
+      execute(parallel[i].programs.shift(), i);
     }
   }
-  return _results;
-} catch (e) {
-  if (!(e instanceof Abend)) throw e;
 }
-};
-
-create = function () {
-  var argument, async, directory, executable, file, harness, harnessFile, inspect, isHarness, name, output, plan, resolvedHarness, signature, _i, _j, _len, _len1, _ref1;
-  signature = [];
-  plan = 0;
-  async = "";
-  harness = "./proof";
-  for (_i = 0, _len = argv.length; _i < _len; _i++) {
-    argument = argv[_i];
-    if (argument === "_") {
-      async = ", _";
-    } else if (/^t(?:est)?\//.test(argument)) {
-      name = argument;
-    } else if (/^\./.test(argument)) {
-      harness = argument;
-    } else if (/^\d+/.test(argument)) {
-      plan = parseInt(argument, 10);
-    } else {
-      signature.push(argument);
-    }
-  }
-  try {
-    if (fs.statSync(name)) {
-      die("test file already exists: " + name);
-    }
-  } catch (e) {
-    if (e.code !== "ENOENT") {
-      throw e;
-    }
-  }
-  directory = path.dirname(name);
-  file = path.basename(name);
-  isHarness = new RegExp("^" + (path.basename(harness)));
-  _ref1 = fs.readdirSync(path.resolve(directory, path.dirname(harness)));
-  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-    harnessFile = _ref1[_j];
-    if (isHarness.test(harnessFile)) {
-      resolvedHarness = harnessFile;
-      break;
-    }
-  }
-  if (!resolvedHarness) {
-    die("cannot find harness " + harness);
-  }
-  executable = async || path.extname(resolvedHarness)[0] === "_" ? "_coffee" : "coffee";
-  fs.writeFileSync(name, "#!/usr/bin/env " + executable + "\nrequire(\"" + harness + "\") 0, (context) ->\n  process.stdout.write JSON.stringify Object.keys context\n  process.stdout.write \"\\n\"\n", "utf8");
-  fs.chmodSync(name, 0x1ed);
-  output = "";
-  inspect = spawn(name);
-  inspect.stderr.setEncoding("utf8");
-  inspect.stderr.on("data", function (chunk) {
-    process.stdout.write(chunk);
-  });
-  inspect.stdout.setEncoding("utf8");
-  inspect.stdout.on("data", function (chunk) {
-    output += chunk;
-  });
-  return inspect.on("close", function (code) {
-    var arg, missing, _k, _len2;
-    fs.unlinkSync(name);
-    if (code !== 0) {
-      say(output);
-      die("cannot generate inspection program");
-    }
-    json = JSON.parse(output.split(/\n/)[1]);
-    missing = [];
-    for (_k = 0, _len2 = signature.length; _k < _len2; _k++) {
-      arg = signature[_k];
-      if (json.indexOf(arg) === -1) {
-        missing.push(arg);
-      }
-    }
-    if (missing.length) {
-      die("harness does not provide " + (missing.join(", ")) + "\ntry: " + (json.join(", ")));
-    }
-    fs.writeFileSync(name, "#!/usr/bin/env " + executable + "\nrequire(\"" + harness + "\") " + plan + ", ({ " + (signature.join(", ")) + " }" + async + ") ->\n\n  # Here be dragons.\n", "utf8");
-    return fs.chmodSync(name, 0x1ed);
-  });
-};
 
 argv = process.argv.slice(2);
 
@@ -1026,7 +895,6 @@ function platform () {
 
 function main (options) {
   ({
-    create: create,
     json: json,
     run: run,
     progress: progress,
@@ -1035,7 +903,7 @@ function main (options) {
   })[options.command](options);
 }
 
-function abended (usage, message) {
+function abended (usage, message, values) {
   if (!usage) {
     var executable = argv.length && !/[-.\/]/.test(argv[0]) ? "proof-" + (argv.shift())
                                                             : "proof-default";
@@ -1044,6 +912,9 @@ function abended (usage, message) {
         child.on("exit", function (code) { process.exit(code) })
       });
     });
+  } else {
+    process.stderr.write("error: " + util.format.apply(util, [ message ].concat(values)) + "\n");
+    process.exit(1);
   }
 }
 

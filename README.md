@@ -58,9 +58,9 @@ in parallel, one test at a time from each suite. **You don't have to think about
 parallel to get parallel.** Your operating system does parallel for you just
 fine, so we use the operating system.
 
-Proof is a ***parallel*** test runner, with a ***terse*** syntax and
-***generated*** scaffolding, that runs ***tests that are programs***, and can
-***handle almost any exception*** and keep running tests.
+Proof is a ***parallel*** test runner, with a ***terse*** syntax that runs
+***tests that are programs***, and can ***handle almost any exception*** and
+keep running tests.
 
 ### Install
 
