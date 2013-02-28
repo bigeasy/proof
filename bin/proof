@@ -131,53 +131,21 @@ ___ usage ___
 var action, argv, blue, create, errors, extend, fs, gray, green, json,
     opts, parse, parser, path, red, spawn, _ref, overwrite;
 
-var fs = require("fs")
-  , path = require("path")
-  , spawn = require("child_process").spawn
-  , arguable = require('arguable')
-  , cadence = require('cadence')()
-  , __slice = [].slice
-  ;
-
-function usage () {
-  var lines, i, I;
-  lines = fs.readFileSync(__filename, "utf8").split(/\n/).slice(3);
-  lines = lines.slice(0, lines.indexOf("*/"));
-  for (i = 0, I = lines.length; i < I; i++) {
-    if (!lines[i].indexOf("usage: proof " + action)) {
-      break;
-    }
-  }
-  lines = lines.slice(i);
-  lines = lines.slice(0, lines.indexOf("---"));
-  console.log(lines.join("\n"));
-  console.log("");
-}
-
-function abend (message, use) {
-  if (overwrite) console.log("");
-  if (message) console.error("error: " + message);
-  if (use) usage();
-  process.on('exit', function () {
-    process.exit(message ? 1 : 0)
-  });
-  throw new Abend(message);
-}
+var fs = require("fs"),
+    path = require("path"),
+    spawn = require("child_process").spawn,
+    arguable = require('arguable'),
+    cadence = require('cadence'),
+    __slice = [].slice;
 
 function say () {
-  var splat;
-  splat = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-  return console.error.apply(null, splat);
-};
+  console.log.apply(console, __slice.call(arguments, 0));
+}
 
 function die () {
-  var splat;
-  splat = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-  if (splat.length) {
-    console.error.apply(null, splat);
-  }
-  return process.exit(1);
-};
+  console.log.apply(console, __slice.call(arguments, 0));
+  process.exit(1);
+}
 
 function validator (callback) {
   if (typeof callback != "function") throw new Error("no callback");
@@ -234,17 +202,27 @@ function json () {
         process.stdout.write("\n");
     }
   });
-};
+}
 
+// Generate a set of colorization functions to colorize console output, or a set
+// a no-op functions if the `--monochrome` switch is selected.
 function colorization (options) {
-  if (!options.params.monochrome) options.params.monochrome = false;
+  if (!options.params.monochrome) {
+    options.params.monochrome = false;
+  }   
+
+  function monochrome (text) { return text }
+
+  if (options.params.monochrome) {
+    return {
+      red: monochrome, green: monochrome, blue: monochrome, gray: monochrome
+    }
+  }
+
   function colorize (color) {
     return function (text) { return "" + color + text + "\u001B[0m" };
-  };
-  function monochrome (text) { return text }
-  if (options.params.monochrome) return {
-    red: monochrome, green: monochrome, blue: monochrome, gray: monochrome
   }
+
   return {
     red: colorize("\u001B[31m"),
     green: colorize("\u001B[32m"),
@@ -255,49 +233,64 @@ function colorization (options) {
 
 // Generate progress reporting, something to watch as the tests are run.
 function progress (options) {
-  var colorize;
-  // Visual cue for table layout.
-  function fill (filler, count) {
-    return Array(Math.max(count + 1, 0)).join(filler);
-  };
-  // Format time.
+  var colorize = colorization(options), durations = {}, programs = {}, displayed;
+
+  // Repeat the given character for the given count.
+  function fill (character, count) {
+    return Array(Math.max(count + 1, 0)).join(character);
+  }
+  // Format seconds.
   function time (program) {
-    var str;
-    str = "" + (program.time - program.start);
+    var str, fit;
+    str = String(program.time - program.start);
     if (str.length < 4) {
       str = ("000" + str).slice(-4);
     }
     str = str.replace(/(\d{3})$/, ".$1");
-    var fit = ("        " + str).slice(-(+options.params.digits + 1));
+    fit = ("        " + str).slice(-(+options.params.digits + 1));
     if (fit.length < str.length) {
       options.params.digits = str.length - 1;
       return str;
     }
     return fit;
   };
+  // All the ways in which a test can fail.
+  function failed (program) {
+    if (!(program.expected == '?' && program.type == 'run')) {
+      if (program.actual > program.expected) return true;
+      if (program.expected == '?') return true;
+      if (program.passed < program.actual) return true;
+      if (program.bailed) return true;
+      if (program.planless) return true;
+      if (program.code != null) {
+        if (program.code) return true;
+        if (program.actual != program.expected) return true;
+      }
+    }
+  }
   // Update our progress bar. The `terminal` parameter is either `\n` if we're
   // done displaying the progress for this test, or `\r` to reset the cursor for
   // to overwrite the line.
   function bar (program, terminal) {
-    var color, dots, file, icon, status, summary;
-    if (!(program.expected == '?' && program.type == 'run') && ((program.actual > program.expected || program.expected == '?' || program.passed < program.actual || program.bailed || ((program.code != null) && (program.code || program.actual != program.expected))))) {
+    var color, icon, file, status, dots, summary;
+    // Update our status bar if we've hit a failure condition.
+    if (failed(program)) {
       extend(program, {
         status: "Failure",
         color: colorize.red,
         icon: "\u2718"
       });
     }
+    color = program.color, icon = program.icon, file = program.file, status = program.status,
     // Format summary.
     summary = "(" + program.passed + "/" + (program.expected || 0) + ") " + (time(program));
-    color = program.color, icon = program.icon, file = program.file, status = program.status;
     dots = fill(".", options.params.width - 6 - file.length - summary.length - status.length);
-    return " " + (color(icon)) + " " + file + " " + dots + " " + summary + " " + (color(status)) + terminal;
+    return " " + color(icon) + " " + file + " " + dots + " " + summary + " " + color(status) + terminal;
   }
 
-  var displayed, durations, programs;
-  colorize = colorization(options);
   // Default width.
   options.params.width || (options.params.width = 76);
+
   // Default timing digits, or a reasonable amount if the user is being
   // unreasonable.
   options.params.digits || (options.params.digits = 4);
@@ -307,20 +300,18 @@ function progress (options) {
   if (options.params.digits > 10) {
     options.params.digits = 10;
   }
+
   // Consume test output from standard input.
   process.stdin.resume();
-  durations = {};
-  displayed = null;
-  programs = {};
-  return parse(process.stdin, function (event) {
-    var color, dots, file, icon, program, stats, status, summary, tests, _name, _ref1;
+  parse(process.stdin, function (event) {
+    var color, dots, file, icon, program, stats, status, summary, tests;
     // Display the output if nothing else is being displayed.
-    displayed || (displayed = event.file);
+    if (!displayed) displayed = event.file;
     // If the type is run, we're starting up a new test, create a new program
     // structure to gather the test output.
     if (event.type === "run") {
-      if ((_ref1 = programs[_name = event.file]) == null) {
-        programs[_name] = {
+      if (programs[event.file] == null) {
+        programs[event.file] = {
           actual: 0,
           expected: '?',
           color: colorize.green,
@@ -334,7 +325,7 @@ function progress (options) {
       }
     }
     // At the end of all tests, we print our summary, otherwise we print.
-    if (event.type === "eof") {
+    if (event.type == "eof") {
       summary = {
         actual: 0,
         passed: 0,
@@ -344,10 +335,7 @@ function progress (options) {
         count: 0,
         code: 0
       };
-      tests = {
-        actual: 0,
-        passed: 0
-      };
+      tests = { actual: 0, passed: 0 };
       for (file in programs) {
         program = programs[file];
         if (program.code) {
@@ -365,6 +353,9 @@ function progress (options) {
         } else {
           summary.expected += program.expected;
         }
+        if (program.bailed) {
+          summary.bailed = true;
+        }
         if (!program.time) {
           continue;
         }
@@ -372,7 +363,8 @@ function progress (options) {
         summary.time = Math.max(summary.time, program.time);
       }
       summary.file = "tests (" + tests.passed + "/" + tests.actual + ") assertions";
-      extend(summary, !program.bailed && summary.actual == summary.expected && summary.passed === summary.expected && !summary.code && !summary.planless ? {
+//      extend(summary, !program.bailed && summary.actual == summary.expected && summary.passed === summary.expected && !summary.code && !summary.planless ? {
+      extend(summary, !failed(summary) ? {
         icon: "\u2713",
         status: "Success",
         color: colorize.green
@@ -456,7 +448,6 @@ function errors (options) {
       colorize = colorization(options);
   process.stdin.resume();
   parse(process.stdin, function (event) {
-    var _results;
     if (event.type === "run") {
       planned = false;
       backlog[event.file] = [
@@ -609,7 +600,20 @@ extend = function () {
 
 function Abend () { Error.call(this) }
 
-parse = function (stream, callback) {
+function abend (message, use) {
+  if (overwrite) console.log("");
+  if (message) console.error("error: " + message);
+  if (use) usage();
+  process.on('exit', function () {
+    process.exit(message ? 1 : 0)
+  });
+  throw new Abend(message);
+}
+
+function parse (stream, callback) {
+  var programs = {}, out = [""][0], count = 0, done = false,
+      abended, data;
+
   function abender (forward) {
     return function () {
       try {
@@ -621,37 +625,32 @@ parse = function (stream, callback) {
       }
     }
   }
-  var count, data, done, out, programs, abended;
-  programs = {};
-  out = [""][0];
-  count = 0;
-  done = false;
+
   stream.setEncoding("utf8");
   stream.on("end", function () {
     if (data && !done) {
       process.exit(1);
-      say(data, done);
     }
   });
-  return stream.on("data", abender(function (chunk) {
-    var code, event, expected, file, line, lines, match, program, rest, time, type, _i, _len, _ref1, _results;
+  stream.on("data", abender(function (chunk) {
+    var code, event, expected, file, line, lines, $, program, rest, time, type;
     data = true;
     out += chunk;
     lines = out.split(/\r?\n/);
     out = lines.pop();
-    _results = [];
-    for (_i = 0, _len = lines.length; _i < _len; _i++) {
-      line = lines[_i];
+    lines.forEach(function (line) {
       count++;
-      if (!(match = /^(\d+)\s+(\w+)\s+([^\s]+)\s?(.*)$/.exec(line))) {
+      if (!($ = /^(\d+)\s+(\w+)\s+([^\s]+)\s?(.*)$/.exec(line))) {
         abend("cannot parse runner output at line " + count + ": invalid syntax");
       }
-      _ref1 = match.slice(1), time = _ref1[0], type = _ref1[1], file = _ref1[2], rest = _ref1[3];
-      time = parseInt(time);
-      program = programs[file] || (programs[file] = {
-        passed: 0,
-        actual: 0
-      });
+      time = parseInt($[1], 10), type = $[2], file = $[3], rest = $[4];
+      if (!programs[file]) {
+        programs[file] = {
+          passed: 0,
+          actual: 0
+        };
+      }
+      program = programs[file];
       switch (type) {
         case "test":
           event = parser.assertion(rest);
@@ -659,73 +658,72 @@ parse = function (stream, callback) {
           if (event.ok) {
             program.passed++;
           }
-          _results.push(callback(extend(event, program, {
+          callback(extend(event, program, {
             time: time,
             file: file,
             type: type
-          })));
+          }));
           break;
         case "run":
           program.start = time;
-          _results.push(callback(extend(program, {
+          callback(extend(program, {
             time: time,
             type: type,
             file: file
-          })));
+          }));
           break;
         case "plan":
           expected = parseInt(rest, 10);
-          _results.push(callback(extend(program, {
+          callback(extend(program, {
             time: time,
             file: file,
             type: type,
             expected: expected
-          })));
+          }));
           break;
         case "bail":
           event = parser.bailout(rest);
           program.bailed = true;
-          _results.push(callback(extend(event, program, {
+          callback(extend(event, program, {
             time: time,
             file: file,
             type: type
-          })));
+          }));
           break;
         case "exit":
           code = parseInt(rest, 10);
           if (isNaN(code)) {
             abend("cannot parse runner test exit code at line " + count + ": exit code " + rest);
           }
-          _results.push(callback(extend({}, program, {
+          callback(extend({}, program, {
             code: code,
             file: file,
             type: type,
             time: time
-          })));
+          }));
           break;
         case "err":
         case "out":
-          _results.push(callback({
+          callback({
             time: time,
             type: type,
             file: file,
             line: rest
-          }));
+          });
           break;
         case "eof":
           callback({
             time: time,
             type: type
           });
-          _results.push(done = true);
+          done = true;
           break;
         default:
           abend("cannot parse runner output at line " + count + ": unknown line type " + type);
       }
-    }
-    return _results;
+    });
   }));
-};
+}
 
 // To do this right, we'd read through the Windows registry, but we really
 // don't want to go digging into it a this point. Not that difficult, since

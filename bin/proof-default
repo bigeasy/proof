@@ -32,8 +32,7 @@ ___ usage ___
 
 */
 
-var arguable = require('arguable')
-  , spawn = require('child_process').spawn;
+var arguable = require('arguable'), spawn = require('child_process').spawn;
 
 function main (options) {
   var progress = {}, run = {};
