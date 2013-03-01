@@ -752,6 +752,16 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.18
+
+Fri Mar  1 03:45:03 UTC 2013
+
+ * Tidy.
+ * Upgrade Arguable to 0.0.6. #120.
+ * Upgrade Cadence to 0.0.7. #110.
+ * Drop support for Node.js 0.6. #124.
+ * Wait on test program `close` instead of `exit`. #123.
+
 ### Version 0.0.17
 
 Mon Feb 18 07:42:56 UTC 2013
