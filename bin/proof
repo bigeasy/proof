@@ -118,16 +118,14 @@ description:
 ___ usage ___
 */
 
-var action, argv, blue, create, errors, extend, fs, gray, green, json,
-    opts, parse, parser, path, red, spawn, _ref, overwrite;
-
 var fs = require("fs"),
     util = require("util"),
     path = require("path"),
     spawn = require("child_process").spawn,
     arguable = require('arguable'),
     cadence = require('cadence'),
-    __slice = [].slice;
+    __slice = [].slice,
+    overwrite;
 
 function say () {
   console.log.apply(console, __slice.call(arguments, 0));
@@ -524,7 +522,7 @@ function errors (options) {
   });
 }
 
-parser = {
+var parser = {
   plan: function (plan) {
     var $;
     if ($ = /^1..(\d+)$/.exec(plan)) {
@@ -855,7 +853,7 @@ function run (options) {
   }
 }
 
-argv = process.argv.slice(2);
+var argv = process.argv.slice(2);
 
 function pathSearch (executable, callback) {
   var parts, env = {}, resolved = [];
