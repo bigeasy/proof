@@ -600,23 +600,21 @@ function parse (stream, callback) {
   }
 
   stream.setEncoding("utf8");
-  stream.on("end", function () {
-    if (data && !done) {
-      process.exit(1);
-    }
-  });
+  stream.on("end", function () { if (data && !done) { process.exit(1) } });
   stream.on("data", abender(function (chunk) {
-    var $, code, event, expected, file, line, lines, program, rest, time, type;
     data = true;
-    out += chunk;
-    lines = out.split(/\r?\n/);
+
+    var lines = (out += chunk).split(/\r?\n/);
     out = lines.pop();
+
     lines.forEach(function (line) {
       count++;
+      var $;
       if (!($ = /^(\d+)\s+(\w+)\s+([^\s]+)\s?(.*)$/.exec(line))) {
         abend("cannot parse runner output at line " + count + ": invalid syntax");
       }
-      time = parseInt($[1], 10), type = $[2], file = $[3], rest = $[4];
+      var time = parseInt($[1], 10), type = $[2], file = $[3], rest = $[4],
+          event, program, expected, code;
       if (!programs[file]) {
         programs[file] = {
           passed: 0,
