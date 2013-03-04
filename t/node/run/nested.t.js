@@ -4,9 +4,9 @@ var test = require("../../../lib/proof");
 
 function asynchronous (callback) { callback(null, true) }
 
-test(1, function (async, ok) {
-  async(function a () {
-    asynchronous(async("named"));
+test(1, function (step, ok) {
+  step(function a () {
+    asynchronous(step("named"));
   }, function b (named) {
     ok(named, "nested was called");
   });

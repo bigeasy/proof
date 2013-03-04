@@ -864,19 +864,19 @@ function pathSearch (executable, callback) {
     resolved.push(path.resolve(part, executable + '.exe'));
     resolved.push(path.resolve(part, executable));
   });
-  cadence(function (async) {
-    async(function shift () {
+  cadence(function (step) {
+    step(function shift () {
       if (resolved.length) return resolved.shift();
       else abend("cannot find executable: " + executable);
     }, function (resolved) {
-      fs.stat(resolved, async()); 
+      fs.stat(resolved, step()); 
     }, function (error, shift) {
-      async(shift)();
+      step(shift)();
     }, function (stat, resolved, shift) {
       if (stat.isFile()) {
         return resolved;
       } else {
-        async(shift); 
+        step(shift); 
       }
     });
   })(callback);

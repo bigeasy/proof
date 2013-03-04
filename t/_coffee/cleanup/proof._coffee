@@ -1,9 +1,9 @@
 #!/usr/bin/env _coffee
 fs      = require "fs"
 {exec}  = require "child_process"
-module.exports = require("../../../lib/proof") (async) ->
+module.exports = require("../../../lib/proof") (step) ->
   tmp = "#{__dirname}/tmp"
-  async cleanup = (_) ->
+  step cleanup = (_) ->
     try
       fs.unlink "#{tmp}/#{file}", _ for file in fs.readdir tmp, _
       fs.rmdir tmp, _

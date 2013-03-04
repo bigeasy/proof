@@ -149,9 +149,9 @@ optimized for this common case.
 #!/usr/bin/env node
 var fs = require('fs');
 
-require('proof')(1, function (async) {
+require('proof')(1, function (step) {
   
-  fs.readFile(__filename, async());
+  fs.readFile(__filename, step());
 
 }, function (body, ok) {
 
@@ -172,41 +172,41 @@ var fs = require('fs');
 
 // Antidisestablishmentarianism
 
-require('proof')(1, function (async) {
+require('proof')(1, function (step) {
 
   var tree = [ __dirname ], count; 
   
-  async(function nextDirectory () {
+  step(function nextDirectory () {
     
     if (tree.length) return tree.shift();
-    else async(null, count);
+    else step(null, count);
 
   }, function (directory) {
 
-    fs.readdir(directory, async());
+    fs.readdir(directory, step());
 
   }, function nextEntry (list, directory, nextDirectory) {
 
     if (list.length) return path.resolve(directory, file);
-    else async(nextDirectory)();
+    else step(nextDirectory)();
 
   }, function (file) {
 
-    fs.stat(file, async());
+    fs.stat(file, step());
 
   }, function (stat, file, nextEntry) {
 
     if (stat.isDirectory()) {
       tree.push(file);
-      async(nextEntry)();
+      step(nextEntry)();
     } else {
-      fs.readFile(file, 'utf8', async());
+      fs.readFile(file, 'utf8', step());
     }
 
   }, function (body, nextEntry) {
 
     if (/Antidisestablishmentarianism/.test(body)) count++;
-    async(nextEntry)();
+    step(nextEntry)();
 
   });
 
@@ -313,14 +313,14 @@ object that is given to the test program.
 
 var mysql = require('mysql'), fs = require('fs');
 
-module.exports = require('proof')(function (async) {
+module.exports = require('proof')(function (step) {
 
-  fs.readFile('./configuration.json', 'utf8', async());
+  fs.readFile('./configuration.json', 'utf8', step());
 
 }, function (file) {
 
   var db = new mysql.Database(JSON.stringify(file));
-  db.connect(async());
+  db.connect(step());
 
 }, function (connection) {
 
@@ -333,17 +333,17 @@ The test itself is no more complicated.
 
 ```javascript
 #!/usr/bin/env _coffee
-require('./proof')(1, function (connection, async) {
+require('./proof')(1, function (connection, step) {
 
-  async(function () {
+  step(function () {
 
-    connection.sql("SELECT COUNT(*) AS num FROM Employee", async());
+    connection.sql("SELECT COUNT(*) AS num FROM Employee", step());
 
   }, function (results) {
 
     equal(12, results[0].num, "employee count");
 
-    connection.close(async());
+    connection.close(step());
 
   });
 });
@@ -398,10 +398,10 @@ You can test asynchrnonous error the same way.
 
 var fs = require('fs');
 
-require('proof')(1, function (async, say) {
+require('proof')(1, function (step, say) {
 
   say('testing file not found'); // be chatty, why not?
-  fs.readFile(__dirname + '/i-do-not-exist.txt', async());
+  fs.readFile(__dirname + '/i-do-not-exist.txt', step());
 
 }, function (error, equals) {
 
@@ -425,23 +425,23 @@ Here's a test that opens a file handle, then closes it like a good citizen.
 ```javascript
 #!/usr/bin/env node
 
-require('./proof')(1, function (async) {
+require('./proof')(1, function (step) {
 
   var buffer = new Buffer(2), fs = require('fs');
 
-  async(function () {
+  step(function () {
 
-    fs.open(__filename, "r", async());
+    fs.open(__filename, "r", step());
 
   }, function (fd) {
 
-    fs.read(fd, buffer, 0, buffer.length, 0, async());
+    fs.read(fd, buffer, 0, buffer.length, 0, step());
 
   }, function (equal) {
 
     equal(buffer.readInt16BE(0), 0x2321, 'shebang magic number');
   
-    fs.close(fd, async())
+    fs.close(fd, step())
 
   });
 });
@@ -495,29 +495,29 @@ for example, it can't complain if the temporary file has already been deleted.
 
 var mysql = require('mysql'), fs = require('fs');
 
-module.exports = require('proof')(function (async) {
+module.exports = require('proof')(function (step) {
   var tmp = __dirname + '/tmp';
 
-  async(function cleanup () { // named cleanup, so run again at exit
+  step(function cleanup () { // named cleanup, so run again at exit
 
-    // nested async delete of tmp directory and contents.
-    async(function () {
-      fs.readdir(tmp, async());
+    // nested step delete of tmp directory and contents.
+    step(function () {
+      fs.readdir(tmp, step());
     }, function (error) {
-      if (error.code == 'ENOENT') async(); // done
+      if (error.code == 'ENOENT') step(); // done
       else throw error; // unexpected
     }, function (list) {
       list.forEach(function (file) {
-        fs.unlink(path.resolve(tmp, file), async());
+        fs.unlink(path.resolve(tmp, file), step());
       });
     }, function () {
-      fs.rmdir(tmp, async());
+      fs.rmdir(tmp, step());
     }
 
   }, function () {
 
     // create a new tmp directory for our test
-    fs.mkdir(tmp, 0755, async());
+    fs.mkdir(tmp, 0755, step());
 
   }, function () {
 
@@ -536,7 +536,7 @@ abnormally, the cleanup function is called again at exit.
 In the harness above, we register a cleanup function that deletes files in a
 temporary directory, then deletes the temporary directory. If the directory
 doesn't exist, that's okay, we catch the `ENOENT` exception and return. Because
-the cleanup function is called when we pass it to `async`, we're assured a clean
+the cleanup function is called when we pass it to `step`, we're assured a clean
 slate. We call `fs.mkdir` without checking to see if it already exists. We know
 that it doesn't.
 
@@ -550,15 +550,15 @@ before every run.
 
 var fs = require('fs'), exec = require('child_process').exec;
 
-require('./proof')(1, function (tmp, async) {
+require('./proof')(1, function (tmp, step) {
   var program = tmp + '/example.sh'
 
-  async(function () {
-    fs.writeFile(program, '#!/bin/bash\nexit 1\n', 'utf8', async());
+  step(function () {
+    fs.writeFile(program, '#!/bin/bash\nexit 1\n', 'utf8', step());
   }, function () {
-    fs.chmod(program, 0755, async());
+    fs.chmod(program, 0755, step());
   }, function () {
-    exec(program, async());
+    exec(program, step());
   }, function (error, equal) {
     equal(error.code, 1, 'exit code');
   });
@@ -577,21 +577,21 @@ the harnesses, but its fine to use them in tests as well.
 
 var fs = require('fs'), exec = require('child_process').exec;
 
-require('./proof')(1, function (tmp, async) ->
+require('./proof')(1, function (tmp, step) {
   var program = __dirname + '/example.sh'
 
-  async(function cleanup() {
-    async(function () {
-      fs.unlink(program, async());
+  step(function cleanup() {
+    step(function () {
+      fs.unlink(program, step());
     }, function (error) {
       if (error.code != 'ENOENT') throw error;
     });
   }, function () {
-    fs.writeFile(program, '#!/bin/bash\nexit 1\n', 'utf8', async());
+    fs.writeFile(program, '#!/bin/bash\nexit 1\n', 'utf8', step());
   }, function () {
-    fs.chmod(program, 0755, async());
+    fs.chmod(program, 0755, step());
   }, function () {
-    exec(program, async());
+    exec(program, step());
   }, function (error, equal) {
     equal(error.code, 1, 'exit code');
   });

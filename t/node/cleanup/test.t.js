@@ -6,12 +6,12 @@ var fs = require("fs")
   ;
 
 require("../../../lib/proof")(
-1, function cleanup (async) {
-  fs.unlink(program, async());
+1, function cleanup (step) {
+  fs.unlink(program, step());
 }, function cleanup (error) {
   if (error && error.code != "ENOENT") throw error;
-}, function (async) {
-  fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", async());
+}, function (step) {
+  fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", step());
 }, function (ok) {
   ok(true, "cleanup");   
 });
