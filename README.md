@@ -235,7 +235,7 @@ require("proof") 1, (ok, _) ->
     ok found, "found the word test"
 ```
 
-When you're test function requests `_` in its parameter list, you'll get a
+When you're test function requests `` _ `` in its parameter list, you'll get a
 callback that works with Streamline. No shims for Streamline.js code. Proof is
 Streamline.js friendly.
 
@@ -272,7 +272,7 @@ necessary to write a test against a subsystem of your project.
 By convention, we name give our test harnesses a file name with a base of
 `proof`. This allows us to continue to `require("./proof")`, which is such a
 clever thing to say. The test harness file should have an extension of one of
-the supported languages, either `.coffee`, `._coffee`, `.js` or `._js`.
+the supported languages, either `.coffee`, `` ._coffee ``, `.js` or `` ._js ``.
 
 In the harness you create a context `Object` and stuff it with useful bits and
 pieces for your test. 
@@ -813,7 +813,7 @@ Sun Jul  8 05:24:13 UTC 2012
  * Convert to closure style removing `Test` class. #91.
  * The `fail` method will print a `not ok`. #94.
  * `UNTIDY` is working again. #92.
- * Removed the Streamline.js specific `throws` and `cleanup_` functions. #93.
+ * Removed the Streamline.js specific `throws` and `` cleanup_ `` functions. #93.
  * Removed the implicit `context` argument that was used with structured
    assignment in CoffeeScript tests. #80.
 
@@ -881,7 +881,7 @@ Sat Jun 16 10:01:21 UTC 2012
  * Pipeline scaffolding. #18.
  * Build CoffeeScript with Makefile. #32.
  * `proof-errors` non-zero exit. #34.
- * `UNTIDY` alias for `PROOF_NO_CLEANUP`. #29.
+ * `UNTIDY` alias for `` PROOF_NO_CLEANUP ``. #29.
 
 ### Version 0.0.4
 
