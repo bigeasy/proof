@@ -752,6 +752,12 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.20
+
+Tue Mar  5 03:50:01 UTC 2013
+
+ * Add `proof platform` Arguable usage message. #130. 
+
 ### Version 0.0.19
 
 Tue Mar  5 03:22:27 UTC 2013
