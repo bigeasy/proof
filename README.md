@@ -752,6 +752,12 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.19
+
+Tue Mar  5 03:22:27 UTC 2013
+
+ * Upgrade Cadence to rename `async` to `step`. #129.
+
 ### Version 0.0.18
 
 Fri Mar  1 03:45:03 UTC 2013
