@@ -737,6 +737,8 @@ Changes for each release.
 
 ### Version 0.0.22.
 
+Tue Mar 12 08:00:30 UTC 2013
+
  * Remove arity from `t/node/cleanup/test.t.js`. #132.
  * Upgrade Cadence to 0.0.11. #135.
 
