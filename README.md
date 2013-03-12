@@ -735,6 +735,12 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.21
+
+ * Upgrade Cadence to 0.0.20. #134.
+ * Export Cadence. #127.
+ * Flatten arguments to Cadence. #131.
+
 ### Version 0.0.20
 
 Tue Mar  5 03:50:01 UTC 2013
