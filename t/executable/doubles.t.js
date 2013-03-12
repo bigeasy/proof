@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-require('./proof')(2, function (step, equal) {
+require('./proof')(2, function (step, equal, execute, proof) {
   var fs = require('fs'), path = require('path');
-  step(function (proof, execute) {
+  step(function () {
     execute('node', [ proof, 'run', 't/node/run/minimal.t.js', 't/node/run/minimal.t.js' ], '', step());
   }, function (code, stdout, stderr) {
     equal(code, 1, 'non-zero exit');

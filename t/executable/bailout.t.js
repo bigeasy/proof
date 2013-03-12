@@ -2,10 +2,10 @@
 
 var spawn = require('child_process').spawn, fs = require('fs');
 
-require('./proof')(4, function (step, equal) {
+require('./proof')(4, function (step, equal, execute, proof) {
   step(function () {
     fs.readFile(__dirname + '/fixtures/bailout-progress.txt', 'utf8', step());
-  }, function (expected, execute, proof) {
+  }, function (expected) {
     execute('node', [ proof,  '-M', 't/executable/bailout' ], '', step());
   }, function (code, stdout, stderr, expected) {
     equal(code, 1, 'bailed progress exit code');
@@ -13,7 +13,7 @@ require('./proof')(4, function (step, equal) {
           expected.replace(/\r/g, ''), 'bailed progress message');
   }, function () {
     fs.readFile(__dirname + '/fixtures/bailout-errors.txt', 'utf8', step());
-  }, function (expected, execute, proof) {
+  }, function (expected) {
     var run = spawn('node', [ proof, 'run', 't/executable/bailout' ]);
     execute('node', [ proof, 'errors', '-M', 't/executable/bailout' ], run.stdout, step());
   }, function (code, stdout, stderr, expected) {
