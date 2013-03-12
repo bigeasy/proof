@@ -735,11 +735,16 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.22.
+
+ * Remove arity from `t/node/cleanup/test.t.js`. #132.
+ * Upgrade Cadence to 0.0.11. #135.
+
 ### Version 0.0.21
 
 Tue Mar 12 06:52:06 UTC 2013
 
- * Upgrade Cadence to 0.0.20. #134.
+ * Upgrade Cadence to 0.0.10. #134.
  * Export Cadence. #127.
  * Flatten arguments to Cadence. #131.
 
