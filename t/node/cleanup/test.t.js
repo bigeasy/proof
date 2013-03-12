@@ -11,7 +11,7 @@ require("../../../lib/proof")(
 }, function cleanup (error) {
   if (error && error.code != "ENOENT") throw error;
 }, function (step) {
-  fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", step(0));
+  fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", step());
 }, function (x, ok) {
   ok(true, "cleanup");   
 });
