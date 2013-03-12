@@ -222,23 +222,6 @@ word "Antidisestablishmentarianism" in the files it encounters. The above test
 proceeds through the directory tree serially, using named functions as branch
 labels to repeatedly visit each directory and file.
 
-### CoffeeScript and Streamline Friendly
-
-If you want to use your favorite alternative langauge, simply change your
-shebang line. You can use Coffee, Streamline with the Proof tap scaffolding.
-
-```coffeescript
-#!/usr/bin/env _coffee
-fs   = require "fs"
-require("proof") 1, (ok, _) ->
-    found = /test/.test(fs.readFile(__filename, "utf8", _))
-    ok found, "found the word test"
-```
-
-When you're test function requests `` _ `` in its parameter list, you'll get a
-callback that works with Streamline. No shims for Streamline.js code. Proof is
-Streamline.js friendly.
-
 ### Shebang all the Langauges
 
 Actually, you an use any langauge with Proof. Emit TAP. Proof will report it.
