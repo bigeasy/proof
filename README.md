@@ -735,7 +735,14 @@ suit your project's needs.
 
 Changes for each release.
 
-### Version 0.0.22.
+### Version 0.0.23
+
+Sat Mar 16 06:03:02 UTC 2013
+
+ * Upgrade Cadence to 0.0.12.
+ * Remove dependency on Cadence hidden context. #136.
+
+### Version 0.0.22
 
 Tue Mar 12 08:00:30 UTC 2013
 
