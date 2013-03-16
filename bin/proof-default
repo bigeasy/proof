@@ -40,9 +40,9 @@ function main (options) {
     if ("help" == name) {
       options.usage();
     } else if (/^(monochrome|width|digits)$/.test(name)) {
-      progress[name] = options[name]; 
+      progress[name] = options[name];
     } else {
-      run[name] = options[name]; 
+      run[name] = options[name];
     }
   });
   progress = spawn('node', arguable.flatten(__dirname + '/proof', 'progress', progress), { customFds: [ -1, 1, 2 ] });

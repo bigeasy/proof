@@ -15,6 +15,6 @@ require("../../../lib/proof")(1, function (step) {
   step(function () {
     fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", step());
   }, function () {
-    ok(true, "cleanup");   
+    ok(true, "cleanup");
   });
 });

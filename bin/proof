@@ -75,7 +75,7 @@ description:
 
   The `proof run` runs zero or more test programs, gathering their
   output and emitting unified test output to STDOUT. It does not perform
-  an error reporting itself. 
+  an error reporting itself.
 
   The test programs must emit valid Perl Test::Harness output.
 
@@ -222,7 +222,7 @@ function json () {
 function colorization (options) {
   if (!options.params.monochrome) {
     options.params.monochrome = false;
-  }   
+  }
 
   function monochrome (text) { return text }
 
@@ -441,14 +441,14 @@ function progress (options) {
 // Problem with errors is that output can be interleaved, so we need to gather
 // up the lines of output after a failed assertion, or else the output of other
 // assertions get interleaved.
-// 
+//
 // The first formatting style that comes to mind would be one that grouped all
 // the failed assertions under their failed test, but that means waiting for a
 // full test to load. There are test with a great many failures, one of the
 // automated tests, like the one in Timezone that tests every clock transition
 // in the world since the dawn of standardized time. We might run out of memory
 // if a test of that nature is really broken and really chatty about it.
-// 
+//
 // What we're going to do for a stab at this problem is create a queue, as we do
 // with progress, and one go at a time. Chances are the queue will be empty. If
 // there is one long running test interleaved with a quick test, then the quick
@@ -893,7 +893,7 @@ function pathSearch (executable, callback) {
     step(shift = function () {
       if (!resolved.length) abend("cannot find executable: " + executable);
     }, function () {
-      fs.stat(resolved[0], step(Error)); 
+      fs.stat(resolved[0], step(Error));
     }, function (error) {
       resolved.shift();
       step(shift)(null);
@@ -902,7 +902,7 @@ function pathSearch (executable, callback) {
         return resolved[0];
       } else {
         resolved.shift();
-        step(shift)(null); 
+        step(shift)(null);
       }
     });
   })(callback);

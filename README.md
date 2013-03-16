@@ -41,7 +41,7 @@ With this in place, you are encouraged to **be a slob** in your test code.  Each
 test is a short lived process, so feel free to suck up memory, leave file
 handles open, and leave sockets open. The operating system knows how to close
 them when your program exits. It won't affect the test runner, or test
-performance. 
+performance.
 
 Well, you'll probably always **be a meticulous programmer**, who would never
 leave a file handle open, but still; you don't have to develop a strategy for
@@ -50,7 +50,7 @@ to *try* to *catch* the crazy monkey bananas thrown from code in development.
 You have a simple, universal strategy that works for normal operation, all tests
 passed, as well at the who-would-ever-have-imagined-that failures.
 
-And that's not all. 
+And that's not all.
 
 Proof is convention over configuration until configuration is zero. Programs are
 organized into directories, which act as suites. The test runner will run suites
@@ -150,12 +150,12 @@ optimized for this common case.
 var fs = require('fs');
 
 require('proof')(1, function (step) {
-  
+
   fs.readFile(__filename, step());
 
 }, function (body, ok) {
 
-  ok(/proof/.test(body), 'found proof'); 
+  ok(/proof/.test(body), 'found proof');
 
 });
 ```
@@ -174,10 +174,10 @@ var fs = require('fs');
 
 require('proof')(1, function (step) {
 
-  var tree = [ __dirname ], count; 
-  
+  var tree = [ __dirname ], count;
+
   step(function nextDirectory () {
-    
+
     if (tree.length) return tree.shift();
     else step(null, count);
 
@@ -211,8 +211,8 @@ require('proof')(1, function (step) {
   });
 
 }, function (count) {
-  
-  ok(count, 1, 'one file contains possible seditious and blasphemous language');  
+
+  ok(count, 1, 'one file contains possible seditious and blasphemous language');
 
 });
 ```
@@ -258,7 +258,7 @@ clever thing to say. The test harness file should have an extension of one of
 the supported languages, either `.coffee`, `` ._coffee ``, `.js` or `` ._js ``.
 
 In the harness you create a context `Object` and stuff it with useful bits and
-pieces for your test. 
+pieces for your test.
 
 ```javascript
 module.exports = require('proof')(function () {
@@ -365,9 +365,9 @@ require('proof')(1, function () {
   throw new Error('oops');
 
 }, function (error, equal) {
-  
+
   equal(error.message, 'oops', 'error thrown');
-  
+
 });
 ```
 
@@ -423,7 +423,7 @@ require('./proof')(1, function (step) {
   }, function (equal) {
 
     equal(buffer.readInt16BE(0), 0x2321, 'shebang magic number');
-  
+
     fs.close(fd, step())
 
   });
@@ -754,7 +754,7 @@ Tue Mar 12 06:52:06 UTC 2013
 
 Tue Mar  5 03:50:01 UTC 2013
 
- * Add `proof platform` Arguable usage message. #130. 
+ * Add `proof platform` Arguable usage message. #130.
 
 ### Version 0.0.19
 
@@ -845,7 +845,7 @@ Fri Jun 29 13:59:21 UTC 2012
  * Create `die` as alias of `bailout`. #31.
  * Use inspector for recursive dump of `say` and `bailout`. #33.
  * Report failure if actual tests exceed expected tests. #77
- * Add switch to `proof progress` to disable colorization. #76. 
+ * Add switch to `proof progress` to disable colorization. #76.
  * Detect tests without plans. #75.
  * Display compilation error output. #22.
 
@@ -903,7 +903,7 @@ Sun May 13 19:43:30 UTC 2012
 ### Version 0.0.3
 
 Sun May 13 17:24:09 UTC 2012
- 
+
  * `proof errors` displays bail outs. #20.
  * Created `proof errors` to display the failed assertions of a failed test run. #5.
  * Fail on when passed tests exceed expected tests. #6.
@@ -914,7 +914,7 @@ Sun May 13 17:24:09 UTC 2012
  * Fixed spelling in documentation and comments, cleanup documentation. #10. #9.
  * Abend when test is specified twice in a run. #4.
  * Spell check `README.md`.
- 
+
 ### Version 0.0.2
 
 Wed May  9 03:52:57 UTC 2012
