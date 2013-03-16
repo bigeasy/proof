@@ -7,7 +7,7 @@ var fs = require("fs")
 
 require("../../../lib/proof")(1, function (step) {
   step(function () {
-    fs.unlink(program, step());
+    fs.unlink(program, step(Error));
   }, function (error) {
     if (error && error.code != "ENOENT") throw error;
   });
