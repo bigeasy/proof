@@ -737,6 +737,8 @@ Changes for each release.
 
 ### Version 0.0.24
 
+Sun Mar 17 06:28:06 UTC 2013
+
  * Upgrade Cadence to 0.0.13.
  * Add contribution guide.
 
