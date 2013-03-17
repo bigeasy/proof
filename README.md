@@ -735,6 +735,11 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.24
+
+ * Upgrade Cadence to 0.0.13.
+ * Add contribution guide.
+
 ### Version 0.0.23
 
 Sat Mar 16 06:03:02 UTC 2013
