@@ -737,8 +737,10 @@ Changes for each release.
 
 ### Version 0.0.25
 
+Mon Mar 18 07:20:00 UTC 2013
+
  * Tidy `lib/proof.js` variable names for harness and program functions. #143.
- * Pass named parameters into harness functions. #142. 
+ * Pass named parameters into harness functions. #142.
  * Generalize `parameterize` function in `lib/proof.js`. #141.
  * Allow user to override assertions. #139.
  * Fix export of `say` and `die`. #137.
