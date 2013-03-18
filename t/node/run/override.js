@@ -1,7 +1,7 @@
 module.exports = require("../../../lib/proof")(function (equal) {
   return { 
-    equal: function (value) {
-      return value == "overridden";
+    equal: function (value, message) {
+      equal(value, "overridden", message);
     }
   }
 });
