@@ -735,6 +735,10 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.26
+
+ * Meld harness and program into single cadence. #144.
+
 ### Version 0.0.25
 
 Mon Mar 18 07:20:00 UTC 2013
