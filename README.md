@@ -737,6 +737,11 @@ Changes for each release.
 
 ### Version 0.0.27
 
+ * Implement execute in tests using Cadence events. #147.
+ * Upgrade Cadence to 0.0.15.
+ * Upgrade Arguable to 0.0.8.
+ * Replace `exit` event of child processes with `close`. #149.
+ * Move binary and library into the root of the project directory. #148.
  * Git rid of default action, report usage instead. #146.
  * Rename default action to `test` and move it into the main binary. #145.
 
