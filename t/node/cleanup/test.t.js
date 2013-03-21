@@ -5,7 +5,7 @@ var fs = require("fs")
   , program = __dirname + "/example.sh"
   ;
 
-require("../../../lib/proof")(1, function (step) {
+require("../../..")(1, function (step) {
   step(function () {
     fs.unlink(program, step(Error));
   }, function (error) {

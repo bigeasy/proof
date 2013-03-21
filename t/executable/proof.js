@@ -34,4 +34,4 @@ function execute (program, parameters, input, callback) {
   });
 }
 
-module.exports = require('../../lib/proof')(function () { return { execute: execute, proof: path.resolve(__dirname, '..', '..', 'bin', 'proof') } });
+module.exports = require('../..')(function () { return { execute: execute, proof: path.resolve(__dirname, '..', '..', 'proof.bin.js') } });

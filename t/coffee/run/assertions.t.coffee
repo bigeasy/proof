@@ -1,5 +1,5 @@
 #!/usr/bin/env coffee
-require("../../../lib/proof") 3, (ok, equal, deepEqual) ->
+require("../../..") 3, (ok, equal, deepEqual) ->
   ok true, "truth works"
   equal 1 + 1, 2, "math works"
   deepEqual "a b".split(/\s/), [ "a", "b" ], "strings work"

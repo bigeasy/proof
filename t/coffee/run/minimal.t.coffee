@@ -1,5 +1,5 @@
 #!/usr/bin/env coffee
 
-test = require "../../../lib/proof"
+test = require "../../.."
 
 test 1, (ok) -> ok true, "test truth"

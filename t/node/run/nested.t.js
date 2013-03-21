@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var test = require("../../../lib/proof");
+var test = require("../../..");
 
 function asynchronous (callback) { callback(null, true) }
 
