@@ -1,7 +1,7 @@
 {   "name":             "proof"
 ,   "description":      "A UNIX way test non-framework for the meticulous programmer who is also very lazy."
 ,   "keywords":         [ "test", "unit", "tap", "assert", "tdd" ]
-,   "version":          "0.0.25"
+,   "version":          "0.0.26"
 ,   "author":           "Alan Gutierrez <alan@prettyrobots.com>"
 ,   "directories":      { "lib" : "./lib" }
 ,   "repository":       "https://github.com/bigeasy/proof"

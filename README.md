@@ -737,6 +737,8 @@ Changes for each release.
 
 ### Version 0.0.26
 
+Tue Mar 19 04:57:56 UTC 2013
+
  * Meld harness and program into single cadence. #144.
 
 ### Version 0.0.25
