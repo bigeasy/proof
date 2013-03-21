@@ -6,7 +6,7 @@
 ,   "directories":      { "lib" : "./lib" }
 ,   "repository":       "https://github.com/bigeasy/proof"
 ,   "homepage":         "https://github.com/bigeasy/proof"
-,   "dependencies":     { "cadence": "0.0.14"
+,   "dependencies":     { "cadence": "0.0.15"
                         , "arguable": "0.0.8"
                         , "expandable": "0.0.0"
                         }
