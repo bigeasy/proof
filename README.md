@@ -737,6 +737,8 @@ Changes for each release.
 
 ### Version 0.0.27
 
+Thu Mar 21 08:54:41 UTC 2013
+
  * Implement execute in tests using Cadence events. #147.
  * Upgrade Cadence to 0.0.15.
  * Upgrade Arguable to 0.0.8.
