@@ -735,6 +735,11 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.27
+
+ * Git rid of default action, report usage instead. #146.
+ * Rename default action to `test` and move it into the main binary. #145.
+
 ### Version 0.0.26
 
 Tue Mar 19 04:57:56 UTC 2013

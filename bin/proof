@@ -139,6 +139,34 @@ description:
   globbing capabilities absent in Windows Power Shell, indirectly through a
   shell program that performs additional testing on UNIX platforms.
 
+___ test _ usage: en_US ___
+usage: proof test [options] [<files>...]
+
+  Run tests and display progress a colorized progress meter.
+
+options:
+
+    -d,   --digits    [count]     number of timing digits to display
+    -h,   --help                  display this usage information
+    -M,   --monochrome            do not display color
+    -p,   --processes [count]     number of processes to run
+    -w,   --width     [count]     width in characters of progress display
+
+invocation:
+
+  If there are no errors, `proof` exits with a zero exit code, otherwise it
+  returns a non-zero exit code.
+
+description:
+
+  `proof` runs a collection of tests and displays a colorful, animated
+  report of test progress. Output from `proof run` can be piped to
+  `proof progress` to display the progress of a test run as it is
+  running. Using a utility like `tee`, you can both pipe `proof run`
+  output to `proof progress` and save it to file for later reporting.
+
+___ usage: en_US ___
+usage: proof [command] <arguments> <tests>
 ___ usage ___
 */
 
@@ -147,6 +175,7 @@ var fs = require("fs"),
     path = require("path"),
     spawn = require("child_process").spawn,
     arguable = require('arguable'),
+    expandable = require('expandable'),
     cadence = require('cadence'),
     __slice = [].slice,
     overwrite;
@@ -767,7 +796,7 @@ function run (options) {
     if (/\s+/.test(glob)) {
       options.abend("spaces", glob);
     }
-    arguable.glob(process.cwd(), [ glob ])[0].files.forEach(function (program) {
+    expandable.glob(process.cwd(), [ glob ])[0].files.forEach(function (program) {
       if (seen[program]) {
         options.abend("once", program);
       }
@@ -916,18 +945,51 @@ function platform (options) {
   process.exit(1);
 }
 
+function test (options) {
+  var progress = {}, run = {};
+  options.given.forEach(function (name) {
+    if ("help" == name) {
+      options.usage();
+    } else if (/^(monochrome|width|digits)$/.test(name)) {
+      progress[name] = options[name];
+    } else {
+      run[name] = options[name];
+    }
+  });
+  progress = spawn('node',
+                   arguable.flatten(__filename, 'progress', progress),
+                   { stdio: [ 'pipe', process.stdout, process.stderr ] });
+  run = spawn('node',
+              arguable.flatten(__filename, 'run', run, options.argv),
+              { stdio: [ 'pipe', 'pipe', process.stderr ] });
+  run.stdout.pipe(progress.stdin);
+
+  var count = 0, code = 0;
+  function closed ($code) {
+    if (!code) code = $code;
+    if (++count == 2) process.exit(code);
+  }
+  run.on('close', closed);
+  progress.on('close', closed);
+}
+
 function main (options) {
-  ({
+  if (!options.command) {
+    console.log(options.usage);
+    process.exit(0);
+  }
+  var command = ({
     json: json,
     run: run,
     progress: progress,
     errors: errors,
-    platform: platform
-  })[options.command](options);
-}
-
-function abended (usage, message, values) {
-  if (!usage) {
+    platform: platform,
+    test: test
+  })[options.command];
+  
+  if (command) {
+    command(options);
+  } else {
     var executable = argv.length && !/[-.\/]/.test(argv[0]) ? "proof-" + (argv.shift())
                                                             : "proof-default";
     pathSearch(executable, function (error, resolved) {
@@ -935,10 +997,12 @@ function abended (usage, message, values) {
         child.on("exit", function (code) { process.exit(code) })
       });
     });
-  } else {
-    process.stderr.write("error: " + util.format.apply(util, [ message ].concat(values)) + "\n");
-    process.exit(1);
   }
+}
+
+function abended (e) {
+  process.stderr.write("error: " + e.message + "\n");
+  process.exit(1);
 }
 
 arguable.parse('en_US', __filename, process.argv.slice(2), main, abended);
