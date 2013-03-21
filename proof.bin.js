@@ -630,9 +630,7 @@ function abend (message, use) {
   if (overwrite) console.log("");
   if (message) console.error("error: " + message);
   if (use) usage();
-  process.on('exit', function () {
-    process.exit(message ? 1 : 0)
-  });
+  process.on('exit', function () { process.exit(message ? 1 : 0) });
   throw new Abend(message);
 }
 
@@ -859,39 +857,21 @@ function run (options) {
         });
       });
       var version = process.versions.node.split('.');
-      test.on(version[0] == 0 && version[1] < 7 ? "exit" : "close", function (code) {
-        var count = 1;
-
-        if (test.stdout.readable) {
-          count++;
-          test.stdout.once("end", exit);
-        }
-
-        if (test.stderr.readable) {
-          count++;
-          test.stderr.once("end", exit);
-        }
-
-        exit();
-
-        function exit () {
-          var time;
-          if (--count == 0) {
-            emit(program, "exit", code);
-            parallel[index].time = time = 0;
-            if (parallel[index].programs.length) {
-              execute(parallel[index].programs.shift(), index);
-            } else if (next < parallel.length) {
-              parallel[index].running = false;
-              if (displayed === index) {
-                displayed = next + 1;
-              }
-              index = next++;
-              execute(parallel[index].programs.shift(), index);
-            } else {
-              emit("*", "eof");
-            }
+      test.on("close", function (code) {
+        var time;
+        emit(program, "exit", code);
+        parallel[index].time = time = 0;
+        if (parallel[index].programs.length) {
+          execute(parallel[index].programs.shift(), index);
+        } else if (next < parallel.length) {
+          parallel[index].running = false;
+          if (displayed === index) {
+            displayed = next + 1;
           }
+          index = next++;
+          execute(parallel[index].programs.shift(), index);
+        } else {
+          emit("*", "eof");
         }
       });
     });
@@ -994,7 +974,7 @@ function main (options) {
                                                             : "proof-default";
     pathSearch(executable, function (error, resolved) {
       shebang(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
-        child.on("exit", function (code) { process.exit(code) })
+        child.on("close", function (code) { process.exit(code) })
       });
     });
   }
