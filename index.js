@@ -72,6 +72,22 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
           harnessCleanup(step);
         });
       }
+    }, function () {
+      var leaked = Object.keys(global).filter(function (global) { return !~globals.indexOf(global); });
+      if (leaked.length) {
+        bailout("Variables leaked to global namespace.", leaked);
+      }
+
+      step(function (step) {
+        if (!process.stdout.write('')) {
+          process.stdout.once('drain', step());
+        }
+        if (!process.stderr.write('')) {
+          process.stderr.once('drain', step());
+        }
+      }, function () {
+        process.exit(passed == expected && actual == expected ? 0 : 1);
+      });
     });
   })(function (error) {
     if (error) abend(error);
@@ -82,24 +98,6 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     require('assert').ok($, "bad function");
     return $[1].trim().split(/\s*,\s*/).map(function (parameter) {
       return context[parameter];
-    });
-  }
-
-  function exit (step) {
-    var leaked = Object.keys(global).filter(function (global) { return !~globals.indexOf(global); });
-    if (leaked.length) {
-      bailout("Variables leaked to global namespace.", leaked);
-    }
-
-    step(function (step) {
-      if (!process.stdout.write('')) {
-        process.stdout.once('drain', step());
-      }
-      if (!process.stderr.write('')) {
-        process.stderr.once('drain', step());
-      }
-    }, function () {
-      process.exit(passed == expected && actual == expected ? 0 : 1);
     });
   }
 
@@ -134,16 +132,16 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     process.stdout.write(message);
     if (vargs.length) comment(util.format.apply(util.format, vargs));
 
-    cadence(function (cadnece) {
+    cadence(function (step) {
       if (!process.stdout.write('')) {
-        process.stdout.once('drain', cadence());
+        process.stdout.once('drain', step());
       }
       if (!process.stderr.write('')) {
-        process.stderr.once('drain', cadence());
+        process.stderr.once('drain', step());
       }
     }, function () {
       process.exit(1);
-    });
+    })();
   }
 
 

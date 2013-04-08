@@ -1,0 +1,4 @@
+1..1
+ok 1 test truth
+Bail out! Variables leaked to global namespace.
+# [ 'a' ]
