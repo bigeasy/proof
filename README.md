@@ -735,6 +735,11 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.28
+
+ * Renew support for Node.js 0.6. #150.
+ * Fix global namespace leak detection. #151.
+
 ### Version 0.0.27
 
 Thu Mar 21 08:54:41 UTC 2013
