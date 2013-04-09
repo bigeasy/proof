@@ -857,7 +857,7 @@ function run (options) {
         });
       });
       var version = process.versions.node.split('.');
-      test.on("close", function (code) {
+      close(test, function (code) {
         var time;
         emit(program, "exit", code);
         parallel[index].time = time = 0;
@@ -925,6 +925,23 @@ function platform (options) {
   process.exit(1);
 }
 
+function close (child, callback) {
+  var count = 0, done;
+  function closed () {
+    if (++count == 3) done();
+  }
+  if (child.stdout) child.stdout.on('close', closed);
+  else count++;
+  if (child.stderr) child.stderr.on('close', closed);
+  else count++;
+  child.on('exit', function (code, signal) {
+    done = function () {
+      callback(code, signal);
+    }
+    closed();
+  });
+}
+
 function test (options) {
   var progress = {}, run = {};
   options.given.forEach(function (name) {
@@ -949,8 +966,8 @@ function test (options) {
     if (!code) code = $code;
     if (++count == 2) process.exit(code);
   }
-  run.on('close', closed);
-  progress.on('close', closed);
+  close(run, closed);
+  close(progress, closed);
 }
 
 function main (options) {
@@ -974,7 +991,7 @@ function main (options) {
                                                             : "proof-default";
     pathSearch(executable, function (error, resolved) {
       shebang(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
-        child.on("close", function (code) { process.exit(code) })
+        close(child, function (code) { process.exit(code) })
       });
     });
   }
