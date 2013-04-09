@@ -737,6 +737,8 @@ Changes for each release.
 
 ### Version 0.0.28
 
+Tue Apr  9 23:07:50 UTC 2013
+
  * Renew support for Node.js 0.6. #150.
  * Fix global namespace leak detection. #151.
 
