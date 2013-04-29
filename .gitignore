@@ -1,6 +1,2 @@
-.DS_Store
-.AppleDouble
-node_modules
-*.swp
-.proof.out
-bin/proof-getopt
+/node_modules
+/.proof.out
