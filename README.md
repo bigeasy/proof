@@ -142,7 +142,7 @@ function arguments. Proof with give them to you as you need them.
 
 Proof has a built in control flow library ala Step, that simplifies testing of
 asynchronous code. Most of the time, you're going to simply want to step through
-a series of calls and bail out on the slightest error. Proof is ergnomoically
+a series of calls and bail out on the slightest error. Proof is ergonomically
 optimized for this common case.
 
 ```javascript
@@ -222,9 +222,9 @@ word "Antidisestablishmentarianism" in the files it encounters. The above test
 proceeds through the directory tree serially, using named functions as branch
 labels to repeatedly visit each directory and file.
 
-### Shebang all the Langauges
+### Shebang all the Languages
 
-Actually, you an use any langauge with Proof. Emit TAP. Proof will report it.
+Actually, you an use any language with Proof. Emit TAP. Proof will report it.
 
 ```bash
 #/bin/bash
@@ -374,7 +374,7 @@ require('proof')(1, function () {
 If no error is thrown, the assertion is not test, the count of passed tests is
 wrong and the test fails.
 
-You can test asynchrnonous error the same way.
+You can test asynchronous error the same way.
 
 ```javascript
 #!/usr/bin/env node
