@@ -983,7 +983,7 @@ function main (options) {
     platform: platform,
     test: test
   })[options.command];
-  
+
   if (command) {
     command(options);
   } else {
