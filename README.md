@@ -735,6 +735,10 @@ suit your project's needs.
 
 Changes for each release.
 
+### Version 0.0.30
+
+ * Upgrade Cadence to 0.0.19. #153.
+
 ### Version 0.0.29
 
 Fri Jun 14 00:17:21 UTC 2013
