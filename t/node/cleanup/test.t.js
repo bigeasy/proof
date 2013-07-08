@@ -6,11 +6,11 @@ var fs = require("fs")
   ;
 
 require("../../..")(1, function (step) {
-  step(function () {
-    fs.unlink(program, step(Error));
-  }, function (error) {
+  step([function () {
+    fs.unlink(program, step());
+  }, function (_, error) {
     if (error && error.code != "ENOENT") throw error;
-  });
+  }]);
 }, function (step, ok) {
   step(function () {
     fs.writeFile(program, "#!/bin/bash\nexit 1\n", "utf8", step());
