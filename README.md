@@ -737,6 +737,8 @@ Changes for each release.
 
 ### Version 0.0.32.
 
+Thu Jul 11 01:47:18 UTC 2013
+
  * Upgrade Cadence to 0.0.23. #160.
 
 ### Version 0.0.31
