@@ -1,470 +1,588 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head><title>Hello, World!</title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" media="all" href="/ace/css/docco.css">
-<link rel="stylesheet" media="all" href="/ace/css/markdown.css">
-</head>
-<body>
-<div class="container"><div id="container">
-<div id="markdown">
+<meta charset="utf-8">
+<title>Proof</title>
+<link href="http://fonts.googleapis.com/css?family=ABeeZee|Inconsolata|Karla:400,700|Oxygen+Mono" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy">
+<link rel="stylesheet" type="text/css" href="css/syntax.css">
+<link rel="stylesheet" type="text/css" href="css/proof.css">
+<body><a href="https://github.com/bigeasy/proof/"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div class="container">
 
-<div class="docs"><h1>Proof &#x2713; <a href="http://travis-ci.org/bigeasy/proof"><img src="https://secure.travis-ci.org/bigeasy/proof.png?branch=master" alt="Build Status" title="" /></a></h1>
+<div class="unit welcome">
+<h1>Proof</h1>
+</div>
 
-<p>A test non-framework for CoffeeScript and Streamlined CoffeeScript.</p>
-
+<div class="unit description markdown"><p>A cross-platform UNIX way test non-framework for JavaScript.</p>
+<h2>Questions?</h2>
+<p>If you have a general question, please ask it. I&#39;ve created a <a href="https://github.com/bigeasy/proof/issues/96">issue to discuss
+Proof</a> to notify you of updates. Use
+it to discuss what version 0.2.0 should be.</p>
+<p>Please ask questions in the issue, on the Node.js listserv or come find me, in
+IRC on freenode as <code>prettyrobots</code>, I&#39;m there most of the time.</p>
 <h2>Philosophy</h2>
-
 <p>Proof is a UNIX way test non-framework for the mightily lazy programmer.</p>
-
 <p>In Proof, a <strong>unit test</strong> is a <strong>program</strong>. It does not need a runner to run. A
 program emits minimal <code>Perl</code> <code>Test::Harness</code> output. Failed assertions appear as
 comments in the file output.</p>
-
 <p><strong>You write your quick and dirty diagnostics to standard error.</strong> The test
 runner will hide it from you during normal test runs. If there is a test failure
 you can run the test program directly to see the error spew.</p>
-
 <p>The Proof test runner execute test programs as child processes. <strong>If a test fails,
 even catastrophically, the test runner tests on.</strong></p>
-
 <p><strong>Let the operating system do set up and tear down.</strong> When a test process exits,
 even when it fails catastrophically, resources are freed for the next test
 process. The test runner does not load or evaluate JavaScript, set tests up up
 or tear tests down. Why count on what amounts to a fragile program loader, when
-you've got a full blown operating system at your disposal?</p>
-
-<p>When there is housekeeping to be done, databases to be reset, temporary files to
-be deleted, we still don't clean up after ourselves. <strong>We clean up before
-oursleves.</strong> You use Proof harnesses to clean up after the last test process at
-the start of the next test process, when everything is stable.</p>
-
+you&#39;ve got a full blown operating system at your disposal?</p>
+<p>When there is housekeeping to be done — databases to be reset, temporary
+files to be deleted — we still don&#39;t clean up after ourselves. <strong>We clean
+up before ourselves.</strong> You use Proof harnesses to clean up after the <em>previous</em>
+test process at the start of the <em>next</em> test process, when everything is stable.</p>
 <p>With this in place, you are encouraged to <strong>be a slob</strong> in your test code.  Each
 test is a short lived process, so feel free to suck up memory, leave file
 handles open, and leave sockets open. The operating system knows how to close
-them when your program exits. It won't affect the test runner, or test
-performance. </p>
-
-<p>Well, you'll probably always <strong>be a meticulous programmer</strong>, who would never
-leave a file handle open, but still; you don't have to develop a strategy for
-error handling in code that is supposed to exercise edge cases. You don't have
+them when your program exits. It won&#39;t affect the test runner, or test
+performance.</p>
+<p>Well, you&#39;ll probably always <strong>be a meticulous programmer</strong>, who would never
+leave a file handle open, but still; you don&#39;t have to develop a strategy for
+error handling in code that is supposed to exercise edge cases. You don&#39;t have
 to <em>try</em> to <em>catch</em> the crazy monkey bananas thrown from code in development.
 You have a simple, universal strategy that works for normal operation, all tests
 passed, as well at the who-would-ever-have-imagined-that failures.</p>
-
-<p>And that's not all. </p>
-
+<p>And that&#39;s not all.</p>
 <p>Proof is convention over configuration until configuration is zero. Programs are
 organized into directories, which act as suites. The test runner will run suites
-in parallel, one test at a time from each suite. <strong>You don't have to think about
+in parallel, one test at a time from each suite. <strong>You don&#39;t have to think about
 parallel to get parallel.</strong> Your operating system does parallel for you just
 fine, so we use the operating system.</p>
-
-<p>Proof is a <strong><em>parallel</em></strong> test runner, with a <strong><em>terse</em></strong> syntax and
-<strong><em>generated</em></strong> scaffolding, that runs <strong><em>tests that are programs</em></strong>, and can
-<strong><em>handle almost any exception</em></strong> and keep running tests.</p>
-
+<p>Proof is a <strong><em>parallel</em></strong> test runner, with a <strong><em>terse</em></strong> syntax that runs
+<strong><em>tests that are programs</em></strong>, and can <strong><em>handle almost any exception</em></strong> and
+keep running tests.</p>
 <h3>Install</h3>
-
-<p>Via NPM.</p></div>
-
-<div class="docs"><pre>npm install proof</pre></div>
-
-<div class="docs"><p>To test via NPM, by extension <a href="http://travis-ci.org/">Travis CI</a>, create a
-<code>package.json</code> for your project that includes the following properties.</p></div>
-
-<div class="docs"><div class="highlight"><pre><span class="p">{</span>   <span class="nt">&quot;name&quot;</span><span class="p">:</span>             <span class="s2">&quot;fibonacci&quot;</span>
-<span class="p">,</span>   <span class="nt">&quot;version&quot;</span><span class="p">:</span>          <span class="s2">&quot;1.0.3&quot;</span>
-<span class="p">,</span>   <span class="nt">&quot;author&quot;</span><span class="p">:</span>           <span class="s2">&quot;Alan Gutierrez&quot;</span>
-<span class="p">,</span>   <span class="nt">&quot;directories&quot;</span><span class="p">:</span>      <span class="p">{</span> <span class="nt">&quot;lib&quot;</span> <span class="p">:</span> <span class="s2">&quot;./lib&quot;</span> <span class="p">}</span>
-<span class="p">,</span>   <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span>  <span class="p">{</span> <span class="nt">&quot;proof&quot;</span><span class="p">:</span> <span class="s2">&quot;&gt;=0.0.1&quot;</span> <span class="p">}</span>
-<span class="p">,</span>   <span class="nt">&quot;scripts&quot;</span><span class="p">:</span>          <span class="p">{</span> <span class="nt">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;proof t/*/*.t&quot;</span> <span class="p">}</span>
-<span class="p">,</span>   <span class="nt">&quot;main&quot;</span><span class="p">:</span>             <span class="s2">&quot;./lib/fibonacci&quot;</span>
-<span class="p">}</span>
-
-</pre></div></div>
-
-<div class="docs"><p>Now you can run <code>npm test</code> to test your project.</p>
-
+<p>Via NPM.</p>
+<pre><code>npm install proof</code></pre>
+<p>To test via NPM, by extension <a href="http://travis-ci.org/">Travis CI</a>, create a
+<code>package.json</code> for your project that includes the following properties.</p>
+<pre><code class="lang-json">{   &quot;name&quot;:             &quot;fibonacci&quot;
+,   &quot;version&quot;:          &quot;1.0.3&quot;
+,   &quot;author&quot;:           &quot;Alan Gutierrez&quot;
+,   &quot;directories&quot;:      { &quot;lib&quot; : &quot;./lib&quot; }
+,   &quot;devDependencies&quot;:  { &quot;proof&quot;: &quot;&lt;=0.0.1&quot; }
+,   &quot;scripts&quot;:          { &quot;test&quot;: &quot;proof t/*/*.t&quot; }
+,   &quot;main&quot;:             &quot;./lib/fibonacci&quot;
+}</code></pre>
+<p>Now you can run <code>npm test</code> to test your project.</p>
 <h3>Every Test is a Program</h3>
-
-<p>Every test is a program. Add a shebang line and make the file executable. </p>
-
-<p>Minimal unit test.</p></div>
-
-<div class="docs"><div class="highlight"><pre><span class="c1">#!/usr/bin/env coffee</span>
-<span class="nx">require</span><span class="p">(</span><span class="s">&quot;proof&quot;</span><span class="p">)</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="nx">@ok</span> <span class="kc">true</span><span class="p">,</span> <span class="s">&quot;true is true&quot;</span></pre></div></div>
-
-<div class="docs"><p>The first argument to test is the number of tests to expect. If to many
+<p>Every test is a program.</p>
+<p>Place your test in a file under a test directory in your project. Add a shebang
+line and make the file executable.</p>
+<p>By convention, all tests are given a <code>.t</code> file extension, regardless of the
+language the test is written in. By convention, the test directory is named
+<code>./t</code> relative to the project root, but <code>./test</code> is good too.</p>
+<p>Minimal unit test.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;true is true&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>The first argument to test is the number of tests to expect. If to many
 or too few tests are run, the test runner will detect it and report it.</p>
-
-<p>The call to <code>require("proof")</code> returns a function. You can call
+<p>The call to <code>require(&#39;proof&#39;)</code> returns a function. You can call
 it immediately. That makes your test preamble quick and to the point.</p>
+<p>This is analogous to the above.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="kd">var</span> <span class="nx">test</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">);</span>
 
-<p>This is analogous to the above.</p></div>
+<span class="nx">test</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;true is true&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>Here&#39;s a test with two assertions.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">2</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ok</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;true is true&#39;</span><span class="p">);</span>
+  <span class="nx">equal</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;test addition&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>You can see that the second argument to <code>test</code> is your program. All of the
+assertions in <a href="http://nodejs.org/api/assert.html"><code>require(&quot;assert&quot;)</code></a> are
+available to your test function, all you need to do is ask for them in your
+function arguments. Proof with give them to you as you need them.</p>
+<h3>Step by Step Asynchronous Tests</h3>
+<p>Proof has a built in control flow library ala Step, that simplifies testing of
+asynchronous code. Most of the time, you&#39;re going to simply want to step through
+a series of calls and bail out on the slightest error. Proof is ergonomically
+optimized for this common case.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
 
-<div class="docs"><pre>test = require "proof"
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
 
-test 1, -&gt; @ok true, "true is true"</pre></div>
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">__filename</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
 
-<div class="docs"><p>Here's a test with two assertions.</p></div>
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">body</span><span class="p">,</span> <span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
 
-<div class="docs"><div class="highlight"><pre>
-<span class="c1">#!/usr/bin/env coffee</span>
-<span class="nx">require</span><span class="p">(</span><span class="s">&quot;proof&quot;</span><span class="p">)</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-&gt;</span>
-  <span class="nx">@ok</span> <span class="kc">true</span><span class="p">,</span> <span class="s">&quot;true is true&quot;</span>
-  <span class="nx">@equal</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s">&quot;test addition&quot;</span></pre></div></div>
+  <span class="nx">ok</span><span class="p">(</span><span class="sr">/proof/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">body</span><span class="p">),</span> <span class="s1">&#39;found proof&#39;</span><span class="p">);</span>
 
-<div class="docs"><p>You can see that the second argument to <code>test</code> is your program. All of the
-assertions in <a href="http://nodejs.org/api/assert.html"><code>require("assert")</code></a> are
-available to your test function. They are bound to <code>this</code> so you can get to them
-using the <code>@</code> operator in CoffeeScript.</p>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>For basic asynchronous testing, there&#39;s no need to nest your code into a temple
+of doom. The control flow library is there to keep your control flow shallow.</p>
+<p>When you do need to some serious asynchronous spelukning, Proof also supports
+supports complicated asynchronous concepts like parallelism and branching.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
 
-<h3>Streamline Auto-Detected</h3>
+<span class="c1">// Antidisestablishmentarianism</span>
 
-<p>Minimal streamlined unit test. Simply add a callback parameter to your callback
-and your test is called asynchronously.</p></div>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
 
-<div class="docs"><pre>#!/usr/bin/env _coffee
-fs   = require "fs"
-require("proof") 1, (_) -&gt;
-    found = /test/.test(fs.readFile(__filename, "utf8", _))
-    @ok found, "found the word test"</pre></div>
+  <span class="kd">var</span> <span class="nx">tree</span> <span class="o">=</span> <span class="p">[</span> <span class="nx">__dirname</span> <span class="p">],</span> <span class="nx">count</span><span class="p">;</span>
 
-<div class="docs"><p>When you give a test a callback with a single parameter, it calls that function
-with a <code>function (error) {}</code>. This is the callback function is required by
-Streamline.js.</p>
+  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="nx">nextDirectory</span> <span class="p">()</span> <span class="p">{</span>
 
-<p>No shims for Streamline.js code. Proof is Streamline.js friendly.</p>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">tree</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="k">return</span> <span class="nx">tree</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
+    <span class="k">else</span> <span class="nx">step</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">count</span><span class="p">);</span>
 
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">directory</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">readdir</span><span class="p">(</span><span class="nx">directory</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="nx">nextEntry</span> <span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="nx">directory</span><span class="p">,</span> <span class="nx">nextDirectory</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="k">return</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">directory</span><span class="p">,</span> <span class="nx">file</span><span class="p">);</span>
+    <span class="k">else</span> <span class="nx">step</span><span class="p">(</span><span class="nx">nextDirectory</span><span class="p">)();</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">stat</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">stat</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">nextEntry</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">stat</span><span class="p">.</span><span class="nx">isDirectory</span><span class="p">())</span> <span class="p">{</span>
+      <span class="nx">tree</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
+      <span class="nx">step</span><span class="p">(</span><span class="nx">nextEntry</span><span class="p">)();</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    <span class="p">}</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">body</span><span class="p">,</span> <span class="nx">nextEntry</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="sr">/Antidisestablishmentarianism/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">body</span><span class="p">))</span> <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+    <span class="nx">step</span><span class="p">(</span><span class="nx">nextEntry</span><span class="p">)();</span>
+
+  <span class="p">});</span>
+
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nx">ok</span><span class="p">(</span><span class="nx">count</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;one file contains possible seditious and blasphemous language&#39;</span><span class="p">);</span>
+
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>The test above walks through the test directory asynchronously, looking for the
+word &quot;Antidisestablishmentarianism&quot; in the files it encounters. The above test
+proceeds through the directory tree serially, using named functions as branch
+labels to repeatedly visit each directory and file.</p>
+<h3>Shebang all the Languages</h3>
+<p>Actually, you an use any language with Proof. Emit TAP. Proof will report it.</p>
+<pre><code class="lang-bash">#/bin/bash
+
+echo &quot;1..1&quot;
+
+true &amp;&amp; echo &quot;ok 1 truth is true&quot;</code></pre>
+<p>You can use Proof to test your next C project, one that that has a dozens of
+little test programs that emit simple TAP.</p>
+<p>You can use other languages to verify the integrity of your JavaScript library.</p>
+<p>In <a href="https://github.com/bigeasy/timezone">Timezone</a>, for example, I verify that
+my  JavaScript time zone compiler correctly parses the IANA Timezone database
+using Ruby&#39;s <code>strftime</code> implementation. I wrote a Ruby program that emits TAP
+and tests each clock transition in the database.</p>
 <h3>Create More Tests More Frequently With Harnesses</h3>
-
-<p>With an Proof harness you can start a test in as little as two lines of code.</p>
-
+<p>With an Proof harness you can give a test everything it needs to run with as
+little as two lines of code.</p>
 <p>Write a harness that does the setup for a test.  It will load the libraries
-necessary to write a test against the subsystem of your project.</p>
-
-<p>You add a shebang line here, because <code>proof</code> will run it for introspection when
-it generates new tests. See the test generation section below.</p></div>
-
-<div class="docs"><pre>#!/usr/bin/env coffee
-context = {}
-context.example = { firstName: "Alan", lastName: "Gutierrez" }
-context.model = require("../../lib/model")
-module.exports = require("proof") context</pre></div>
-
-<div class="docs"><p>Now you can write tests with a mere two lines of preamble. The common setup for
-your test suite is in your harness.</p></div>
-
-<div class="docs"><pre>#!/usr/bin/env coffee
-require("./harness") 2, ({ example, model }) -&gt;
-  @equal model.fullName(exmaple), "Alan Gutierrez", "full name"
-  @equal model.lastNameFirst(exmaple), "Gutierrez, Alan", "last name first"</pre></div>
-
-<div class="docs"><h3>Auto-Generate Test Skeletons From Harnesses</h3>
-
-<p>Once you have a harness, you can use <code>proof create</code> to generate tests based on
-your harness.</p></div>
-
-<div class="docs"><pre>$ proof create t/model/formats.t.coffee model example
-$</pre></div>
-
-<div class="docs"><p>You'll have a new test harness. The execute bit is set. It is ready to go.</p></div>
-
-<div class="docs"><pre>#!/usr/bin/env coffee
-require("./harness") 0, ({ example, model }) -&gt;
-
-  # Here be dragons.</pre></div>
-
-<div class="docs"><p>Now you can write your test.</p>
-
-<p>Proof assumes that you've created a harness in the target directory named
-<code>harness.js</code>, <code>harness._js</code>, <code>harness.coffee</code> or `harness._coffee'. You might
-decide to have different name or path for your harness, or you might want to use
-streamline, or specify a starting number of tests. Just type it out and proof
-will figure it out.</p></div>
-
-<div class="docs"><pre>$ proof create t/model/formats.t._coffee 2 db ./db-harness _
-$</pre></div>
-
-<div class="docs"><p>Would generate.</p></div>
-
-<div class="docs"><pre>#!/usr/bin/env _coffee
-require("./harness") 2, ({ db }, _) -&gt;
-
-  # Here be dragons.</pre></div>
-
-<div class="docs"><p>Check the docs for details.</p>
-
+necessary to write a test against a subsystem of your project.</p>
+<p>By convention, we name give our test harnesses a file name with a base of
+<code>proof</code>. This allows us to continue to <code>require(&quot;./proof&quot;)</code>, which is such a
+clever thing to say. The test harness file should have an extension of one of
+the supported languages, either <code>.coffee</code>, <code>._coffee</code>, <code>.js</code> or <code>._js</code>.</p>
+<p>In the harness you create a context <code>Object</code> and stuff it with useful bits and
+pieces for your test.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">context</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="nx">context</span><span class="p">.</span><span class="nx">example</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">firstName</span><span class="o">:</span> <span class="s2">&quot;Alan&quot;</span><span class="p">,</span> <span class="nx">lastName</span><span class="o">:</span> <span class="s2">&quot;Gutierrez&quot;</span> <span class="p">}</span>
+  <span class="nx">context</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;../../lib/model&quot;</span><span class="p">)</span>
+  <span class="k">return</span> <span class="nx">context</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>You would place the above in a file named <code>proof.js</code>, for example.</p>
+<p>Now you can write tests with a mere two lines of preamble. The common setup for
+the tests in your test suite is in your harness.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">2</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">example</span><span class="p">,</span> <span class="nx">model</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">equal</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">fullName</span><span class="p">(</span><span class="nx">exmaple</span><span class="p">),</span> <span class="s2">&quot;Alan Gutierrez&quot;</span><span class="p">,</span> <span class="s2">&quot;full name&quot;</span><span class="p">);</span>
+  <span class="nx">equal</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">lastNameFirst</span><span class="p">(</span><span class="nx">exmaple</span><span class="p">),</span> <span class="s2">&quot;Gutierrez, Alan&quot;</span><span class="p">,</span> <span class="s2">&quot;last name first&quot;</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
 <h3>Asynchronous Harnesses</h3>
-
 <p>Some setup will require asynchronous calls. Database connections are a common
-case. You can create asynchrous harnesses by providing a callback function
+case. You can create asynchronous harnesses by providing a callback function
 instead of an object to the require method in your harness.</p>
-
 <p>The callback function will itself get a callback that is used to return an
 object that is given to the test program.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
 
-<p>You'll note that, if you add a member to the object named <code>$teardown</code> that has a
-function value, that function will be called at teardown time.</p></div>
+<span class="kd">var</span> <span class="nx">mysql</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;mysql&#39;</span><span class="p">),</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
 
-<div class="docs"><pre>#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module exports = require("proof") (callback) -&gt;
-  fs.readFile "./configuration.json", "utf8", (error, file) -&gt;
-    if error
-      callback error
-    else
-      mysql = new mysql.Database(JSON.stringify file)
-      mysql.connect (error, connection) -&gt;
-        if error
-          callback error
-        else
-          callback null, { connection }</pre></div>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
 
-<div class="docs"><p>Or streamlined.</p></div>
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="s1">&#39;./configuration.json&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
 
-<div class="docs"><pre>#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module exports = require("proof") (_) -&gt;
-  file = fs.readFile "./configuration.json", "utf8", _
-  mysql = new mysql.Database(JSON.stringify file)
-  conneciton = mysql.connect _
-  { connection }</pre></div>
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
 
-<div class="docs"><p>The test itself is no more complicated.</p></div>
+  <span class="kd">var</span> <span class="nx">db</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">mysql</span><span class="p">.</span><span class="nx">Database</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">file</span><span class="p">));</span>
+  <span class="nx">db</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">step</span><span class="p">());</span>
 
-<div class="docs"><pre>#!/usr/bin/env _coffee
-require("./harness") 1, ({ connection }, _) -&gt;
-  results = connection.sql("SELECT COUNT(*) AS num FROM Employee", _)
-  @equal 12, results[0].num, "employee count"
-  connection.close()</pre></div>
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">connection</span><span class="p">)</span> <span class="p">{</span>
 
-<div class="docs"><p>Note that, you can use asynchronous harnesses with synchronous tests, and create
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">connection</span><span class="o">:</span> <span class="nx">connection</span> <span class="p">};</span>
+
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>The test itself is no more complicated.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env _coffee</span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">connection</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="nx">connection</span><span class="p">.</span><span class="nx">sql</span><span class="p">(</span><span class="s2">&quot;SELECT COUNT(*) AS num FROM Employee&quot;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">equal</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">num</span><span class="p">,</span> <span class="s2">&quot;employee count&quot;</span><span class="p">);</span>
+
+    <span class="nx">connection</span><span class="p">.</span><span class="nx">close</span><span class="p">(</span><span class="nx">step</span><span class="p">());</span>
+
+  <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>Note that, you can use asynchronous harnesses with synchronous tests, and create
 asynchronous tests from synchronous harnesses.</p>
+<h3>Assertions</h3>
+<p>Proof defines the assertions <code>ok</code>, <code>equal</code>, <code>notEqual</code>, <code>deepEqual</code>,
+<code>notDeepEqual</code>, <code>strictEqual</code>, and <code>notStrictEqual</code>. They are identical to the
+assertions of the same named defined in the
+<a href="http://nodejs.org/api/assert.html">assert</a> Node.js module, except that they
+print a message to <code>stdout</code>, instead of throwing an exception.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">3</span><span class="p">,</span> <span class="nx">funciton</span> <span class="p">(</span><span class="nx">ok</span><span class="p">,</span> <span class="nx">equal</span><span class="p">,</span> <span class="nx">deepEqual</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;truth works&#39;</span><span class="p">);</span>
+  <span class="nx">equal</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;math works&#39;</span><span class="p">);</span>
+  <span class="nx">deepEqual</span><span class="p">(</span><span class="s1">&#39;a b&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\s/</span><span class="p">),</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span> <span class="p">],</span> <span class="s1">&#39;strings work&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>Proof does not define a <code>throws</code> assertion. Instead, it uses the asynchronous
+control flow to test assertions.</p>
+<p>When a step function in the control flow starts with the argument <code>error</code>, it
+indicates that this is an error handling step.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;oops&#39;</span><span class="p">);</span>
+
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nx">equal</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span> <span class="s1">&#39;oops&#39;</span><span class="p">,</span> <span class="s1">&#39;error thrown&#39;</span><span class="p">);</span>
+
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>If no error is thrown, the assertion is not test, the count of passed tests is
+wrong and the test fails.</p>
+<p>You can test asynchronous error the same way.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+
+<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">,</span> <span class="nx">say</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nx">say</span><span class="p">(</span><span class="s1">&#39;testing file not found&#39;</span><span class="p">);</span> <span class="c1">// be chatty, why not?</span>
+  <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/i-do-not-exist.txt&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equals</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nx">equals</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="s1">&#39;ENOENT&#39;</span><span class="p">,</span> <span class="s1">&#39;file does not exist&#39;</span><span class="p">);</span>
+
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>Try not to worry about failure being inferred from count. It is actually really
+easy to see what what went wrong with a test with you keep your tests programs
+unit focused.</p>
 <h3>Exception Handling</h3>
-
 <p>When a test is healthy, it is healthy for the test to release resources. When a
-test fails catastrophically, Proof lets the operating system to hard work of
+test fails catastrophically, Proof lets the operating system do the hard work of
 releasing system resources, such as memory, sockets and file handles.</p>
+<p>Here&#39;s a test that opens a file handle, then closes it like a good citizen.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
 
-<p>Here's a test that opens a file handle, then closes it like a good citizen.</p></div>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
 
-<div class="docs"><pre>#!/usr/bin/env _coffee
-require("./harness") 1, ({ fs, tmp }, _) -&gt;
-  fs.open(__filename, "r", _)
+  <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
 
-  buffer = new Buffer(2)
-  fs.read(fd, buffer, 0, buffer.length, 0, _)
-  @equal buffer.readInt16BE(0), 0x2321, "shebang magic number"
+  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
-  fs.close(fd, _)</pre></div>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="nx">__filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
 
-<div class="docs"><p>But, what if there is a catastrophic error? Let's say that in the code above,
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fd</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="nx">fd</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">equal</span><span class="p">(</span><span class="nx">buffer</span><span class="p">.</span><span class="nx">readInt16BE</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mh">0x2321</span><span class="p">,</span> <span class="s1">&#39;shebang magic number&#39;</span><span class="p">);</span>
+
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">close</span><span class="p">(</span><span class="nx">fd</span><span class="p">,</span> <span class="nx">step</span><span class="p">())</span>
+
+  <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>But, what if there is a catastrophic error? Let&#39;s say that in the code above,
 the <code>Buffer</code> cannot be allocated because the system is out of memory. What
 happens? An exception is thrown, the process exits, and the operating system
 closes the file handle.</p>
-
-<p>Of course, we could register an error handler to run at the last minute, or we
-could create a towering pyramid of try/catch blocks, but why bother? Let the
-operating system handle your exceptions in your test code. Much easier than
-trying to account for every possible error in code that is under active
-development.</p>
-
+<p>The operating system? Aren&#39;t we always supposed to close our own file handles?</p>
+<p>Well, we could register an error handler to run at the last minute, or we could
+create a towering pyramid of try/catch blocks, but why bother? None of that will
+matter if your test has hung and you feed it a <code>kill -9</code>.</p>
+<p>Trying to write exception handlers that account for every possible error that a
+test might find in code that is under active development is a tall order and a
+not a good use of your time.</p>
+<p>Test code is supposed to raise unexpected exceptions. It is supposed to discover
+the unexpected. Let your tests find the exceptions. Let your operating system
+clean up after your tests when the exceptions are found.</p>
 <h3>Housekeeping</h3>
+<p>Because each test is a short lived program, we can count on the operating system
+to reclaim resources like memory, file handles, and sockets when exceptions
+occur. But there is state that will not be reclaimed automatically. The most
+obvious example is temporary files and directories. We reclaim these using
+<strong><em>cleanup functions</em></strong>.</p>
+<p>We&#39;re so meticulous, we run our cleanup functions twice for each test. Rather
+than counting on our test to clean up after itself, when it might be in bad
+shape due to some unforeseen error state, we count on it to always <strong><em>cleanup
+before itself</em></strong>, at the start of the test program, when it is most stable.</p>
+<p>We do try to run our test again at exit. What we don&#39;t do is jump through hoops
+to ensure that our cleanup functions are called at exit. We could register exit
+handlers and create intricate try/catch blocks, but the test still might not run
+its cleanup functions at exit if the test exhausts system memory, segfaults, or
+gets a <code>kill -9</code>. We can&#39;t guarantee a cleanup at exit, so we don&#39;t count on it.</p>
+<p>Because your cleanup functions are run twice, they must be <strong>idempotent</strong>, as
+the kids like to say. You must be able to run a cleanup function over and over
+again and get the same results.  If a cleanup function deletes a temporary file,
+for example, it can&#39;t complain if the temporary file has already been deleted.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
 
-<p>Rather than cleaning up after ourselves, we cleanup before ourselves. We create
-a harness that cleanups any mess form a previously failed test.</p></div>
+<span class="kd">var</span> <span class="nx">mysql</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;mysql&#39;</span><span class="p">),</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
 
-<div class="docs"><pre>#!/usr/bin/env _coffee
-require("./harness") 1, ({ fs, spawn, cwd }, _) -&gt;
-  program = "#{cwd}/example.sh"
-  fs.writeFile(program, "utf8", "#!/bin/bash\nexit 1\n", _)
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">tmp</span> <span class="o">=</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/tmp&#39;</span><span class="p">;</span>
 
-  try
-    exec "#{cwd}/example.sh", _
-  catch e
-    @equal e.code, 1, "failed"</pre></div>
+  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="nx">cleanup</span> <span class="p">()</span> <span class="p">{</span> <span class="c1">// named cleanup, so run again at exit</span>
 
-<div class="docs"><p>In the test above, we create a bash program to to test that error codes work
+    <span class="c1">// nested step delete of tmp directory and contents.</span>
+    <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">readdir</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span> <span class="o">==</span> <span class="s1">&#39;ENOENT&#39;</span><span class="p">)</span> <span class="nx">step</span><span class="p">();</span> <span class="c1">// done</span>
+      <span class="k">else</span> <span class="k">throw</span> <span class="nx">error</span><span class="p">;</span> <span class="c1">// unexpected</span>
+    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">list</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">list</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fs</span><span class="p">.</span><span class="nx">unlink</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">file</span><span class="p">),</span> <span class="nx">step</span><span class="p">());</span>
+      <span class="p">});</span>
+    <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">rmdir</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    <span class="p">}</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="c1">// create a new tmp directory for our test</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">mkdir</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="mi">0755</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="c1">// give our test the tmp directory</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">tmp</span><span class="o">:</span> <span class="nx">tmp</span> <span class="p">};</span>
+
+  <span class="p">})</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>When we register a cleanup function, the cleanup function is called upon
+registration. Cleanup functions are run at the start of a test to cleanup in
+case our last test run exited abnormally. As long as the test does not exit
+abnormally, the cleanup function is called again at exit.</p>
+<p>In the harness above, we register a cleanup function that deletes files in a
+temporary directory, then deletes the temporary directory. If the directory
+doesn&#39;t exist, that&#39;s okay, we catch the <code>ENOENT</code> exception and return. Because
+the cleanup function is called when we pass it to <code>step</code>, we&#39;re assured a clean
+slate. We call <code>fs.mkdir</code> without checking to see if it already exists. We know
+that it doesn&#39;t.</p>
+<p>Now we can use our temporary directory in a test. The test doesn&#39;t have to
+perform any housekeeping. We can write test after test in the same suite, each
+one making use of this temporary directory, because it is cleaned up after or
+before every run.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+
+<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">),</span> <span class="nx">exec</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;child_process&#39;</span><span class="p">).</span><span class="nx">exec</span><span class="p">;</span>
+
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">program</span> <span class="o">=</span> <span class="nx">tmp</span> <span class="o">+</span> <span class="s1">&#39;/example.sh&#39;</span>
+
+  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="s1">&#39;#!/bin/bash\nexit 1\n&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">chmod</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="mi">0755</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">exec</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">equal</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;exit code&#39;</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>In the test above, we create a bash program to to test that error codes work
 correctly. If no exception is thrown, the test runner will report that a test
 was missed.</p>
+<p>Tests can register cleanup functions too. It is generally easier to keep them in
+the harnesses, but its fine to use them in tests as well.</p>
+<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
 
-<p>This leaves a file lying around. How do we clean it up? With a harness.</p>
+<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">),</span> <span class="nx">exec</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;child_process&#39;</span><span class="p">).</span><span class="nx">exec</span><span class="p">;</span>
 
-<p>Here's a streamlined harness for our function.</p></div>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">program</span> <span class="o">=</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/example.sh&#39;</span>
 
-<div class="docs"><pre>#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module.exports = require("proof") -&gt;
-  cwd = "#{__dirname}"
-  $cleanup = (_) -&gt;
-    try
-      fs.unlink "#{cwd}/example.sh", _
-    catch e
-      throw e if e.code isnt "ENOENT" 
-  { cwd, $cleanup }</pre></div>
-
-<div class="docs"><p>As you can see, your cleanup function can use Streamline.js, even if your
-harness function does not.</p>
-
-<p>We run your clean up function at the start of a test, then again at the end of
-the test if the test exits normally. Thus, even if the test fails, everything
-will be clean for the next test using the same harness.</p>
-
-<p>Your <code>$cleanup</code> function must be <strong>idempotent</strong>, as the kids like to say. You
-must be able to run it over and over again and get the same results. If your
-cleanup function deletes a temporary file, it can't complain if the temporary
-file has already been deleted.</p>
-
-<p>What if you're <code>$cleanup</code> function deletes something you need? Then you provide
-a <code>$setup</code> function. Before your test is run, <code>$cleanup</code> is run to clear out the
-remains of any failed tests, then <code>$setup</code> is run. After your test is run
-<code>$cleanup</code> is run, and everything goes back to the way it was.</p></div>
-
-<div class="docs"><pre>#!/usr/bin/env _coffee
-mysql   = require "mysql"
-fs      = require "fs"
-module.exports = require("proof") -&gt;
-  tmp = "#{__dirname}/tmp"
-  $setup = (_) -&gt;
-    fs.mkdir tmp, 0755, _
-  $cleanup = (_) -&gt;
-    try
-      for file in fs.readdir tmp, _
-        fs.unlink file, _
-      fs.unlink tmp, _
-    catch e
-      throw e if e.code isnt "ENOENT" 
-  { tmp, $setup, $cleanup }</pre></div>
-
-<div class="docs"><p>Now we can use a temporary directory to create our bash program.</p></div>
-
-<div class="docs"><div class="highlight"><pre>
-<span class="c1">#!/usr/bin/env _coffee</span>
-<span class="nx">require</span><span class="p">(</span><span class="s">&quot;./harness&quot;</span><span class="p">)</span> <span class="mi">1</span><span class="p">,</span> <span class="nf">({ fs, spawn, tmp }, _) -&gt;</span>
-  <span class="nv">program = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">tmp</span><span class="si">}</span><span class="s">/example.sh&quot;</span>
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="s">&quot;utf8&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="err">#</span><span class="s">!/bin/bash\nexit 1\n&quot;</span><span class="p">,</span> <span class="nx">_</span><span class="p">)</span>
-
-  <span class="k">try</span>
-    <span class="nx">exec</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">tmp</span><span class="si">}</span><span class="s">/example.sh&quot;</span><span class="p">,</span> <span class="nx">_</span>
-  <span class="k">catch</span> <span class="nx">e</span>
-    <span class="nx">@equal</span> <span class="nx">e</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;failed&quot;</span>
-
-</pre></div></div>
-
-<div class="docs"><h3>Running Tests</h3>
-
-<p>A test is a program. You can run a test to see its output.</p></div>
-
-<div class="docs"><pre>$ t/logic/minimal.t
+  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="nx">cleanup</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">fs</span><span class="p">.</span><span class="nx">unlink</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span> <span class="o">!=</span> <span class="s1">&#39;ENOENT&#39;</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">error</span><span class="p">;</span>
+    <span class="p">});</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="s1">&#39;#!/bin/bash\nexit 1\n&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nx">chmod</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="mi">0755</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">exec</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">equal</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;exit code&#39;</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+</code></pre>
+<p>Here our test creates a temporary file in the same directory as the test,
+instead of in a harness provided temporary directory. It registers a cleanup
+function that deletes the file, so that the file is deleted before and after we
+write to it.</p>
+<p>A useful pattern falls out of cleanup before. You may want to skip cleanup at
+exit so you can inspect the file output of a test. If so, you can set the
+environment variable <code>UNTIDY=1</code> before running an individual test. It will
+cleanup before the test but not after. Now you can go through an edit, test,
+inspect cycle and watch how the output changes.</p>
+<p>We count on cleanup before a test to allow us to keep running our tests until
+they pass, without having us have to stop and cleanup cruft after each because a
+test is exiting abnormally. If tests are exiting normally, regardless of whether
+they pass or fail, they will clean up after themselves, leaving your project
+directory nice and tidy after each run.</p>
+<h3>Running Tests</h3>
+<p>A test is a program. You can run a test to see its output.</p>
+<pre><code>$ t/logic/minimal.t
 1..2
-ok 1 - true is true
-ok 2 - test arithmetic
-$</pre></div>
-
-<div class="docs"><p>By immutable convention, tests are grouped together by directory. The tests
+ok 1 true is true
+ok 2 test arithmetic
+$</code></pre>
+<p>By immutable convention, tests are grouped together by directory. The tests
 within a directory are considered a suite of tests. Test suites are generally
-kept in a directory <code>t</code> off the root of the project.</p></div>
-
-<div class="docs"><pre>$ find t
+kept in a directory <code>t</code> off the root of the project.</p>
+<pre><code>$ find t
 t/logic/minimal.t
 t/regex/minimal.t
 t/regex/complex.t
-$</pre></div>
-
-<div class="docs"><p>You can run a test with the proof test runner to get gaudy console output with
+$</code></pre>
+<p>You can run a test with the proof test runner to get gaudy console output with
 colors and non-ASCII characters (approximated below).</p>
-
-<pre>
-$ proof t/logic/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
-$
-</pre>
-
+<pre><code>$ proof t/logic/minimal.t
+ ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
+                                      tests (1/1) assertions (2/2) 0.230 Success
+$</code></pre>
 <p>Each test you pass to the test runner is will be run by the test runner. Tests
 in separate suites are run in parallel.</p>
-
-<pre>
-$ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
-$
-</pre>
-
+<pre><code>$ proof t/logic/minimal.t t/regex/minimal.t
+ ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
+ ✓ t/regex/minimal.t ....................................... (2/2) 0.331 Success
+                                      tests (2/2) assertions (4/4) 0.561 Success
+$</code></pre>
 <h3>Tests Run in Parallel</h3>
-
 <p>As above.</p>
-
-<pre>
-$ proof t/logic/minimal.t.coffee t/regex/minimal.t.coffee t/regex/complex.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
- &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
-$
-</pre>
-
+<pre><code>$ proof t/logic/minimal.t t/regex/minimal.t t/regex/complex.t
+ ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
+ ✓ t/regex/minimal.t ....................................... (2/2) 0.331 Success
+ ✓ t/regex/complex.t ....................................... (2/2) 1.045 Success
+                                      tests (3/3) assertions (6/6) 1.606 Success
+$</code></pre>
 <p>Because each test is a program, parallelism is simply a matter of running more
 than one test program at once. The default mode of the proof runner is to run four
 test programs a time.</p>
-
 <p>The runner will run a test program from each suite, for up to four programs
 running at once. When a suite it complete, it moves onto the next one.</p>
-
 <p>Tests within suites are run one after another, in the order in which they were
 specified on the command line.</p>
-
 <p>If you design your tests so that they can run in any order, then you can run an
 entire suite of tests with globbing.</p>
-
-<pre>
-$ proof t/*/*.t.coffee
- &#x2713; t/logic/minimal.t.coffee ......................... (2/2)  .230 Success
- &#x2713; t/regex/minimal.t.coffee ......................... (2/2)  .331 Success
- &#x2713; t/regex/complex.t.coffee ......................... (2/2) 1.045 Success
-$
-</pre>
-
+<pre><code>$ proof t/*/*.t
+ ✓ t/logic/minimal.t ....................................... (2/2)  .230 Success
+ ✓ t/regex/minimal.t ....................................... (2/2)  .331 Success
+ ✓ t/regex/complex.t ....................................... (2/2) 1.045 Success
+                                      tests (3/3) assertions (6/6) 1.606 Success
+$</code></pre>
 <p>Generally avoid making tests depend on being run in a specific order. That way
 you can get parallelism easily.</p>
-
 <p>Suites run in parallel. You can group your tests however you like, by feature,
 subsystem, stages of workflow.</p>
-
 <p>Make sure they can run in parallel though. You may have a single MySQL database
-to use for testing. You'll have to  group all your MySQL tests in a suite, you
-can be sure that they won't stomp on each other. If your application supports
+to use for testing. You&#39;ll have to  group all your MySQL tests in a suite, you
+can be sure that they won&#39;t stomp on each other. If your application supports
 either MySQL or PostgreSQL, you could run those tests in parallel.</p>
-
 <p>If every test expects to hit a MySQL database, then create a separate MySQL
 database for each suite. Not a big deal, really, and then you have your tests
 running in parallel.</p>
-
 <h3>Continuous Integration With Travis CI</h3>
-
-<p>For an example of Travis CI output, you can look at the <a href="http://travis-ci.org/#!/bigeasy/ace">output from Proof
+<p>For an example of Travis CI output, you can look at the <a href="http://travis-ci.org/#!/bigeasy/proof">output from Proof
 itself</a>.</p>
-
-<p>With a minimal <code>.travis.yml</code> and Proof will work with Travis CI.</p></div>
-
-<div class="docs"><pre>language: node_js
+<p>With a minimal <code>.travis.yml</code> and Proof will work with Travis CI.</p>
+<pre><code>language: node_js
 
 node_js:
   - 0.6
 
 before_install:
   - npm install --dev
-  - git submodule init &amp;&amp; git submodule update</pre></div>
-
-<div class="docs"><p>However, <code>npm install --dev</code> will recursively install development dependencies,
+  - git submodule init &amp;&amp; git submodule update</code></pre>
+<p>However, <code>npm install --dev</code> will recursively install development dependencies,
 bringing in all of CoffeeScript, which is not necessary. Explicitly installing
-your development dependencies makes your Travis CI output much less verbose.</p></div>
-
-<div class="docs"><pre>language: node_js
+your development dependencies makes your Travis CI output much less verbose.</p>
+<pre><code>language: node_js
 
 node_js:
   - 0.6
@@ -472,91 +590,252 @@ node_js:
 before_install:
   - npm install
   - npm install proof coffee-script streamline
-  - git submodule init &amp;&amp; git submodule update</pre></div>
-
-<div class="docs"><p>If you are not using Streamline.js exclude <code>streamline</code>. If you are not using
-CoffeeScript exclude <code>coffee-script</code>. Add additional development dependencies as
-to suit your project's needs.</p>
-
-<h2>Why I Wrote My Own (Non-)Framework</h2>
-
-<p>This is my test framework. There are many like it, but this one is mine.</p>
-
-<p>The catalyist was Streamline.js. The frameworks that exist generally group tests
-into a object or the functional programming equavalent. Each test is a function.
-A suite is a class or other grouping of functions.</p>
-
-<p>The function may provide a callback, but the callback isn't in the <code>function
-(error, result) {}</code> format that works with Streamline.js.</p>
-
-<p>Of course, once I was done writing this, it occured to me that callback
-signature differences are easily shimmed, but it was too late by then.</p>
-
-<p>There is a lot of extra stuff your grarden variety test frameworks. Folks put a
-lot of thought into testing, which is an area that invites over-thinking.</p>
-
-<p>I don't want to pay for those features; compatability with CI frameworks I don't
-use, compatability with IDEs I don't use, histograms that I'll never look at.</p>
-
-<p>I've never thought to myself, boy, if only I could see my test results in XML,
-JSON, RDF and YAML, then I'd really get to the bottom of this pesky bug.</p>
-
-<p>I don't want to depend on a test runner to run my tests.  The test runner here
-runs tests, it does not load them, set them up and tear them down. It just runs
-them and reports on how they ran.</p>
-
-<p>I don't want to have fiddle with a test runner to run a specific test. I want a
-each test to be a a program. I want to group my tests into suites by grouping my
-test programs into directories. When I want to run a specific test, I'll just
-run the test program directly.</p>
-
-<p>I'm happy to pay the extra millis to spawn a process per test, because it is so
-much easier to write a test program, with a clean program state, and not have to
-worry about teardown. I don't want my test runner to manage memory, file handles
-and sockets. Let the operating system to do that.</p>
-
-<p>I do want pretty green check marks. Those are <em>very</em> important to me. You'll see
-that my check marks are green and they use UNICODE check marks. I splurged on
-the check marks. They make me happy.</p>
-
-<h2>Un-Filtered Blather</h2>
-
+  - git submodule init &amp;&amp; git submodule update</code></pre>
+<p>If you are not using Streamline.js exclude <code>streamline</code>. If you are not using
+CoffeeScript exclude <code>coffee-script</code>. Add additional development dependencies to
+suit your project&#39;s needs.</p>
+<h2>Change Log</h2>
+<p>Changes for each release.</p>
+<h3>Version 0.0.32.</h3>
+<p>Thu Jul 11 01:47:18 UTC 2013</p>
 <ul>
-<li>Deeply nested try/catch blocks.</li>
-<li>Frameworks group assertions into tests and tests into suites. A suite is a
-file containing test. To run a test you need to run it through the test
-runner. Proof has the same grouping this too, but a suite is a directory, a
-test is a program.  Thus, to run a specific test, you run that program. No
-special switches to the test runner to pluck out the test you want to run.</li>
-<li><em>We cleanup at setup instead of tearing down.</em> You can be loosey goosey about
-resources in your tests because they are short lives programs, but if you
-need to have a an empty directory, or a reset a database state, do it at test
-start, and leave it a mess for the next run to cleanup. If you want to be
-tidy, you can have a cleanup function that you run at the end, but run it at
-the begining as well in case the last run ended early.</li>
-<li>Tests are meant to exercise the demons in our software. We're not surprised
-when they fail catastrohpically. Why do we try to register last minute
-callbacks to do housekeeping in a process that might have just decided to
-kill itself rather than go on? Why do try to run test after test in a single
-long-running test runner process, when we know that an error most likely
-means resources left unused, yet uncollected?</li>
-<li>Do we want to manage all the failure states for code in development? A long
-running test runner is a horrible model for a test framework.</li>
-<li>We write tests because we know that static analysis is not enough to ensure
-quality.  We write tests to exercise the demons from our software. We should
-not be surprised when our tests fail in ways that we cannot imagine. We
-should not feel ashamed that we could never imagine the failure states that
-our tests uncover. We should be humble before the complexity of software. We
-should accept that it is more than we can hold in our head at once.</li>
-<li>To think otherwise is to expect oneself to be omnicient.</li>
-<li>Moreover, why do you need a plan to turn off every light switch on your way
-out the door when the house is burning down? Dont' worry. The fire will take
-care of it for you.</li>
-</ul></div>
+<li>Upgrade Cadence to 0.0.23. #160.</li>
+</ul>
+<h3>Version 0.0.31</h3>
+<p>Mon Jul  8 14:52:16 UTC 2013</p>
+<ul>
+<li>Upgrade Cadence to 0.0.22. #157.</li>
+</ul>
+<h3>Version 0.0.30</h3>
+<p>Wed Jun 19 03:23:54 UTC 2013</p>
+<ul>
+<li>Upgrade Cadence to 0.0.19. #153.</li>
+</ul>
+<h3>Version 0.0.29</h3>
+<p>Fri Jun 14 00:17:21 UTC 2013</p>
+<ul>
+<li>Upgrade Cadence to 0.0.17. #153.</li>
+</ul>
+<h3>Version 0.0.28</h3>
+<p>Tue Apr  9 23:07:50 UTC 2013</p>
+<ul>
+<li>Renew support for Node.js 0.6. #150.</li>
+<li>Fix global namespace leak detection. #151.</li>
+</ul>
+<h3>Version 0.0.27</h3>
+<p>Thu Mar 21 08:54:41 UTC 2013</p>
+<ul>
+<li>Implement execute in tests using Cadence events. #147.</li>
+<li>Upgrade Cadence to 0.0.15.</li>
+<li>Upgrade Arguable to 0.0.8.</li>
+<li>Replace <code>exit</code> event of child processes with <code>close</code>. #149.</li>
+<li>Move binary and library into the root of the project directory. #148.</li>
+<li>Git rid of default action, report usage instead. #146.</li>
+<li>Rename default action to <code>test</code> and move it into the main binary. #145.</li>
+</ul>
+<h3>Version 0.0.26</h3>
+<p>Tue Mar 19 04:57:56 UTC 2013</p>
+<ul>
+<li>Meld harness and program into single cadence. #144.</li>
+</ul>
+<h3>Version 0.0.25</h3>
+<p>Mon Mar 18 07:20:00 UTC 2013</p>
+<ul>
+<li>Tidy <code>lib/proof.js</code> variable names for harness and program functions. #143.</li>
+<li>Pass named parameters into harness functions. #142.</li>
+<li>Generalize <code>parameterize</code> function in <code>lib/proof.js</code>. #141.</li>
+<li>Allow user to override assertions. #139.</li>
+<li>Fix export of <code>say</code> and <code>die</code>. #137.</li>
+</ul>
+<h3>Version 0.0.24</h3>
+<p>Sun Mar 17 06:28:06 UTC 2013</p>
+<ul>
+<li>Upgrade Cadence to 0.0.13.</li>
+<li>Add contribution guide.</li>
+</ul>
+<h3>Version 0.0.23</h3>
+<p>Sat Mar 16 06:03:02 UTC 2013</p>
+<ul>
+<li>Upgrade Cadence to 0.0.12.</li>
+<li>Remove dependency on Cadence hidden context. #136.</li>
+</ul>
+<h3>Version 0.0.22</h3>
+<p>Tue Mar 12 08:00:30 UTC 2013</p>
+<ul>
+<li>Remove arity from <code>t/node/cleanup/test.t.js</code>. #132.</li>
+<li>Upgrade Cadence to 0.0.11. #135.</li>
+</ul>
+<h3>Version 0.0.21</h3>
+<p>Tue Mar 12 06:52:06 UTC 2013</p>
+<ul>
+<li>Upgrade Cadence to 0.0.10. #134.</li>
+<li>Export Cadence. #127.</li>
+<li>Flatten arguments to Cadence. #131.</li>
+</ul>
+<h3>Version 0.0.20</h3>
+<p>Tue Mar  5 03:50:01 UTC 2013</p>
+<ul>
+<li>Add <code>proof platform</code> Arguable usage message. #130.</li>
+</ul>
+<h3>Version 0.0.19</h3>
+<p>Tue Mar  5 03:22:27 UTC 2013</p>
+<ul>
+<li>Upgrade Cadence to rename <code>async</code> to <code>step</code>. #129.</li>
+</ul>
+<h3>Version 0.0.18</h3>
+<p>Fri Mar  1 03:45:03 UTC 2013</p>
+<ul>
+<li>Tidy.</li>
+<li>Upgrade Arguable to 0.0.6. #120.</li>
+<li>Upgrade Cadence to 0.0.7. #110.</li>
+<li>Drop support for Node.js 0.6. #124.</li>
+<li>Wait on test program <code>close</code> instead of <code>exit</code>. #123.</li>
+</ul>
+<h3>Version 0.0.17</h3>
+<p>Mon Feb 18 07:42:56 UTC 2013</p>
+<ul>
+<li>Report missing tests from errors/progress runners. #121.</li>
+</ul>
+<h3>Version 0.0.16</h3>
+<p>Sun Dec  9 17:25:16 UTC 2012</p>
+<ul>
+<li>Unclutter root of project directory. #118. #119.</li>
+<li>Progress runner exits with success when no input is given. #114.</li>
+<li>Unclutter package.json. #114.</li>
+<li>Add Node.js 0.8 to Travis CI build. #117.</li>
+<li>Add source language file suffix to test program files. #115.</li>
+<li>Rewrite <code>README.md</code>. #85. #107. #108.</li>
+</ul>
+<h3>Version 0.0.15</h3>
+<p>Fri Jul 13 17:00:01 UTC 2012</p>
+<ul>
+<li>Upgrade to Cadence 0.0.5. #104.</li>
+</ul>
+<h3>Version 0.0.14</h3>
+<p>Thu Jul 12 01:50:03 UTC 2012</p>
+<ul>
+<li>Platform detection program. #102.</li>
+<li>Animate Windows. #103.</li>
+<li>Print summary on <code>run</code> and <code>plan</code>. #28.</li>
+</ul>
+<h3>Version 0.0.13</h3>
+<p>Wed Jul 11 22:43:24 UTC 2012</p>
+<ul>
+<li>Run on Windows. #101. #99. #98. #47.</li>
+</ul>
+<h3>Version 0.0.12</h3>
+<p>Sun Jul  8 05:58:51 UTC 2012</p>
+<ul>
+<li>Upgrade to Cadence 0.0.2. #100.</li>
+</ul>
+<h3>Version 0.0.11</h3>
+<p>Sun Jul  8 05:24:13 UTC 2012</p>
+<ul>
+<li>Extract Cadence control flow library. #97. #90. #52.</li>
+<li>Convert to closure style removing <code>Test</code> class. #91.</li>
+<li>The <code>fail</code> method will print a <code>not ok</code>. #94.</li>
+<li><code>UNTIDY</code> is working again. #92.</li>
+<li>Removed the Streamline.js specific <code>throws</code> and <code>cleanup_</code> functions. #93.</li>
+<li>Removed the implicit <code>context</code> argument that was used with structured
+assignment in CoffeeScript tests. #80.</li>
+</ul>
+<h3>Version 0.0.10</h3>
+<p>Sat Jun 30 16:41:44 UTC 2012</p>
+<ul>
+<li><code>proof progress</code> exits non-zero for any failure. #87.</li>
+</ul>
+<h3>Version 0.0.9</h3>
+<p>Fri Jun 29 13:59:21 UTC 2012</p>
+<ul>
+<li>Preserve leading whitespace in output parsing. #27.</li>
+<li>Usage messages for all commands. #23.</li>
+<li>Nested control flow. #51.</li>
+<li>Detect variables leaked to the global namespace. #54.</li>
+<li>Variable argument say. #30.</li>
+<li>Create <code>die</code> as alias of <code>bailout</code>. #31.</li>
+<li>Use inspector for recursive dump of <code>say</code> and <code>bailout</code>. #33.</li>
+<li>Report failure if actual tests exceed expected tests. #77</li>
+<li>Add switch to <code>proof progress</code> to disable colorization. #76.</li>
+<li>Detect tests without plans. #75.</li>
+<li>Display compilation error output. #22.</li>
+</ul>
+<h3>Version 0.0.8</h3>
+<p>Thu Jun 28 21:05:46 UTC 2012</p>
+<ul>
+<li>Wait on pending output before exit. #72.</li>
+</ul>
+<h3>Version 0.0.7</h3>
+<p>Wed Jun 27 18:22:41 UTC 2012</p>
+<ul>
+<li>Fixed <code>this</code> binding error in <code>bailout</code>. #68.</li>
+<li>Development dependencies in <code>pacakage.json</code> only. #66.</li>
+<li>Populated <code>.npmignore</code>. #67.</li>
+<li>Increase digit width to fit. #26.</li>
+</ul>
+<h3>Version 0.0.6</h3>
+<p>Wed Jun 27 17:08:41 UTC 2012</p>
+<ul>
+<li>Added <code>TIMELESS</code> environment variable switch to disable timeouts. #60.</li>
+<li>Fix named callbacks. #57.</li>
+<li>Ensure that step finished before next step begins when generated callback is
+called. #50.</li>
+<li>Restore animation through inherited stdio. #38.</li>
+<li><code>getopt</code> like option parser. #49.</li>
+<li>Nicer error messages. #17.</li>
+<li>Named cleanup functions. #48.</li>
+</ul>
+<h3>Version 0.0.5</h3>
+<p>Sat Jun 16 10:01:21 UTC 2012</p>
+<ul>
+<li>Exit non-zero if actual does not equal expxected. #46.</li>
+<li>Hide <code>Test</code> private members. #45.</li>
+<li>Using JavaScript flows everywhere. #44. #43. #41. #40.</li>
+<li>Orgnaize tests by language. #42.</li>
+<li>Convert to JavaScript. #37.</li>
+<li>Extracting context into callback parameters. #39.</li>
+<li>Step-like asynchronous flow utility. #14.</li>
+<li>Pipeline scaffolding. #18.</li>
+<li>Build CoffeeScript with Makefile. #32.</li>
+<li><code>proof-errors</code> non-zero exit. #34.</li>
+<li><code>UNTIDY</code> alias for <code>PROOF_NO_CLEANUP</code>. #29.</li>
+</ul>
+<h3>Version 0.0.4</h3>
+<p>Sun May 13 19:43:30 UTC 2012</p>
+<ul>
+<li>Showing standard error and standard output prior to a failed test or a bail
+out in failed assertions display. #24.</li>
+</ul>
+<h3>Version 0.0.3</h3>
+<p>Sun May 13 17:24:09 UTC 2012</p>
+<ul>
+<li><code>proof errors</code> displays bail outs. #20.</li>
+<li>Created <code>proof errors</code> to display the failed assertions of a failed test run. #5.</li>
+<li>Fail on when passed tests exceed expected tests. #6.</li>
+<li>Correctly reporting tests that fail before they start, like failure to
+compile. #8.</li>
+<li>Set width of progress display using <code>--width</code> option. #19.</li>
+<li>Set width of progress timing display using <code>--digits</code> option. #16.</li>
+<li>Fixed spelling in documentation and comments, cleanup documentation. #10. #9.</li>
+<li>Abend when test is specified twice in a run. #4.</li>
+<li>Spell check <code>README.md</code>.</li>
+</ul>
+<h3>Version 0.0.2</h3>
+<p>Wed May  9 03:52:57 UTC 2012</p>
+<ul>
+<li>Correctly summing assertions. #13.</li>
+<li>Failed assertions no longer repeat message. #11.</li>
+<li>Initial release.</li>
+</ul>
+</div>
 
-</div>
-</div>
+</div></body>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-</div>
-</body>
+ga('create', 'UA-20388260-3', 'bigeasy.github.io');
+ga('send', 'pageview');
+</script>
 </html>
