@@ -1,17 +1,26 @@
-{   "name":             "proof"
-,   "description":      "A UNIX way test non-framework for the meticulous programmer who is also very lazy."
-,   "keywords":         [ "test", "unit", "tap", "assert", "tdd" ]
-,   "version":          "0.0.33"
-,   "author":           "Alan Gutierrez <alan@prettyrobots.com>"
-,   "directories":      { "lib" : "./lib" }
-,   "repository":       "https://github.com/bigeasy/proof"
-,   "homepage":         "https://github.com/bigeasy/proof"
-,   "dependencies":     { "cadence": "0.0.25"
-                        , "arguable": "0.0.8"
-                        , "expandable": "0.0.0"
-                        }
-,   "devDependencies":  { "coffee-script": ">=1.1.3" }
-,   "scripts" :
-    { "test": "(node proof.bin.js run t/*/*.t.* t/*/*/*.t.* | tee .proof.out | node proof.bin.js progress) || (node proof.bin.js errors < .proof.out)" }
-,   "bin":              { "proof": "proof.bin.js" }
+{
+    "name":             "proof",
+    "version":          "0.0.33",
+    "author":           "Alan Gutierrez <alan@prettyrobots.com>",
+    "description":      "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
+    "keywords":         [
+                            "test", "unit", "tap", "assert", "tdd"
+                        ],
+    "directories":      { "lib" : "./lib" },
+    "repository":       "https://github.com/bigeasy/proof",
+    "homepage":         "https://github.com/bigeasy/proof",
+    "dependencies":     { 
+                            "cadence": "0.0.25",
+                            "arguable": "0.0.8",
+                            "expandable": "0.0.0"
+                        },
+    "devDependencies":  {
+                            "coffee-script": ">=1.1.3"
+                        },
+    "bin":              {
+                            "proof": "proof.bin.js"
+                        },
+    "scripts" :         {
+      "test": "(node proof.bin.js run t/*/*.t.* t/*/*/*.t.* | tee .proof.out | node proof.bin.js progress) || (node proof.bin.js errors < .proof.out)"
+    }
 }
