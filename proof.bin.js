@@ -273,18 +273,16 @@ function colorization (options) {
     }
 }
 
-// Generate progress reporting, something to watch as the tests are run.
 function progress (options) {
     var colorize = colorization(options)
     var durations = {}
     var programs = {}
     var displayed
 
-    // Repeat the given character for the given count.
     function fill (character, count) {
         return Array(Math.max(count + 1, 0)).join(character)
     }
-    // Format seconds.
+
     function time (program) {
         var str, fit
         str = String(program.time - program.start)
@@ -299,11 +297,10 @@ function progress (options) {
         }
         return fit
     }
-    // All the ways in which a test can fail.
+
     function failed (program) {
         if (!(program.expected == '?' && program.type == 'run')) {
             if (program.actual > program.expected) return true
-            if (program.expected == '?') return true
             if (program.passed < program.actual) return true
             if (program.bailed) return true
             if (program.planless) return true
@@ -313,31 +310,26 @@ function progress (options) {
             }
         }
     }
-    // Update our progress bar. The `terminal` parameter is either `\n` if we're
-    // done displaying the progress for this test, or `\r` to reset the cursor for
-    // to overwrite the line.
+
     function bar (program, terminal) {
-        var color, icon, file, status, dots, summary
-        // Update our status bar if we've hit a failure condition.
         if (failed(program)) {
-            extend(program, {
-                status: 'Failure',
-                color: colorize.red,
-                icon: '\u2718'
-            })
+            extend(program, { status: 'Failure', color: colorize.red, icon: '\u2718' })
         }
-        color = program.color, icon = program.icon, file = program.file, status = program.status,
-        // Format summary.
-        summary = '(' + program.passed + '/' + (program.expected || 0) + ') ' + (time(program))
-        dots = fill('.', options.params.width - 6 - file.length - summary.length - status.length)
+
+        var color = program.color
+        var icon = program.icon
+        var file = program.file
+        var status = program.status
+
+        var summary = '(' + program.passed + '/' + (program.expected || 0) + ') ' + (time(program))
+
+        var dots = fill('.', options.params.width - 6 - file.length - summary.length - status.length)
+
         return ' ' + color(icon) + ' ' + file + ' ' + dots + ' ' + summary + ' ' + color(status) + terminal
     }
 
-    // Default width.
     options.params.width || (options.params.width = 76)
 
-    // Default timing digits, or a reasonable amount if the user is being
-    // unreasonable.
     options.params.digits || (options.params.digits = 4)
     if (options.params.digits < 4) {
         options.params.digits = 4
@@ -346,15 +338,13 @@ function progress (options) {
         options.params.digits = 10
     }
 
-    // Consume test output from standard input.
     process.stdin.resume()
     parse(process.stdin, function (event) {
-        var color, dots, file, icon, program, stats, status, summary, tests
-        // Display the output if nothing else is being displayed.
+        var program, status, summary, tests
+
         if (!displayed) displayed = event.file
-        // If the type is run, we're starting up a new test, create a new program
-        // structure to gather the test output.
-        if (event.type === 'run') {
+
+        if (event.type == 'run') {
             if (programs[event.file] == null) {
                 programs[event.file] = {
                     actual: 0,
@@ -369,7 +359,7 @@ function progress (options) {
                 }
             }
         }
-        // At the end of all tests, we print our summary, otherwise we print.
+
         if (event.type == 'eof') {
             summary = {
                 actual: 0,
@@ -408,7 +398,6 @@ function progress (options) {
                 summary.time = Math.max(summary.time, program.time)
             }
             summary.file = 'tests (' + tests.passed + '/' + tests.actual + ') assertions'
-//      extend(summary, !program.bailed && summary.actual == summary.expected && summary.passed === summary.expected && !summary.code && !summary.planless ? {
             extend(summary, !failed(summary) ? {
                 icon: '\u2713',
                 status: 'Success',
@@ -418,17 +407,22 @@ function progress (options) {
                 status: 'Failure',
                 color: colorize.red
             })
-            // Format summary.
-            stats = '(' + summary.passed + '/' + summary.expected + ') ' + (time(summary))
-            color = summary.color, icon = summary.icon, file = summary.file, status = summary.status
-            dots = fill(' ', options.params.width - 6 - summary.file.length - stats.length - status.length)
+
+            var stats = '(' + summary.passed + '/' + summary.expected + ') ' + (time(summary))
+
+            var color = summary.color
+            var icon = summary.icon
+            var file = summary.file
+            var status = summary.status
+            var dots = fill(' ', options.params.width - 6 - summary.file.length - stats.length - status.length)
+
             process.stdout.write(' ' + (color(' ')) + ' ' + dots + ' ' + file + ' ' + stats + ' ' + (color(status)) + '\n')
+
             overwrite = false
             if (summary.status == 'Failure') {
                 process.on('exit', function () { process.exit(1) })
             }
         } else {
-            // Otherwise update duration.
             programs[event.file].duration = event.time - event.start
             switch (event.type) {
                 case 'run':
@@ -517,8 +511,8 @@ function errors (options) {
             failed[event.file].events.push(event)
             if (event.type === 'test' && event.ok) delete failed[event.file]
         } else if ((event.type === 'bail') ||
-                              (event.type === 'test' && !(event.ok && planned)) ||
-                              (event.type === 'exit' && (event.code || !planned || (event.expected != event.actual)))) {
+                   (event.type === 'test' && !(event.ok)) ||
+                   (event.type === 'exit' && (event.code || !planned || (event.expected != event.actual)))) {
             queue.push(failed[event.file] = {
                 events: backlog[event.file].concat([event])
             })
@@ -549,10 +543,11 @@ function errors (options) {
                     process.stdout.write('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': Bail Out!\n')
                     break
                 case 'test':
-                    if (!planned) {
+/*                    if (!planned) {
                         process.stdout.write('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': no plan given: ' + event.message + '\n')
                         planned = true
-                    } else if (event.ok) {
+                    } else */
+                    if (event.ok) {
                         queue.shift()
                     } else {
                         process.stdout.write('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': ' + event.message + '\n')
@@ -840,8 +835,7 @@ function run (options) {
         process.stdout.write('' + (+new Date()) + ' ' + type + ' ' + file + message + '\n')
     }
     function execute (program, index) {
-        var bailed, err, out, test,
-                testing; // after a test is emitted, any plans are just stdout
+        var bailed, err, out, test, planned; // after a test is emitted, any plans are just stdout
         emit(program, 'run')
         shebang(program, [], {}, function (error, test) {
             bailed = false
@@ -863,9 +857,9 @@ function run (options) {
                     if (bailed) {
                         emit(program, 'out', line)
                     } else if (parser.assertion(line)) {
-                        testing = true
                         emit(program, 'test', line)
-                    } else if (!testing && (plan = parser.plan(line))) {
+                    } else if (!planned && (plan = parser.plan(line))) {
+                        planned = true
                         emit(program, 'plan', plan.expected)
                     } else if (parser.bailout(line)) {
                         testing = true

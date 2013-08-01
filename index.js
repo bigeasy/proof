@@ -17,9 +17,10 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     var callbacks = { results: {} }
     var exitCode = 0
     var timeout, untidy, name
-    var context = { bailout: bailout, die: bailout, say: say }
+    var context = { bailout: bailout, die: bailout, say: say, counter: counter }
     var cadences = []
     var janitors = []
+    var delayedPlan = ~parameters(program).indexOf('counter')
 
     for (name in assert) {
         if (context[name] || name === 'AssertionError') {
@@ -31,14 +32,16 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     untidy = process.env.PROOF_NO_CLEANUP || process.env.UNTIDY
     untidy = untidy && !/^(0|no|false)$/.test(untidy)
 
-    process.stdout.write('1..' + expected + '\n')
-
     timeout = parseInt(process.env.PROOF_TIMEOUT)
     if (isNaN(timeout)) {
         timeout = parseInt(process.env.TIMEOUT)
     }
     if (isNaN(timeout)) {
         timeout = 30000
+    }
+
+    function counter (count) {
+        expected += count 
     }
 
     cadence(function (step) {
@@ -61,8 +64,14 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
         }, function () {
             programCleanup.apply(null, parameterize(programCleanup, context))
         }, function () {
+            if (!delayedPlan) {
+                process.stdout.write('1..' + expected + '\n')
+            }
             program.apply(null, parameterize(program, context))
         }, function () {
+            if (delayedPlan) {
+                process.stdout.write('1..' + expected + '\n')
+            }
             if (!untidy) {
                 step(function () {
                     programCleanup.apply(null, parameterize(programCleanup, context))
@@ -91,10 +100,16 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
         if (error) abend(error)
     })
 
-    function parameterize (program, context) {
+    function parameters (program) {
         var $ = /^function\s*[^(]*\(([^)]*)\)/.exec(program.toString())
-        require('assert').ok($, 'bad function')
-        return $[1].trim().split(/\s*,\s*/).map(function (parameter) {
+        assert.ok($, 'bad function')
+        var params = $[1].trim().split(/\s*,\s*/)
+        if (params.length == 1 && params[0] == '') return []
+        return params
+    }
+
+    function parameterize (program, context) {
+        return parameters(program).map(function (parameter) {
             return context[parameter]
         })
     }
