@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-var test = require("../..");
+var test = require("../..")
 
-a = 1;
+a = 1
 
-test(1, function (ok) { ok(true, "test truth") });
+test(1, function (ok) { ok(true, "test truth") })
