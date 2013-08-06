@@ -3,9 +3,8 @@
 var spawn = require('child_process').spawn
 var path = require('path'), stderr = []
 
-function execute (program, parameters, input, step) {
+function execute (proc, input, step) {
     step(function () {
-        var proc = spawn(program, parameters), count = 0
         proc.stderr.setEncoding('utf8')
         proc.stdout.setEncoding('utf8')
         proc.on('close', step(-1))

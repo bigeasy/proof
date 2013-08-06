@@ -40,6 +40,13 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
         timeout = 30000
     }
 
+    var timer = setTimeout(function () { abend(new Error('timeout')) }, 864e5)
+
+    function resetTimeout () {
+        clearTimeout(timer)
+        timer = setTimeout(function () { abend(new Error('timeout')) }, timeout)
+    }
+
     function counter (count) {
         expected += count 
     }
@@ -49,11 +56,14 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
         this.step = step
         step(function () {
             step(function () {
+                resetTimeout()
                 harnessCleanup(step)
             }, function () {
+                resetTimeout()
                 return harness.apply(this, parameterize(harness, this))
             })
         }, function (object) {
+            resetTimeout()
             object = typeof object == 'object' ? object : {}
             for (var key in object) {
                 this[key] = object[key]
@@ -63,11 +73,13 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
         }, function () {
             programCleanup.apply(this, parameterize(programCleanup, this))
         }, function () {
+            resetTimeout()
             if (!delayedPlan) {
                 process.stdout.write('1..' + expected + '\n')
             }
             program.apply(this, parameterize(program, this))
         }, function () {
+            resetTimeout()
             if (delayedPlan) {
                 process.stdout.write('1..' + expected + '\n')
             }
@@ -75,10 +87,13 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
                 step(function () {
                     programCleanup.apply(this, parameterize(programCleanup, this))
                 }, function () {
+                    resetTimeout()
                     harnessCleanup(step)
                 })
             }
         }, function () {
+            resetTimeout()
+
             var leaked = Object.keys(global).filter(function (global) { return !~globals.indexOf(global); })
             if (leaked.length) {
                 bailout('Variables leaked to global namespace.', leaked)
@@ -171,6 +186,7 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
 
     function assertion (name, assertion) {
         return function () {
+            resetTimeout()
             var EXPECTED, inspect, message, splat
             splat = 1 <= arguments.length ? __slice.call(arguments, 0) : []
             message = splat[splat.length - 1]
