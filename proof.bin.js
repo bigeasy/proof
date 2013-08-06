@@ -965,17 +965,15 @@ function test (options) {
         if ('help' == name) {
             options.usage()
         } else if (/^(monochrome|width|digits)$/.test(name)) {
-            progress[name] = options[name]
+            progress[name] = options.params[name]
         } else {
-            run[name] = options[name]
+            run[name] = options.params[name]
         }
     })
-    progress = spawn('node',
-                                      arguable.flatten(__filename, 'progress', progress),
-                                      { stdio: [ 'pipe', process.stdout, process.stderr ] })
-    run = spawn('node',
-                            arguable.flatten(__filename, 'run', run, options.argv),
-                            { stdio: [ 'pipe', 'pipe', process.stderr ] })
+    progress = spawn('node', arguable.flatten(__filename, 'progress', progress),
+                             { stdio: [ 'pipe', process.stdout, process.stderr ] })
+    run = spawn('node', arguable.flatten(__filename, 'run', run, options.argv),
+                        { stdio: [ 'pipe', 'pipe', process.stderr ] })
     run.stdout.pipe(progress.stdin)
 
     var count = 0
