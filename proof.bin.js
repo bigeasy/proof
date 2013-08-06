@@ -757,44 +757,69 @@ function parse (stream, callback) {
     }))
 }
 
+function canExecute (stat) {
+    if (stat.mode & 0x1) return true
+    if (stat.uid == process.getuid() && stat.mode & 0x40) return true
+    if (process.getgroups().some(function (gid) { 
+        return gid == stat.gid
+    }) && stat.mode & 0x8) return true
+    return false
+}
+
 // To do this right, we'd read through the Windows registry, but we really
 // don't want to go digging into it a this point. Not that difficult, since
 // there are command line utilities we can invoke to get a list of file
 // associations.
-function shebang (program, parameters, options, callback) {
+var shebang = cadence(function (step, program, parameters, options) {
     var buffer, first, $
     options || (options = {})
-    if (process.platform.indexOf('win')) callback(null, spawn(program, parameters, options))
-    else {
-        switch (path.extname(program)) {
-        case '.exe':
-        case '.bat':
-        case '.cmd':
-            pathSearch(program, function (error, resolved) {
-                callback(null, spawn(resolved, parameters, options))
-            })
-            break
-        default:
-            buffer = fs.readFileSync(program)
-            if (buffer[0] == 0x23 && buffer[1] == 0x21
-                    && (first = buffer.toString().split(/\n/).shift())) {
-                if ($ = /^#!\/usr\/bin\/env\s+(\S+)/.exec(first)) {
-                    parameters.unshift(program)
-                    program = $[1]
-                } else if ($ = /^#!\/.*\/(.*)/.exec(first)) {
-                    parameters.unshift(program)
-                    program = $[1]
-                }
-                pathSearch(program, function (error, resolved) {
-                    shebang(resolved, parameters, options, callback)
-                    //callback(null, spawn(resolved + '.cmd', parameters, options))
-                })
-            } else {
-                callback(null, spawn(program, parameters, options))
+    if (process.platform.indexOf('win')) {
+        step(function () {
+            fs.stat(program, step())
+        }, function (stat) {
+            if (canExecute(stat)) step(null, spawn(program, parameters, options))
+            else fs.readFile(program, step())
+        }, function (buffer) {
+            // no exec bit, but there's a shebang line? I call shenanigans.
+            if (buffer[0] == 0x23 && buffer[1] == 0x21) {
+                throw new Error('set execute bit to use shebang line')
             }
-        }
+            parameters.unshift(program)
+            step(null, spawn('node', parameters, options))
+        })
+    } else {
+        step(function () {
+            fs.readFile(program, step())
+        }, function (buffer, stat) {
+            switch (path.extname(program)) {
+            case '.exe':
+            case '.bat':
+            case '.cmd':
+                pathSearch(program, function (error, resolved) {
+                    callback(null, spawn(resolved, parameters, options))
+                })
+                break
+            default:
+                if (buffer[0] == 0x23 && buffer[1] == 0x21
+                    && (first = buffer.toString().split(/\n/).shift())) {
+                    if ($ = /^#!\/usr\/bin\/env\s+(\S+)/.exec(first)) {
+                        parameters.unshift(program)
+                        program = $[1]
+                    } else if ($ = /^#!\/.*\/(.*)/.exec(first)) {
+                        parameters.unshift(program)
+                        program = $[1]
+                    }
+                    pathSearch(program, function (error, resolved) {
+                        shebang(resolved, parameters, options, callback)
+                        //callback(null, spawn(resolved + '.cmd', parameters, options))
+                    })
+                } else {
+                    callback(null, spawn(program, parameters, options))
+                }
+            }
+        })
     }
-}
+})
 
 function run (options) {
     var displayed = 0
@@ -1005,8 +1030,9 @@ function main (options) {
     if (command) {
         command(options)
     } else {
-        var executable = argv.length && !/[-.\/]/.test(argv[0]) ? 'proof-' + (argv.shift())
-                                                                                                                        : 'proof-default'
+        var executable = argv.length && !/[-.\/]/.test(argv[0])
+                       ? 'proof-' + (argv.shift())
+                       : 'proof-default'
         pathSearch(executable, function (error, resolved) {
             shebang(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
                 close(child, function (code) { process.exit(code) })
