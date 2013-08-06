@@ -876,15 +876,17 @@ function run (options) {
                 parallel[index].time = time = 0
                 if (parallel[index].programs.length) {
                     execute(parallel[index].programs.shift(), index)
-                } else if (next < parallel.length) {
-                    parallel[index].running = false
-                    if (displayed === index) {
-                        displayed = next + 1
-                    }
-                    index = next++
-                    execute(parallel[index].programs.shift(), index)
                 } else {
-                    emit('*', 'eof')
+                    parallel[index].running = false
+                    if (next < parallel.length) {
+                        if (displayed === index) {
+                            displayed = next + 1
+                        }
+                        index = next++
+                        execute(parallel[index].programs.shift(), index)
+                    } else if (parallel.every(function (p) { return ! p.running })) {
+                        emit('*', 'eof')
+                    }
                 }
             })
         })
