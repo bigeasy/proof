@@ -101,6 +101,22 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
                 bailout('Variables leaked to global namespace.', leaked)
             }
 
+            var width = String(expected).length
+
+            function pad (number) {
+                number = String(number)
+                while (number.length != width) {
+                    number = ' ' + number
+                }
+                return number
+            }
+
+            process.stdout.write('# expected ' + pad(expected) + '\n')
+            process.stdout.write('# passed   ' + pad(passed) + '\n')
+            if (passed != expected) {
+                process.stdout.write('# failed   ' + pad(expected - passed) + '\n')
+            }
+
             step(function (step) {
                 if (!process.stdout.write('')) {
                     process.stdout.once('drain', step())
