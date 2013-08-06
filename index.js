@@ -20,7 +20,9 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     var context = { bailout: bailout, die: bailout, say: say, counter: counter }
     var cadences = []
     var janitors = []
-    var delayedPlan = ~parameters(program).indexOf('counter')
+    var delayedPlan = expected == 0
+                    || ~parameters(harness).indexOf('counter')
+                    || ~parameters(program).indexOf('counter')
 
     for (name in assert) {
         if (context[name] || name === 'AssertionError') {
