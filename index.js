@@ -45,36 +45,35 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     }
 
     cadence(function (step) {
-        context.cadence = cadence
-        context.step = step
+        this.cadence = cadence
+        this.step = step
         step(function () {
             step(function () {
                 harnessCleanup(step)
             }, function () {
-                return harness.apply(null, parameterize(harness, context))
+                return harness.apply(this, parameterize(harness, this))
             })
         }, function (object) {
             object = typeof object == 'object' ? object : {}
             for (var key in object) {
-                context[key] = object[key]
+                this[key] = object[key]
             }
-            context.cadence = cadence
-            context.step = step
-            return context
+            this.cadence = cadence
+            this.step = step
         }, function () {
-            programCleanup.apply(null, parameterize(programCleanup, context))
+            programCleanup.apply(this, parameterize(programCleanup, this))
         }, function () {
             if (!delayedPlan) {
                 process.stdout.write('1..' + expected + '\n')
             }
-            program.apply(null, parameterize(program, context))
+            program.apply(this, parameterize(program, this))
         }, function () {
             if (delayedPlan) {
                 process.stdout.write('1..' + expected + '\n')
             }
             if (!untidy) {
                 step(function () {
-                    programCleanup.apply(null, parameterize(programCleanup, context))
+                    programCleanup.apply(this, parameterize(programCleanup, this))
                 }, function () {
                     harnessCleanup(step)
                 })
@@ -96,7 +95,7 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
                 process.exit(passed == expected && actual == expected ? 0 : 1)
             })
         })
-    })(function (error) {
+    }).call(context, function (error) {
         if (error) abend(error)
     })
 
