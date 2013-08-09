@@ -113,7 +113,7 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
 
             process.stdout.write('# expected ' + pad(expected) + '\n')
             process.stdout.write('# passed   ' + pad(passed) + '\n')
-            if (passed != expected) {
+            if (passed < expected) {
                 process.stdout.write('# failed   ' + pad(expected - passed) + '\n')
             }
 
