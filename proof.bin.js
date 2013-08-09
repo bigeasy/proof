@@ -63,6 +63,8 @@ options:
 
     -h,   --help                  display this usage information
     -p,   --processes <count>     number of processes to run
+    -t,   --timeout <count>       when to stop waiting for process output,
+                                  default 30 seconds
 
 invocation:
 
@@ -150,6 +152,8 @@ options:
     -h,   --help                  display this usage information
     -M,   --monochrome            do not display color
     -p,   --processes [count]     number of processes to run
+    -t,   --timeout   [count]     when to stop waiting for process output,
+                                  default 30 seconds
     -w,   --width     [count]     width in characters of progress display
 
 invocation:
@@ -864,10 +868,19 @@ function run (options) {
         var bailed, err, out, test, planned; // after a test is emitted, any plans are just stdout
         emit(program, 'run')
         shebang(program, [], {}, function (error, test) {
+            var timer;
+            function resetTimer() {
+                if (timer) clearTimeout(timer)
+                timer = setTimeout(function () {
+                    test.kill();
+                }, options.params.timeout * 1000 || 30000)
+            }
+            resetTimer()
             bailed = false
             err = ''
             test.stderr.setEncoding('utf8')
             test.stderr.on('data', function (chunk) {
+                resetTimer()
                 err += chunk
                 var lines = err.split(/\n/)
                 err = lines.pop()
@@ -876,6 +889,7 @@ function run (options) {
             out = ''
             test.stdout.setEncoding('utf8')
             test.stdout.on('data', function (chunk) {
+                resetTimer()
                 out += chunk
                 var lines = out.split(/\n/)
                 out = lines.pop()
@@ -897,6 +911,7 @@ function run (options) {
             })
             var version = process.versions.node.split('.')
             close(test, function (code) {
+                clearTimeout(timer)
                 var time
                 emit(program, 'exit', code)
                 parallel[index].time = time = 0
