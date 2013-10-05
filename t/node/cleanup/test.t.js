@@ -4,7 +4,6 @@ var fs      = require("fs")
 var exec    = require("child_process").exec
 
 var program = __dirname + "/example.sh"
-    
 
 require("../../..")(1, function (step) {
     step([function () {
