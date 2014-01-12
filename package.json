@@ -6,6 +6,11 @@
     "keywords":         [
                             "test", "unit", "tap", "assert", "tdd"
                         ],
+    "licenses":
+    [{
+                        "type": "Affero GPL 3.0 with linking exception.",
+                        "url": "http://github.com/bigeasy/proof/raw/master/LINKING"
+    }],
     "directories":      { "lib" : "./lib" },
     "repository":       "https://github.com/bigeasy/proof",
     "homepage":         "https://bigeasy.github.io/proof",
