@@ -12,7 +12,7 @@
     "bugs":             "https://github.com/bigeasy/proof/issues",
     "dependencies":     { 
                             "cadence": "0.0.28",
-                            "arguable": "0.0.8",
+                            "arguable": "0.0.10",
                             "expandable": "0.0.1"
                         },
     "devDependencies":  {
