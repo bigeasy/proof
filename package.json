@@ -13,7 +13,7 @@
     "dependencies":     { 
                             "cadence": "0.0.28",
                             "arguable": "0.0.8",
-                            "expandable": "0.0.0"
+                            "expandable": "0.0.1"
                         },
     "devDependencies":  {
                             "coffee-script": ">=1.1.3"
