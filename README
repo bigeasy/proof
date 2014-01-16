@@ -10,7 +10,7 @@ A cross-platform UNIX way test non-framework for JavaScript.
 
     Install:        `npm install proof`
 
-    License:        Affero GPL 3.0 with linking exception.
+    License:        MIT
 
 To learn everything you want to know about Proof start here:
 

@@ -8,8 +8,8 @@
                         ],
     "licenses":
     [{
-                        "type": "Affero GPL 3.0 with linking exception.",
-                        "url": "http://github.com/bigeasy/proof/raw/master/LINKING"
+                        "type": "MIT",
+                        "url": "http://github.com/bigeasy/proof/raw/master/LICENSE"
     }],
     "directories":      { "lib" : "./lib" },
     "repository":       "https://github.com/bigeasy/proof",
