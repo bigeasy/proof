@@ -12,7 +12,10 @@
                         "url": "http://github.com/bigeasy/proof/raw/master/LICENSE"
     }],
     "directories":      { "lib" : "./lib" },
-    "repository":       "https://github.com/bigeasy/proof",
+    "repository":       {
+                            "url": "https://github.com/bigeasy/proof",
+                            "type": "git"
+                        },
     "homepage":         "https://bigeasy.github.io/proof",
     "bugs":             "https://github.com/bigeasy/proof/issues",
     "dependencies":     { 
