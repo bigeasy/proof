@@ -39,7 +39,6 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     }
 
     cadence(function (step) {
-        this.cadence = cadence
         this.step = step
         step(function () {
             step(function () {
@@ -52,7 +51,6 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
             for (var key in object) {
                 this[key] = object[key]
             }
-            this.cadence = cadence
             this.step = step
         }, function () {
             programCleanup.apply(this, parameterize(programCleanup, this))
