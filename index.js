@@ -35,7 +35,7 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     untidy = untidy && !/^(0|no|false)$/.test(untidy)
 
     function counter (count) {
-        expected += count 
+        expected += count
     }
 
     cadence(function (step) {
