@@ -14,7 +14,7 @@ done
 #node_modules/.bin/istanbul cover -x 't/**' stencil.bin.js --help #> /dev/null 2>&1
 #mv coverage/coverage.json coverage/coverage$count.json
 
-#node_modules/.bin/istanbul report --root coverage --dir coverage > /dev/null
+node_modules/.bin/istanbul report --root coverage --dir coverage > /dev/null
 
 sed -i -e s,'^SF:'`pwd`/,SF:, coverage/lcov.info
 sed -i -e '/BRF:0/d' coverage/lcov.info
