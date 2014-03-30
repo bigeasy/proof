@@ -31,6 +31,15 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
         context[name] = assertion(name, assert[name])
     }
 
+    context.assert = function () {
+        var vargs = __slice.call(arguments)
+        if (vargs.length == 3) {
+            context.deepEqual(vargs[0], vargs[1], vargs[2])
+        } else {
+            context.ok(vargs[0], vargs[1])
+        }
+    }
+
     untidy = process.env.PROOF_NO_CLEANUP || process.env.UNTIDY
     untidy = untidy && !/^(0|no|false)$/.test(untidy)
 
