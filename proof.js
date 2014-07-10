@@ -8,10 +8,6 @@ var cadence = require('cadence')
 var __slice = [].slice
 var overwrite
 
-function say () {
-    console.log.apply(console, __slice.call(arguments, 0))
-}
-
 function die () {
     console.log.apply(console, __slice.call(arguments, 0))
     process.exit(1)
