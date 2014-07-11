@@ -8,11 +8,6 @@ var cadence = require('cadence')
 var __slice = [].slice
 var overwrite
 
-function die () {
-    console.log.apply(console, __slice.call(arguments, 0))
-    process.exit(1)
-}
-
 function validator (callback) {
     if (typeof callback != 'function') throw new Error('no callback')
     return function (forward) { return check(callback, forward) }
