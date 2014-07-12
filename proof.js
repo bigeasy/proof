@@ -8,27 +8,6 @@ var cadence = require('cadence')
 var __slice = [].slice
 var overwrite
 
-function validator (callback) {
-    if (typeof callback != 'function') throw new Error('no callback')
-    return function (forward) { return check(callback, forward) }
-}
-
-function check (callback, forward) {
-    if (typeof callback != 'function') throw new Error('no callback')
-    if (typeof forward != 'function') throw new Error('no forward')
-    return function (error) {
-        if (error) {
-            callback(error)
-        } else {
-            try {
-                forward.apply(null, __slice.call(arguments, 1))
-            } catch (error) {
-                callback(error)
-            }
-        }
-    }
-}
-
 function json () {
     var object = {}
     process.stdin.resume()
