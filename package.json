@@ -19,7 +19,7 @@
     "homepage":         "https://bigeasy.github.io/proof",
     "bugs":             "https://github.com/bigeasy/proof/issues",
     "dependencies":     { 
-                            "cadence": "0.0.36",
+                            "cadence": "0.0.38",
                             "arguable": "0.0.16",
                             "expandable": "0.0.6"
                         },
