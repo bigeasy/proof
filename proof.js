@@ -8,10 +8,9 @@ var cadence = require('cadence')
 var __slice = [].slice
 var overwrite
 
-function json () {
+exports.json = function (out) {
     var object = {}
-    process.stdin.resume()
-    parse(process.stdin, function (event) {
+    return function (event) {
         var comment, file, message, passed, skip, time, todo
         switch (event.type) {
             case 'run':
@@ -20,10 +19,12 @@ function json () {
                     expected: event.expected,
                     tests: []
                 }
+                break
             case 'plan':
                 object[event.file].expected = event.expected
+                break
             case 'test':
-                object[file].tests.push({
+                object[event.file].tests.push({
                     message: event.message,
                     time: event.time,
                     passed: event.passed,
@@ -31,17 +32,25 @@ function json () {
                     todo: event.todo,
                     comment: event.comment
                 })
+                break
             case 'exit':
                 extend(object[event.file], {
                     actual: event.actual,
                     duration: event.time - event.start,
                     code: event.code
                 })
+                break
             case 'eof':
-                process.stdout.write(JSON.stringify(object, null, 2))
-                process.stdout.write('\n')
+                out.write(JSON.stringify(object, null, 2))
+                out.write('\n')
+                break
         }
-    })
+    }
+}
+
+function json () {
+    process.stdin.resume()
+    parse(process.stdin, exports.json(process.stdout))
 }
 
 // Generate a set of colorization functions to colorize console output, or a set
@@ -421,7 +430,7 @@ function extend (destination) {
     var sources = __slice.call(arguments, 1)
     var destination
     sources.forEach(function (source) {
-        for (key in source) destination[key] = source[key]
+        for (var key in source) destination[key] = source[key]
     })
     return destination
 }
