@@ -585,7 +585,7 @@ var shebang = cadence(function (step, program, parameters, options) {
         step(function () {
             fs.stat(program, step())
         }, function (stat) {
-            if (canExecute(stat)) step(null, spawn(program, parameters, options))
+            if (canExecute(stat)) return [ step, spawn(program, parameters, options) ]
             else fs.readFile(program, step())
         }, function (buffer) {
             // no exec bit, but there's a shebang line? I call shenanigans.
@@ -593,7 +593,7 @@ var shebang = cadence(function (step, program, parameters, options) {
                 throw new Error('set execute bit to use shebang line')
             }
             parameters.unshift(program)
-            step(null, spawn('node', parameters, options))
+            return [ spawn('node', parameters, options) ]
         })
     } else {
         step(function () {

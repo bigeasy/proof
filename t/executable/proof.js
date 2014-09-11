@@ -14,7 +14,7 @@ function execute (proc, input, step) {
         proc.stderr.on('data', step(-1, []))
         proc.stderr.on('error', step(Error))
         proc.stdin.on('error', step(Error))
-        proc.on('error', function (error) { throw error; })
+        proc.on('error', function (error) { throw error })
         if (typeof input == "string") {
             proc.stdin.write('%t\n')
             proc.stdin.end()
@@ -22,8 +22,14 @@ function execute (proc, input, step) {
             input.pipe(proc.stdin)
         }
     }, function (code, signal, stdout, stderr) {
-        step(null, code, stdout.join(''), stderr.join(''))
+        console.log(code, stdout.join(''))
+        return [ code, stdout.join(''), stderr.join('') ]
     })
 }
 
-module.exports = require('../..')(function () { return { execute: execute, proof: path.resolve(__dirname, '..', '..', 'proof.bin.js') } })
+module.exports = require('../..')(function () {
+    return {
+        execute: execute,
+        proof: path.resolve(__dirname, '..', '..', 'proof.bin.js')
+    }
+})
