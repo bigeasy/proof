@@ -18,8 +18,6 @@ function execute (expected, harnessCleanup, harness, programCleanup, program) {
     var exitCode = 0
     var timeout, untidy, name
     var context = { bailout: bailout, die: bailout, say: say, counter: counter }
-    var cadences = []
-    var janitors = []
     var delayedPlan = expected == 0
                     || ~parameters(harness).indexOf('counter')
                     || ~parameters(program).indexOf('counter')
