@@ -26,9 +26,9 @@ module.exports = function (sigil, outer) {
             }
             break
         case 'number':
-            expected = expect(count)
-            inner.call(context, assert, callback)
-            if (inner.length == 1) callback()
+            expected = expect(sigil)
+            outer.call(context, assert, callback)
+            if (outer.length == 1) callback()
             break
         default:
             throw new Error('unknown invocation')
