@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../../..')(1, function (assert) {
+require('../../../redux')(1, function (assert) {
     var proof = require('../../../proof')
     var stream = require('stream')
     var out = new stream.PassThrough
