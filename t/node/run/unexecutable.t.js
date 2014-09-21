@@ -1,3 +1,3 @@
-var test = require("../../..")
+var test = require("../../../redux")
 
-test(1, function (ok) { ok(true, "test truth") })
+test(1, function (assert) { assert(true, "test truth") })
