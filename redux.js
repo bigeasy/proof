@@ -1,4 +1,4 @@
-var util = require('util'), _assert  = require('assert')
+var util = require('util'), _assert = require('assert')
 var globals = Object.keys(global).concat([ 'errno' ]), __slice = [].slice
 
 module.exports = function (sigil, outer) {
