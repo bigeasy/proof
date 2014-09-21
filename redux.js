@@ -37,10 +37,10 @@ module.exports = function (sigil, outer) {
         die(e)
     }
 
-    if (synchronicity == 1) {
+    if (synchronicity) {
         finish()
     } else {
-        synchronicity = 1
+        synchronicity = true
     }
 
     function expect (count) {
@@ -151,10 +151,10 @@ module.exports = function (sigil, outer) {
         if (error) {
             die(error)
         } else {
-            if (synchronicity == 1) {
+            if (synchronicity) {
                 finish()
             } else {
-                synchronicity = 1
+                synchronicity = true
             }
         }
     }
