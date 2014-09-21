@@ -2,8 +2,8 @@ var util = require('util'), _assert = require('assert')
 var globals = Object.keys(global).concat([ 'errno' ]), __slice = [].slice
 
 module.exports = function (sigil, outer) {
-    var context = {}, synchronicity = 0, passed = 0, actual = 0
-    var name, expected, delayedPlan
+    var context = {}, passed = 0, actual = 0
+    var name, expected, delayedPlan, synchronicity
 
     for (name in _assert) {
         if (assert[name] || name === 'AssertionError') {
