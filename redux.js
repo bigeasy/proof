@@ -22,7 +22,7 @@ module.exports = function (sigil, outer) {
             sigil.exports = function (count, inner) {
                 expected = expect(count)
                 outer.call(context, inner, assert, callback)
-                if (inner.length == 2) callback()
+                if (outer.length == 2) callback()
             }
             break
         case 'number':
