@@ -1,8 +1,10 @@
 var util = require('util'), _assert = require('assert'), __slice = [].slice
 
-module.exports = function (sigil, outer, globals, die) {
+module.exports = function (sigil, outer, globals, die, process) {
     var context = {}, passed = 0, actual = 0
     var name, expected, delayedPlan, synchronicity
+
+    die = die(comment, process)
 
     for (name in _assert) {
         if (assert[name] || name === 'AssertionError') {
@@ -64,6 +66,7 @@ module.exports = function (sigil, outer, globals, die) {
         comment(util.format.apply(util.format, arguments))
     }
 
+
     function assert () {
         var vargs = __slice.call(arguments)
         if (vargs.length == 3) {
@@ -96,8 +99,6 @@ module.exports = function (sigil, outer, globals, die) {
             }
         }
     }
-
-    function die () { require('./die')(__slice.call(arguments), process) }
 
     function finish () {
         if (delayedPlan) {
