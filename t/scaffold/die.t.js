@@ -1,4 +1,4 @@
-require('../../redux')(8, function (assert, callback) {
+require('../..')(8, function (assert, callback) {
     var stream = require('stream'), __slice = [].slice
     var process = {}, comments = [], comment = function () {
         comments.push(__slice.call(arguments))

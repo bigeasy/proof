@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../../redux')(1, function (assert) {
+require('../..')(1, function (assert) {
     assert.say('Hello')
     assert.ok(1)
 })

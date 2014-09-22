@@ -1,4 +1,4 @@
-require('../../redux')(2, function (assert) {
+require('../..')(2, function (assert) {
     var stream = require('stream')
     var scaffold = require('../../scaffold')
     var stdout = new stream.PassThrough

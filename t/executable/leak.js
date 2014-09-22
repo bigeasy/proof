@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var test = require('../../redux')
+var test = require('../..')
 
 a = 1
 

@@ -1,6 +1,6 @@
 var globals = Object.keys(global).concat([ 'errno' ])
 
-require('../../redux')(1, function (assert) {
+require('../..')(1, function (assert) {
     var stream = require('stream')
     var scaffold = require('../../scaffold')
     var stdout = new stream.PassThrough

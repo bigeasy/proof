@@ -11,7 +11,7 @@ not ok 2 equal\n\
 # failed   1\n\
 '
 
-require('../../redux')(4, function (assert) {
+require('../..')(4, function (assert) {
     var stream = require('stream')
     var scaffold = require('../../scaffold')
     var stdout = new stream.PassThrough

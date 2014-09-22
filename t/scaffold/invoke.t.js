@@ -1,6 +1,6 @@
-require('../../redux')(1, function (assert) {
+require('../..')(1, function (assert) {
     try {
-        require('../../redux')([])
+        require('../..')([])
     } catch (e) {
         assert(e.message, 'invalid arguments', 'invalid arguments')
     }

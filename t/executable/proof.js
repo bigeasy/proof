@@ -27,7 +27,7 @@ function execute (proc, input, step) {
     })
 }
 
-require('../../redux')(module, function (body, assert, callback) {
+require('../..')(module, function (body, assert, callback) {
     var proof = path.resolve(__dirname, '..', '..', 'proof.bin.js')
     require('cadence')(body).call(this, assert, execute, proof, callback)
 })

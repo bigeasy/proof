@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-require('../..')(1, function (step) {
-    step(function () {
-        setTimeout(step(), 6e4)
-    })
+require('../..')(1, function (callback) {
+    setTimeout(function () { callback() }, 6e4)
 })
