@@ -11,7 +11,7 @@ not ok 2 equal\n\
 # failed   1\n\
 '
 
-require('../../redux')(1, function (assert) {
+require('../../redux')(4, function (assert) {
     var stream = require('stream')
     var scaffold = require('../../scaffold')
     var stdout = new stream.PassThrough
@@ -24,4 +24,8 @@ require('../../redux')(1, function (assert) {
     })
 
     assert(stdout.read().toString(), expected, 'assert')
+
+    assert.ok(true, 'truth works')
+    assert.equal(1 + 1, 2, 'math works')
+    assert.deepEqual('a b'.split(/\s/), [ 'a', 'b' ], 'strings work')
 })
