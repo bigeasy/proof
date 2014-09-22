@@ -109,7 +109,7 @@ module.exports = function (sigil, outer, globals, die, process) {
             return !~globals.indexOf(global)
         })
         if (leaked.length) {
-            die('Variables leaked to global namespace.', leaked)
+            die('Variables leaked into global namespace.', leaked)
         }
     }
 
