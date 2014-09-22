@@ -1,5 +1,5 @@
 #!/usr/bin/env coffee
 
-test = require "../.."
+test = require "../../redux"
 
-test 1, (ok) -> ok true, "test truth"
+test 1, (assert) -> assert true, "test truth"
