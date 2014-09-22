@@ -1,3 +1,9 @@
+# Proof 0.0.50
+
+### 100% Test Coverage of Self
+
+Proof now has 100% test coverage of it's own self. This took some decomposition of the executable into component parts for unit testing, so that the executable base in a minimal Arguable stub.
+
 # Proof 0.0.49
 
 ## Whole New Scaffold

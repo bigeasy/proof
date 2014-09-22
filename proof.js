@@ -5,6 +5,7 @@ var spawn = require('child_process').spawn
 var arguable = require('arguable')
 var expandable = require('expandable')
 var cadence = require('cadence')
+var candidate = require('./candidate')
 var __slice = [].slice
 var overwrite
 
@@ -603,7 +604,7 @@ var shebang = cadence(function (step, program, parameters, options) {
             case '.exe':
             case '.bat':
             case '.cmd':
-                pathSearch(program, function (error, resolved) {
+                candidate(process.env.PATH, program, function (error, resolved) {
                     callback(null, spawn(resolved, parameters, options))
                 })
                 break
@@ -617,7 +618,7 @@ var shebang = cadence(function (step, program, parameters, options) {
                         parameters.unshift(program)
                         program = $[1]
                     }
-                    pathSearch(program, function (error, resolved) {
+                    candidate(process.env.PATH, program, function (error, resolved) {
                         shebang(resolved, parameters, options, callback)
                         //callback(null, spawn(resolved + '.cmd', parameters, options))
                     })
@@ -745,39 +746,6 @@ function run (options) {
 
 var argv = process.argv.slice(2)
 
-function pathSearch (executable, callback) {
-    var env = {}
-    var resolved = []
-    var parts
-    parts = process.env.PATH.split(process.platform === 'win32' ? ';' : ':')
-    parts.push(__dirname)
-    Object.keys(process.env).forEach(function (key) { env[key.toUpperCase()] = process.env[key] })
-    parts.forEach(function (part) {
-        resolved.push(path.resolve(part, executable + '.bat'))
-        resolved.push(path.resolve(part, executable + '.cmd'))
-        resolved.push(path.resolve(part, executable + '.exe'))
-        resolved.push(path.resolve(part, executable))
-    })
-    cadence(function (step) {
-        var shift
-        step(shift = function () {
-            if (!resolved.length) abend('cannot find executable: ' + executable)
-        }, function () {
-            fs.stat(resolved[0], step(Error))
-        }, function (error) {
-            resolved.shift()
-            step(shift)(null)
-        }, function (stat) {
-            if (stat.isFile()) {
-                return resolved[0]
-            } else {
-                resolved.shift()
-                step(shift)(null)
-            }
-        })
-    })(callback)
-}
-
 function platform (options) {
     if (options.params.help) options.help()
     argv.forEach(function (platform) {
@@ -853,7 +821,7 @@ function main (options) {
         var executable = argv.length && !/[-.\/]/.test(argv[0])
                        ? 'proof-' + (argv.shift())
                        : 'proof-default'
-        pathSearch(executable, function (error, resolved) {
+        candidate(process.env.PATH, executable, function (error, resolved) {
             shebang(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
                 close(child, function (code) { process.exit(code) })
             })
