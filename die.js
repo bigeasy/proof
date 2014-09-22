@@ -17,6 +17,8 @@ module.exports = function (comment, process) {
         process.stdout.write(message)
 
         if (vargs.length) {
+            // fixme: probably just want to inspect, not format.
+            // fixme: does format inspect?
             comment(util.format.apply(util.format, vargs))
         }
 
