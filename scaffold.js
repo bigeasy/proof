@@ -46,11 +46,11 @@ module.exports = function (sigil, outer, globals, die, process) {
     }
 
     function expect (count) {
-        delayedPlan = count < 1
-        expected = Math.abs(count)
-        if (!delayedPlan) {
+        var expected = Math.abs(count)
+        if (!(delayedPlan = count < 1)) {
             process.stdout.write('1..' + expected + '\n')
         }
+        return expected
     }
 
     function inc (count) {
@@ -79,23 +79,18 @@ module.exports = function (sigil, outer, globals, die, process) {
 
     function assertion (name, assertion) {
         return function () {
-            var EXPECTED, inspect, message, splat
-            splat = 1 <= arguments.length ? __slice.call(arguments, 0) : []
-            message = splat[splat.length - 1]
+            var vargs = __slice.call(arguments), message = vargs[vargs.length - 1]
             try {
-                assertion.apply(this, splat)
+                assertion.apply(this, vargs)
                 process.stdout.write('ok ' + (++actual) + ' ' + message + '\n')
                 ++passed
                 return true
             } catch (e) {
                 process.stdout.write('not ok ' + (++actual) + ' ' + e.message + '\n')
-                EXPECTED = name === 'ok' ? true : splat[1]
-                inspect = {
-                    EXPECTED: EXPECTED,
-                    GOT: splat[0]
-                }
-                inspect = require('util').inspect(inspect, null, Math.MAX_VALUE)
-                comment(inspect)
+                comment(util.inspect({
+                    EXPECTED: name == 'ok' ? true : vargs[1],
+                    GOT: vargs[0]
+                }, null, Math.MAX_VALUE))
                 return false
             }
         }
@@ -110,6 +105,17 @@ module.exports = function (sigil, outer, globals, die, process) {
         })
         if (leaked.length) {
             die('Variables leaked into global namespace.', leaked)
+        }
+        var widths = [ expected, actual, passed ].map(function (number) { return String(number).length })
+        var width = Math.max.apply(Math, widths)
+        function pad (number) {
+            number = String(number)
+            return (new Array(width + 1).join(' ') + number).substr(-Math.max(width, number.length))
+        }
+        process.stdout.write('# expected ' + pad(expected) + '\n')
+        process.stdout.write('# passed   ' + pad(passed) + '\n')
+        if (passed < expected) {
+            process.stdout.write('# failed   ' + pad(expected - passed) + '\n')
         }
     }
 

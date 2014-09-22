@@ -11,5 +11,5 @@ require('../../redux')(1, function (assert) {
         stdout: stdout
     })
 
-    assert(stdout.read().toString(), '1..1\n# 1 2 3\n', 'say')
+    assert(stdout.read().toString(), '1..1\n# 1 2 3\n# expected 1\n# passed   0\n# failed   1\n', 'say')
 })
