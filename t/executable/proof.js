@@ -3,6 +3,7 @@
 var spawn = require('child_process').spawn
 var path = require('path'), stderr = []
 
+// FIXME: NO! Make this a real Cadnece function. Bad!
 function execute (proc, input, step) {
     step(function () {
         proc.stderr.setEncoding('utf8')
@@ -22,14 +23,11 @@ function execute (proc, input, step) {
             input.pipe(proc.stdin)
         }
     }, function (code, signal, stdout, stderr) {
-        console.log(code, stdout.join(''))
         return [ code, stdout.join(''), stderr.join('') ]
     })
 }
 
-module.exports = require('../..')(function () {
-    return {
-        execute: execute,
-        proof: path.resolve(__dirname, '..', '..', 'proof.bin.js')
-    }
+require('../../redux')(module, function (body, assert, callback) {
+    var proof = path.resolve(__dirname, '..', '..', 'proof.bin.js')
+    require('cadence')(body).call(this, assert, execute, proof, callback)
 })

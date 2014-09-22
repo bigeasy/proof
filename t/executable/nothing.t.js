@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('./proof')(4, function (step, equal, proof, execute) {
+require('./proof')(4, function (step, equal, execute, proof) {
     var spawn = require('child_process').spawn
     var fs = require('fs')
     step(function () {
