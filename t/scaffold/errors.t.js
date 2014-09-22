@@ -1,4 +1,4 @@
-require('../../redux')(1, function (assert) {
+require('../../redux')(2, function (assert) {
     var stream = require('stream')
     var scaffold = require('../../scaffold')
     var stdout = new stream.PassThrough
@@ -8,6 +8,16 @@ require('../../redux')(1, function (assert) {
     }, [], function () {
         return function (error) {
             assert(error.message, 'exception', 'exception')
+        }
+    }, {
+        stdout: stdout
+    })
+
+    scaffold(1, function (assert, callback) {
+        callback(new Error('error'))
+    }, [], function () {
+        return function (error) {
+            assert(error.message, 'error', 'error')
         }
     }, {
         stdout: stdout
