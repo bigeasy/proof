@@ -8,7 +8,7 @@ var executable = require('./executable')
 // there are command line utilities we can invoke to get a list of file
 // associations.
 module.exports = cadence(function (step, platform, program, parameters) {
-    var isWindows = ! platform.indexOf('win'), buffer, first, $
+    var isWindows = ! platform.indexOf('win')
     if (isWindows) {
         switch (path.extname(program)) {
         case '.exe':
@@ -19,6 +19,7 @@ module.exports = cadence(function (step, platform, program, parameters) {
             step(function () {
                 fs.readFile(program, step())
             }, function (buffer, stat) {
+                var first, $
                 if (buffer[0] == 0x23 && buffer[1] == 0x21
                     && (first = buffer.toString().split(/\n/).shift())) {
                     if ($ = /^#!\/usr\/bin\/env\s+(\S+)/.exec(first)) {
