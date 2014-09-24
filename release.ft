@@ -54,6 +54,7 @@ Proof could now work on the browser after minification. No more source code tric
 
 ### Issue by Issue
 
+ * Specify known leaks. #236.
  * Upgrade Cadence to 0.0.43. #233.
  * Remove parameter parsing from scaffold. #232.
  * Upgrade Cadence to 0.0.42. #231.

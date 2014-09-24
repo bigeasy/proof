@@ -16,6 +16,7 @@ module.exports = function (sigil, outer, globals, die, process) {
     assert.say = say
     assert.die = die
     assert.inc = inc
+    assert.leak = leak
 
     try {
         if (typeof sigil == 'object' && !Array.isArray(sigil)) {
@@ -55,6 +56,10 @@ module.exports = function (sigil, outer, globals, die, process) {
 
     function inc (count) {
         expected += count
+    }
+
+    function leak () {
+        globals.push.apply(globals, arguments)
     }
 
     function comment (string) {
