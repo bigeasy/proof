@@ -6,6 +6,7 @@ var arguable = require('arguable')
 var expandable = require('expandable')
 var cadence = require('cadence')
 var candidate = require('./candidate')
+var shebang = require('./shebang')
 var __slice = [].slice
 var overwrite
 
@@ -565,69 +566,12 @@ function parse (stream, callback) {
     }))
 }
 
-function canExecute (stat) {
-    if (stat.mode & 0x1) return true
-    if (stat.uid == process.getuid() && stat.mode & 0x40) return true
-    if (process.getgroups && process.getgroups().some(function (gid) {
-        return gid == stat.gid
-    }) && stat.mode & 0x8) return true
-    if (process.getgid() == stat.gid && stat.mode & 0x8) return true
-    return false
-}
-
-// To do this right, we'd read through the Windows registry, but we really
-// don't want to go digging into it a this point. Not that difficult, since
-// there are command line utilities we can invoke to get a list of file
-// associations.
-var shebang = cadence(function (step, program, parameters, options) {
-    var buffer, first, $
-    options || (options = {})
-    if (process.platform.indexOf('win')) {
-        step(function () {
-            fs.stat(program, step())
-        }, function (stat) {
-            if (canExecute(stat)) return [ step, spawn(program, parameters, options) ]
-            else fs.readFile(program, step())
-        }, function (buffer) {
-            // no exec bit, but there's a shebang line? I call shenanigans.
-            if (buffer[0] == 0x23 && buffer[1] == 0x21) {
-                throw new Error('set execute bit to use shebang line')
-            }
-            parameters.unshift(program)
-            return [ spawn('node', parameters, options) ]
-        })
-    } else {
-        step(function () {
-            fs.readFile(program, step())
-        }, function (buffer, stat) {
-            switch (path.extname(program)) {
-            case '.exe':
-            case '.bat':
-            case '.cmd':
-                candidate(process.env.PATH, program, function (error, resolved) {
-                    callback(null, spawn(resolved, parameters, options))
-                })
-                break
-            default:
-                if (buffer[0] == 0x23 && buffer[1] == 0x21
-                    && (first = buffer.toString().split(/\n/).shift())) {
-                    if ($ = /^#!\/usr\/bin\/env\s+(\S+)/.exec(first)) {
-                        parameters.unshift(program)
-                        program = $[1]
-                    } else if ($ = /^#!\/.*\/(.*)/.exec(first)) {
-                        parameters.unshift(program)
-                        program = $[1]
-                    }
-                    candidate(process.env.PATH, program, function (error, resolved) {
-                        shebang(resolved, parameters, options, callback)
-                        //callback(null, spawn(resolved + '.cmd', parameters, options))
-                    })
-                } else {
-                    callback(null, spawn(program, parameters, options))
-                }
-            }
-        })
-    }
+var badabing = cadence(function (step, program, parameters, options) {
+    step(function () {
+        shebang(process.platform, program, parameters, step())
+    }, function (program, parameters) {
+        return [ spawn(program, parameters, options) ]
+    })
 })
 
 function run (options) {
@@ -671,7 +615,8 @@ function run (options) {
     function execute (program, index) {
         var bailed, err, out, test, planned; // after a test is emitted, any plans are just stdout
         emit(program, 'run')
-        shebang(program, [], {}, function (error, test) {
+        badabing(program, [], {}, function (error, test) {
+            if (error) throw error
             var timer;
             function resetTimer() {
                 if (timer) clearTimeout(timer)
@@ -822,7 +767,7 @@ function main (options) {
                        ? 'proof-' + (argv.shift())
                        : 'proof-default'
         candidate(process.env.PATH, executable, function (error, resolved) {
-            shebang(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
+            badabing(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
                 close(child, function (code) { process.exit(code) })
             })
         })
