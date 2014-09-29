@@ -1,6 +1,7 @@
 require('../..')(4, function (assert) {
     var executable = require('../../executable')
     var stats = { mode: 0x8, gid: 100 }
+     // ^^^ named `stat` not `stats`.
     var groups = [ 100, 33, 19 ]
     var process = {
         getuid: function () {
