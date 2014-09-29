@@ -7,10 +7,14 @@ require('../..')(3, function (assert) {
         },
         getgid: function(gid) {
                 return gid
+        },
+        getgroups: { some: function (gid) {
+                    return  gid == stat.gid
+                   }
         }
     }
     assert(executable(null, { mode: 0x1 }), 'other execute')
     assert(executable(process, { mode: 0x40, uid: 701 }), 'other execute')
-    assert(executable(process, { mode: 0x1, gid: 100 }), 'other execute')
+    assert(executable(process.getgroups, { mode: 0x1, gid: 100 }), 'other execute')
     //assert(executable(process, { mode: 0x1 }), 'other execute')
 })
