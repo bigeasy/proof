@@ -7,7 +7,7 @@ require('../..')(4, function (assert) {
                 return 701
         },
         getgid: function () {
-                return stat.gid 
+                return 100 
         },
         getgroups: function () {
                 return groups
@@ -17,24 +17,13 @@ require('../..')(4, function (assert) {
     assert(executable(null, { mode: 0x1 }), 'other execute')
     assert(executable(process, { mode: 0x40, uid: 701 }), 'other execute')
     assert(executable(process, stat), 'other execute')
-    assert(executable(process, stat), 'other execute') // does not pass
+    assert(executable(process, { mode: 0x8, gid: 100 }), 'other execute') // does not pass
+    // how come this ^^^ is not covered while the 2nd assertion is?
+    // it is not the order in which process is called. See console.log below, and I changed the 
+    // order in `executable.js`
+    // does it have to do with uid vs. gid?
 
-    // vvv Testing variables:
-    console.log((stat.mode & 0x8) && (process.getgid() == stat.gid)) // returns 2nd test: true
-    //order of operation  ^10     ^^ order 11          ^^order 9
-    console.log((process.getgid() == stat.gid) && (stat.mode & 0x8)) // returns 2nd test: 8 
-    console.log("stat.git", stat.gid)
-    console.log("process.getgid()", process.getgid())
-    console.log("stat.mode", stat.mode)
-    console.log((stat.mode & 0x8) === 8) // <- this is true
-    console.log(stat.mode === 8) // <- this is true 
-    console.log(stat.mode === (stat.mode & 0x8)) // <- this is true
-    console.log(stat.mode === (2*4)) // <- this is true 
-    // vvv these evaluate to false. a comparison btw 2 are made evaluating to true
-    //     true is then compared to 8, which is false. 
-    console.log(stat.mode == (2*4) == 8) 
-    console.log((16/2) == (2*4) == 8) 
-    console.log(stat.mode == (stat.mode & 0x8) == 8) 
-    // vvv this evalutes to true because 2 true comparisons are evaluated.
-    console.log((stat.mode == (2*4)) == ((stat.mode & 0x8) == 8)) // <- this is false 
+    //              vvv changing the order does not appear to keep these vvv from evaluating true
+    console.log((process.getgid() == stat.gid && stat.mode & 0x8) == (stat.gid ==  process.getgid() && stat.mode & 0x8))  
+    console.log((process.getgid() == stat.gid) == (stat.gid  == process.getgid()))  
 })
