@@ -2,6 +2,20 @@ require('../..')(4, function (assert) {
     var executable = require('../../executable')
     var stat = { mode: 0x8, gid: 100 }
     var groups = [ 100, 33, 19 ]
+
+    assert(executable(null, { mode: 0x1 }), 'other execute')
+    assert(executable(process, { mode: 0x40, uid: 701 }), 'other execute')
+    assert(executable(process, stat), 'other execute')
+    assert(executable(process, { mode: 0x8, gid: 100 }), 'other execute') // does not pass
+    // There is more covarage if the 2nd and 4th conditional are changed in `executable.js`
+    // but that is not allowed. It does mean, however, that consideration must be paid to 
+    // the order of the test. 
+    // QUESTION: how come order of the conditionals in `executable.js` 
+    // matters? 
+})
+
+// may need to reuse this vvv.
+    /*
     var process = {
         getuid: function () {
                 return 701
@@ -12,18 +26,5 @@ require('../..')(4, function (assert) {
         getgroups: function () {
                 return groups
         }
-
     }
-    assert(executable(null, { mode: 0x1 }), 'other execute')
-    assert(executable(process, { mode: 0x40, uid: 701 }), 'other execute')
-    assert(executable(process, stat), 'other execute')
-    assert(executable(process, { mode: 0x8, gid: 100 }), 'other execute') // does not pass
-    // how come this ^^^ is not covered while the 2nd assertion is?
-    // it is not the order in which process is called. See console.log below, and I changed the 
-    // order in `executable.js`
-    // does it have to do with uid vs. gid?
-
-    //              vvv changing the order does not appear to keep these vvv from evaluating true
-    console.log((process.getgid() == stat.gid && stat.mode & 0x8) == (stat.gid ==  process.getgid() && stat.mode & 0x8))  
-    console.log((process.getgid() == stat.gid) == (stat.gid  == process.getgid()))  
-})
+    */
