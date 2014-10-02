@@ -1,4 +1,4 @@
-require('../..')(4, function (assert) {
+require('../..')(5, function (assert) {
     var executable = require('../../executable')
     var stat = { mode: 0x8, gid: 100 }
     var groups = [ 100, 33, 19, 10]
@@ -14,6 +14,15 @@ require('../..')(4, function (assert) {
         }
     }
 
+    var process2 = {
+        getuid: function () {
+            return 700
+        },
+        getgid: function () {
+            return 10
+       },
+    }
+
     assert(executable(null, { mode: 0x1 }), 'other execute')
         // what is a bit mask?
         // bit mask  0x1: 000000001
@@ -21,7 +30,10 @@ require('../..')(4, function (assert) {
         // bit mask  0x8: 000001000
     assert(executable(process, { mode: 0x40, uid: 700 }), 'user execute')
     assert(executable(process, { mode: 0x8, gid: 10 }), 'group executes')
-    assert(executable(process, { mode: 0x8, gid: 10 }), '`who` executes?')
+    assert(executable(process2, { mode: 0x8, gid: 10 }), 'group executes')
+
+    // vvv is covered, but returns false so the test fails.
+    //assert(executable(process2, { mode: 0x180, gid: 19}), 'returns false')
 
         // '10111101001' & '1000'
         //
