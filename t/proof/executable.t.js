@@ -1,6 +1,7 @@
 require('../..')(5, function (assert) {
     var executable = require('../../executable')
-    var groups = [ 100, 33, 19, 11]
+
+    var groups = [ 100, 33, 19, 11 ]
     var process = {
         getuid: function () {
             return 700
@@ -15,9 +16,9 @@ require('../..')(5, function (assert) {
 
     assert(executable(null, { mode: 0x1 }), 'other execute')
     assert(executable(process, { mode: 0x40, uid: 700 }), 'uid execute')
-    assert(executable(process, { mode: 0x8, gid: 10 }), 'groups execute')
+    assert(executable(process, { mode: 0x8, gid: 33 }), 'groups execute')
     assert(executable(process, { mode: 0x8, gid: 10 }), 'gid execute')
-    assert(!executable(process, { mode: 0x180, gid: 19}), 'cannot execute')
+    assert(!executable(process, { mode: 0x180, gid: 19 }), 'cannot execute')
 
 // LESSON:
     // what is a bit mask?
