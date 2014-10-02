@@ -1,25 +1,54 @@
-require('../..')(4, function (assert) {
+require('../..')(5, function (assert) {
     var executable = require('../../executable')
-    var stats = { mode: 0x8, gid: 100 }
-     // ^^^ named `stat` not `stats`.
-    var groups = [ 100, 33, 19 ]
+    var stat = { mode: 0x8, gid: 100 }
+    var groups = [ 100, 33, 19, 10]
     var process = {
         getuid: function () {
-                return 701
+            return 700
         },
         getgid: function () {
-                return stats.gid 
+            return 10
         },
         getgroups: function () {
-                return groups
+            return groups
         }
-
     }
+
+    var process2 = {
+        getuid: function () {
+            return 700
+        },
+        getgid: function () {
+            return 10
+       },
+    }
+
     assert(executable(null, { mode: 0x1 }), 'other execute')
-    assert(executable(process, { mode: 0x40, uid: 701 }), 'other execute')
-    assert(executable(process, stats), 'other execute')
-    assert(executable(process, stats), 'other execute') // does not pass
-    // how do I return both of the object elements?
-    console.log(process.getgid() == stats.gid && stats.mode & 0x8) // returns 8 
-    //order of operation         ^^ order 9   ^^ order 11   ^^order 10
+    assert(executable(process, { mode: 0x40, uid: 700 }), 'user execute')
+    assert(executable(process, { mode: 0x8, gid: 10 }), 'group executes')
+    assert(executable(process2, { mode: 0x8, gid: 10 }), 'group executes')
+    assert(!executable(process2, { mode: 0x180, gid: 19}), 'returns false')
+
+// LESSON:
+    // what is a bit mask?
+    // bit mask  0x1: 000000001
+    // bit mask 0x40: 001000000
+    // bit mask  0x8: 000001000
+
+        // '10111101001' & '1000'
+        //
+        // value & mask == mask <- is set?
+        // '10111101001'
+        //        '1000'
+        // '00000001000' == '1000'
+        //
+        //  value | mask <- turn on
+        // '10111101001'
+        //        '1000'
+        // '10111101001'
+        //
+        //  value & ~mask <- turn off
+        // '10111101001' <-
+        //~'11111110111' == ~'1000'
+        // '10111100001' <-
 })
