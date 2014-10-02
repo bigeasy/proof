@@ -24,10 +24,10 @@ require('../..')(5, function (assert) {
     }
 
     assert(executable(null, { mode: 0x1 }), 'other execute')
-    assert(executable(process, { mode: 0x40, uid: 700 }), 'user execute')
-    assert(executable(process, { mode: 0x8, gid: 10 }), 'group executes')
-    assert(executable(process2, { mode: 0x8, gid: 10 }), 'group executes')
-    assert(!executable(process2, { mode: 0x180, gid: 19}), 'returns false')
+    assert(executable(process, { mode: 0x40, uid: 700 }), 'uid execute')
+    assert(executable(process, { mode: 0x8, gid: 10 }), 'groups execute')
+    assert(executable(process2, { mode: 0x8, gid: 10 }), 'gid execute')
+    assert(!executable(process2, { mode: 0x180, gid: 19}), 'cannot execute')
 
 // LESSON:
     // what is a bit mask?
