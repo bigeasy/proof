@@ -422,7 +422,7 @@ function abend (message, use) {
     throw new Abend(message)
 }
 
-function parseRedux (done, abend, callback) {
+function parseRedux (done, abend, parser, callback) {
     var programs = {}
     var out = [''][0]
     var count = 0
@@ -537,7 +537,7 @@ function parse (stream, callback) {
         }
     }
 
-    var parseLine = parseRedux(done, abend, callback)
+    var parseLine = parseRedux(done, abend, parser, callback)
 
     stream.setEncoding('utf8')
     stream.on('end', function () { if (data && !done) { process.exit(1) } })
