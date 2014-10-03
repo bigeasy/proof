@@ -16,8 +16,8 @@ require('../..')(5, function (assert) {
 
     assert(executable(null, { mode: 001 }), 'other execute')
     assert(executable(process, { mode: 010, uid: 700 }), 'uid execute')
-    assert(executable(process, { mode: 100, gid: 33 }), 'groups execute')
-    assert(executable(process, { mode: 100, gid: 10 }), 'gid execute')
+    assert(executable(process, { mode: 0100, gid: 33 }), 'groups execute')
+    assert(executable(process, { mode: 0100, gid: 10 }), 'gid execute')
     assert(!executable(process, { mode: 002, gid: 19 }), 'cannot execute')
 
 // LESSON:
