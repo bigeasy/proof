@@ -9,6 +9,7 @@ var candidate = require('./candidate')
 var shebang = require('./shebang')
 var __slice = [].slice
 var overwrite
+var extend = require('./extend')
 var parseRedux = require('./parse')
 
 exports.json = function (out) {
@@ -402,15 +403,6 @@ var parser = {
             }
         }
     }
-}
-
-function extend (destination) {
-    var sources = __slice.call(arguments, 1)
-    var destination
-    sources.forEach(function (source) {
-        for (var key in source) destination[key] = source[key]
-    })
-    return destination
 }
 
 function Abend () { Error.call(this) }
