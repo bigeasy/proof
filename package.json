@@ -20,7 +20,7 @@
     "bugs":             "https://github.com/bigeasy/proof/issues",
     "dependencies":     { 
                             "cadence": "0.0.43",
-                            "arguable": "0.0.16",
+                            "arguable": "0.0.22",
                             "expandable": "0.0.6"
                         },
     "devDependencies":  {
