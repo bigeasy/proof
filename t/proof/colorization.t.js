@@ -2,5 +2,9 @@
 
 require('../..')(1, function (assert) {
     var colorization = require('../../colorization')
-    assert(colorization, 'ok')
+
+    var options = { params: { monochrome: true } }
+
+    assert(options.params.monochrome == true, 'options.params.monochrome')
+
 })
