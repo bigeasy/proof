@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../..')(7, function (assert) {
+require('../..')(10, function (assert) {
     var colorization = require('../../colorization')
 
     var options = { params: { monochrome: true } }
@@ -8,11 +8,9 @@ require('../..')(7, function (assert) {
 
     assert(colorization(options), 'options true')
     assert(colors.red('test'), 'has monochrome red')
-    // How come when these vvv tests are added to the program 
-    // tcover does not return lcov-report?
-    // assert(colors.green('test'), 'has monochrome green')
-    // assert(colors.blue('test'), 'has monochrome blue')
-    // assert(colors.grey'test'), 'has monochrome grey')
+    assert(colors.green('test'), 'has monochrome green')
+    assert(colors.blue('test'), 'has monochrome blue')
+    assert(colors.gray('test'), 'has monochrome gray')
 
     options = { params: { monochrome: false } }
     colors = colorization(options)
