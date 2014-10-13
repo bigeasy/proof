@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../..')(3, function (assert) {
+require('../..')(7, function (assert) {
     var colorization = require('../../colorization')
 
     var options = { params: { monochrome: true } }
@@ -17,5 +17,9 @@ require('../..')(3, function (assert) {
     options = { params: { monochrome: false } }
     colors = colorization(options)
     assert(colorization(options), 'options false')
+    assert(colors.red('test'), 'has red')
+    assert(colors.green('test'), 'has green')
+    assert(colors.blue('test'), 'has blue')
+    assert(colors.gray('test'), 'has gray')
 
 })
