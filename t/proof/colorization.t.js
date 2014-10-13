@@ -14,6 +14,7 @@ require('../..')(10, function (assert) {
 
     options = { params: { monochrome: false } }
     colors = colorization(options)
+
     assert(colorization(options), 'options false')
     assert(colors.red('test'), 'has red')
     assert(colors.green('test'), 'has green')
