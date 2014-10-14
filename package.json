@@ -19,9 +19,10 @@
     "homepage":         "https://bigeasy.github.io/proof",
     "bugs":             "https://github.com/bigeasy/proof/issues",
     "dependencies":     { 
-                            "cadence": "0.0.43",
-                            "arguable": "0.0.22",
-                            "expandable": "0.0.6"
+                            "byline":       "4.1.1",
+                            "cadence":      "0.0.43",
+                            "arguable":     "0.0.22",
+                            "expandable":   "0.0.6"
                         },
     "devDependencies":  {
                             "coffee-script": ">=1.1.3"
