@@ -1,22 +1,14 @@
-// What is required? vvv these are in parse. 
-var fs = require('fs') // <- dont see it.
-var util = require('util') // <- dont see it.
-var path = require('path') // <- dont see it.
-var spawn = require('child_process').spawn // <- dont see it.
-var arguable = require('arguable') // <- dont see it.
-var expandable = require('expandable') // <- dont see it.
-var cadence = require('cadence') // <- dont see it.
-var candidate = require('./candidate') // <- dont see it.
-var shebang = require('./shebang') // <- dont see it.
-var __slice = [].slice // <- dont see it.
-var overwrite // <- dont see it.
-var extend = require('./extend')// <-THIS IS IN HERE
-var parser = require('./parser') // <- dont see it.
-var parseRedux = require('./parse') // <- dont see it.
+var extend = require('./extend')// <-THIS IS IN PROOF and JSON 
+// ^^^ this is also module.exports
 
 
-// how should this be exported?
-exports.json = function (out) {
+// 'exports collects properties and attaches them to module.exports if module.exports
+// doesn't have something on it already. If there is something attached to module.-
+// exports already, everything in exports is ignored.'
+//
+// how should this be exported? In Proof it  was export will change this to module.exports
+// in order to stay consistent with extend.
+module.exports = function (out) {
     var object = {}
     return function (event) {
         var comment, file, message, passed, skip, time, todo
@@ -56,7 +48,10 @@ exports.json = function (out) {
     }
 }
 
+/*
+// vvv not sure this should be in this file.
 function json () {
     process.stdin.resume()
-    parse(process.stdin, exports.json(process.stdout))
+    parse(process.stdin, exports.json(process.stdout)) // <- function parse not defined 
 }
+*/
