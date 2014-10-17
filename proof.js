@@ -13,6 +13,7 @@ var extend = require('./extend')
 var parser = require('./parser')
 var parseRedux = require('./parse')
 
+// vvvv took this out
 exports.json = function (out) {
     var object = {}
     return function (event) {
@@ -57,6 +58,7 @@ function json () {
     process.stdin.resume()
     parse(process.stdin, exports.json(process.stdout))
 }
+// ^^^^ this was taken out. 
 
 var colorization = require('./colorization')
 
