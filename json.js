@@ -1,4 +1,21 @@
+// What is required? vvv these are in parse. 
+var fs = require('fs') // <- dont see it.
+var util = require('util') // <- dont see it.
+var path = require('path') // <- dont see it.
+var spawn = require('child_process').spawn // <- dont see it.
+var arguable = require('arguable') // <- dont see it.
+var expandable = require('expandable') // <- dont see it.
+var cadence = require('cadence') // <- dont see it.
+var candidate = require('./candidate') // <- dont see it.
+var shebang = require('./shebang') // <- dont see it.
+var __slice = [].slice // <- dont see it.
+var overwrite // <- dont see it.
+var extend = require('./extend')// <-THIS IS IN HERE
+var parser = require('./parser') // <- dont see it.
+var parseRedux = require('./parse') // <- dont see it.
 
+
+// how should this be exported?
 exports.json = function (out) {
     var object = {}
     return function (event) {
