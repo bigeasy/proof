@@ -47,11 +47,3 @@ module.exports = function (out) {
         }
     }
 }
-
-/*
-// vvv not sure this should be in this file.
-function json () {
-    process.stdin.resume()
-    parse(process.stdin, exports.json(process.stdout)) // <- function parse not defined 
-}
-*/
