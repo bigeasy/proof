@@ -173,7 +173,6 @@ ___ usage: en_US ___
 usage: proof [command] <arguments> <tests>
 ___ usage ___
 */
-
 var arguable = require('arguable')
 var proof = require('./proof')
 

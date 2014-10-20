@@ -2,11 +2,12 @@
 
 require('../..')(1, function (assert) {
     var proof = require('../../proof')
+    var json = require('../../json')
     var stream = require('stream')
     var out = new stream.PassThrough
     var chunks = []
     out.on('data', function (chunk) { chunks.push(chunk.toString()) })
-    var output = proof.json(out)
+    var output = json(out)
     output({
         type: 'run',
         file: 't/foo.t.js',
