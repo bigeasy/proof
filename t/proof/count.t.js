@@ -5,5 +5,5 @@ require('../..')(2, function (assert) {
     var arr = [ "one", "two", "three" ]
     var arr2 = [ "one", "two", 3 ]
     assert(count(arr), [ 3, 'one', 3, 'two', 5, 'three' ], 'Add lengths')
-    assert.throws(count(arr2), 'Array element not a string' , 'throws an exception')
+    assert.throws(count(arr2), 'Array element not a string.' , 'throws an exception')
 })
