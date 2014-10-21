@@ -1,13 +1,11 @@
 module.exports = function (arr) {
-    var e = new Error('Array element not a string')
 
-    function addLength(arr, e) {
-        var e = new Error('Array element not a string')
+    function addLength(arr) {
         var a = []
         var i = 0 
         for (i; i < arr.length; i++) {
             if (typeof(arr[i]) != 'string') {
-                throw e
+                throw new Error('Array element not a string')
             } else {
                 a.push(arr[i].length, arr[i])
             }   
@@ -18,6 +16,6 @@ module.exports = function (arr) {
     try {
         var a = addLength(arr)
         return a
-    } catch (e) {throw e}
+    } catch (e) { e }
 
 }
