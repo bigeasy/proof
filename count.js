@@ -1,6 +1,5 @@
 module.exports = function (arr) {
 
-    function addLength(arr) {
         var a = []
         var i = 0 
         for (i; i < arr.length; i++) {
@@ -11,11 +10,4 @@ module.exports = function (arr) {
             }   
         }
         return a
-    }
-
-    try {
-        var a = addLength(arr)
-        return a
-    } catch (e) { e }
-
 }
