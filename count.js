@@ -1,5 +1,4 @@
 module.exports = function (arr) {
-
         var a = []
         var i = 0 
         for (i; i < arr.length; i++) {
