@@ -10,6 +10,6 @@ require('../..')(2, function (assert) {
     try { 
         count(arr2)
     } catch (e) {
-        assert(e, Error('Array element not a string.'), 'Throws expected exception')
+        assert(e.message, 'Array element not a string.', 'Throws expected exception')
     }
 })
