@@ -1,5 +1,9 @@
 module.exports = function (func) {
     return function (arr) {
-        return func(arr).toString().replace(',', '\n')
+        var a = func(arr)
+        var lastElement = a.pop()
+        var push = lastElement.concat('\n') 
+        a.push(push)
+        return a.toString().replace(/,/g, '\n')
     } 
 }
