@@ -2,9 +2,9 @@
 
 require('../..')(1, function (assert) {
     var count = require('../../count')
-    var funcBuilder = require('../../funcBuilder')
+    var adaptor = require('../../adaptor')
     var arr = ["string"]
     var string = '6\nstring\n'
-    var test = funcBuilder(count)
+    var test = adaptor(count)
     assert(test(arr), string, 'equal')
 })
