@@ -1,6 +1,6 @@
 module.exports = function (func) {
     return function (arg) {
-        var arr = [ arg ]
-        return func(arr).join('\n') + ('\n')
+        //var arr = [ arg ] // <- does not need to wrap arg in a array
+        return func(arg).join('\n') + ('\n')
     } 
 }
