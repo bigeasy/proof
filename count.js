@@ -1,12 +1,9 @@
-module.exports = function (arr) {
-        var a = []
+module.exports = function (arg) {
         var i = 0 
-        for (i; i < arr.length; i++) {
-            if (typeof(arr[i]) != 'string') {
-                throw new Error('Array element not a string.')
-            } else {
-                a.push(arr[i].length, arr[i])
-            }   
+        if (arg == null) {
+            return []
+        } else {
+            arg = String(arg)
+            return [arg.length, arg]
         }
-        return a
 }
