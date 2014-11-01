@@ -1,5 +1,4 @@
 module.exports = function (arg) {
-        var i = 0 
         if (arg == null) {
             return []
         } else {

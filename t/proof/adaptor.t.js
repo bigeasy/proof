@@ -7,5 +7,5 @@ require('../..')(2, function (assert) {
     var string = '6\nstring\n'
     var test = adaptor(count)
     assert(test(arg), string, 'equal')
-    assert(test(), '\n', 'equal')
+    assert(test(), '', 'equal')
 })
