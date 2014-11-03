@@ -1,10 +1,12 @@
-module.exports = function (func) { // <- this is taking count. 
-    // anything here will be executed when adaptor takes its function argument.
-    // it does not carry into the scope below.
-    return function (arg) { //<- if this arg is left empty...
-        console.log("Inside adaptor. Testing arg type: " + arg) //... then this is undefined 
-        return (arg == []) ? ('') : func(arg).join('\n') + ('\n') //<-ternary op needs to be removed 
-        // ^^^ does not make any decisions nor inspect the args.
+module.exports = function (func) {
+    return function (arg) {
+        return  func(arg).join('\n') + ('\n') 
+                                              //    the func returns an array. the join method
+                                              //    uses newline as a deliminator. It then adds
+                                              //    a new line to the end. If the array is empty
+                                              //    there is no join, but it adds a newline. 
+                                              //    Instead of a newline I want to add ('').
+                                              //    How is this done w/ the restraints below?
     } 
 }
 // The adaptor function does not make any decisions based on arguments.
