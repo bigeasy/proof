@@ -1,7 +1,8 @@
-module.exports = function (func) {
-    console.log("func " + typeof(arg))
+module.exports = function (func) { // <- this is taking count. 
+    // anything here will be executed when adaptor takes its function argument.
+    // it does not carry into the scope below.
     return function (arg) {
-        console.log("Inside adaptor. Testing arg type: " + typeof(arg))
+        console.log("Inside adaptor. Testing arg type: " + arg)
         return (arg == []) ? ('') : func(arg).join('\n') + ('\n') //<- this arg needs to be an array
     } 
 }
