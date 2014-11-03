@@ -1,7 +1,16 @@
-module.exports = function (func) { // adaptor cannot be wrapper specific.
+module.exports = function (func) {
     return function (arg) {
-        return ((func(arg).join('\n') + ('\n')) == '\n' ) ? ('') : func(arg).join('\n') + ('\n') 
-        //if (func(arg).join('\n') + ('\n')) == '\n' ) return ('')
-        //else if (
-    } 
+
+        if (func(arg).length == 0) {
+            return ('')
+        } 
+        
+        for (var i = 0; i < func(arg).length; i++) {
+            if (String(func(arg)[i]).length == 0) {
+                return ('\n')
+            }
+        }
+        
+        return func(arg).join('\n') + ('\n')
+    }
 }
