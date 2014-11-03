@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../..')(1, function (assert) {
+require('../..')(2, function (assert) {
     var count = require('../../count')
     var adaptor = require('../../adaptor')
     var arg = "string"
