@@ -1,16 +1,18 @@
-module.exports = function (func) {
+module.exports = function (func) { // adaptor cannot be wrapper specific.
     return function (arg) {
+        var string = func(arg).join('\n') + ('\n')
+        var arr = func(arg)
 
-        if (func(arg).length == 0) {
+        if (arr.length == 0) {
             return ('')
         } 
         
-        for (var i = 0; i < func(arg).length; i++) {
-            if (String(func(arg)[i]).length == 0) {
+        for (var i = 0; i < arr.length; i++) {
+            if (String(arr[i]).length == 0) {
                 return ('\n')
             }
         }
         
-        return func(arg).join('\n') + ('\n')
+        return string
     }
 }
