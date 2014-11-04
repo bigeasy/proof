@@ -8,5 +8,5 @@ require('../..')(2, function (assert) {
     function echo (string) { return string }
     var print = printer(echo, test)
     assert(typeof(printer), 'function', 'ok') 
-    assert(print('foo'), 'foo', 'equal')
+    assert(print('foo'), true, 'equal')
 })

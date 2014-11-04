@@ -1,6 +1,6 @@
 module.exports = function (func, stream) {
     return function(arg) {
-            stream.write(arg)
-            return func(stream.read().toString()) 
+            var written = func(arg)
+            return stream.write(written/*func(arg)*/)
     }
 }
