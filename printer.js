@@ -1,5 +1,6 @@
-module.exports = function (func) {
+module.exports = function (func, stream) {
     return function(arg) {
-        return func(arg)
+            stream.write(arg)
+            return func(stream.read().toString()) 
     }
 }
