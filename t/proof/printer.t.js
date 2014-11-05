@@ -3,10 +3,10 @@
 require('../..')(2, function (assert) {
     var printer = require('../../printer')
     var stream = require('stream')
-    var test = new stream.PassThrough
-    //test.write('foo')
+    var passThrough = new stream.PassThrough
     function echo (string) { return string }
-    var print = printer(echo, test)
+    var writeToStream = printer(echo, passThrough)
+    writeToStream('foo')
     assert(typeof(printer), 'function', 'ok') 
-    assert(print('foo'), true, 'equal')
+    assert(passThrough.read().toString(), 'foo', 'equal')
 })
