@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
-require('../..')(1, function (assert) {
+require('../..')(2, function (assert) {
     var printer = require('../../printer')
     var stream = require('stream')
-    var test = new stream.PassThrough
-    test.write('foo')
+    var passThrough = new stream.PassThrough
+    function echo (string) { return string }
+    var writeToStream = printer(echo, passThrough)
+    writeToStream('foo')
     assert(typeof(printer), 'function', 'ok') 
-    assert(test.read().toString(), 'foo', 'equal')
+    assert(passThrough.read().toString(), 'foo', 'equal')
 })
