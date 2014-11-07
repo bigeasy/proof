@@ -41,9 +41,9 @@ module.exports = function (out) {
                 })
                 break
             case 'eof':
-                out.write(JSON.stringify(object, null, 2))
-                out.write('\n')
-                break
+                    out.write(JSON.stringify(object, null, 2))
+                        out.write('\n')
+                        break
         }
     }
 }
