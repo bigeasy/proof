@@ -40,6 +40,20 @@ require('../..')(1, function (assert) {
     output({
         type: 'eof'
     })
+    console.log(out.on) // <- [Function]
+    console.log('\n')
+    console.log(typeof(chunks))
+    console.log(Array.isArray(chunks))
+    console.log('\n')
+    console.log(chunks)
+    console.log('\n')
+    console.log(chunks.join(''))
+    console.log('\n')
+    console.log(JSON.parse(chunks.join('')))
+    console.log('\n')
+    console.log(JSON.stringify(chunks.join('')))
+    console.log('\n')
+
     assert(JSON.parse(chunks.join('')), {
       "t/foo.t.js": {
         "time": 0,
