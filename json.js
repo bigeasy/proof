@@ -8,7 +8,7 @@ var extend = require('./extend')// <-THIS IS IN PROOF and JSON
 //
 // how should this be exported? In Proof it  was export will change this to module.exports
 // in order to stay consistent with extend.
-module.exports = function (out) {
+module.exports = function (out) { // <- takes a stream
     var object = {}
     return function (event) {
         var comment, file, message, passed, skip, time, todo
@@ -41,9 +41,11 @@ module.exports = function (out) {
                 })
                 break
             case 'eof':
-                    out.write(JSON.stringify(object, null, 2))
-                        out.write('\n')
-                        break
+                // vv this needs to change
+                console.log(object)
+                out.write(JSON.stringify(object, null, 2)) // how does this make it to chunks?
+                out.write('\n')
+                break
         }
     }
 }

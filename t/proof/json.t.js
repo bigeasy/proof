@@ -29,7 +29,7 @@ require('../..')(1, function (assert) {
         expected: 3
     })
 
-    console.log(chunks) // <- []
+//    console.log(chunks) // <- []
 // (2)
     output({
         type: 'plan',
@@ -37,7 +37,7 @@ require('../..')(1, function (assert) {
         expected: 3
     })
 
-    console.log(chunks) //<- empty array
+//    console.log(chunks) //<- empty array
 // (3)
     output({
         type: 'test',
@@ -50,7 +50,7 @@ require('../..')(1, function (assert) {
         comment: 'fix'
     })
 
-    console.log(chunks) //<- empty array
+//    console.log(chunks) //<- empty array
 // (4)
     output({
         type: 'exit', // <- this type makes a call to extend.
@@ -61,13 +61,13 @@ require('../..')(1, function (assert) {
         code: 0
     })
 
-    console.log(chunks) //<- empty array
+//    console.log(chunks) //<- empty array
 // (5)
     output({
         type: 'eof' // <- this is the branch of json that needs to change. look at parse.
                     //    this is also where chunks is filled
     })
-
+/*
     console.log(out.on) // <- [Function]
     console.log(output) // <- [Function: addListener]
     console.log('\n')
@@ -83,7 +83,7 @@ require('../..')(1, function (assert) {
     console.log('\n')
     console.log(JSON.stringify(chunks.join('')))
     console.log('\n')
-
+*/
     // vvv this test needs to change when the json function is changed.
     assert(JSON.parse(chunks.join('')), {
       "t/foo.t.js": {
