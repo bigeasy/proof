@@ -44,7 +44,8 @@ module.exports = function (out) { // <- takes a stream
                 // vv this needs to change
                 console.log(object)
                 out.write(JSON.stringify(object, null, 2)) // how does this make it to chunks?
-                out.write('\n')
+                out.write('\n') // what is the newline character for in this case? A newline a the end?
+                // there is no difference in the assertion test if it is there or not. 
                 break
         }
     }
