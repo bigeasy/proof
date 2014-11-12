@@ -14,10 +14,10 @@ require('../..')(1, function (assert) {
     var chunks = []
                     // vvv Anonymous function that takes an array
     out.on('data', function (chunk) { chunks.push(chunk.toString()) })
-    // ^^ How does the `on` method work? Upon `data` the function is invoked? 
-    // The `on` method is not invoked until the out.write method is invoked?
-    var output = json(out) // <- what is this function doing?
-                   // ^^ it takes a stream with an event emitter.
+
+    var output = json(out)// <-json encapsulates an object in its own scope that interacts with the
+                          //   enclosed stream that is in this scope but passed into the function
+                          //   as an argument.
 
 // There are five calls to output. One call for each type. These calls to output 
 // are routed to different branches becuase of the switch in the json function. 
