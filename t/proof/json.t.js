@@ -7,20 +7,25 @@ require('../..')(5, function (assert) {
     var out = new stream.PassThrough // <- may we take out the stream?
 
     var chunks = []
-    // this is gross, how do I deal with it?
-    var arr = [ '{\n  "t/foo.t.js": {',
-                 '\n    "time": 0,\n    "expected": 3,',
-                 '\n    "tests": [', '\n      {\n        "message": "message",',
-                 '\n        "time": 1,','\n        "passed": true,',
-                 '\n        "skip": false,',
-                 '\n        "todo": true,\n        "comment": "fix"',
-                 '\n      }\n    ],\n    "actual": 1,\n    "duration": 2,\n    "code": 0\n  }\n}'
-              ].join('')
     
-    var test = [ arr ]
-    test.push('\n')
+    // This function generates the expected array from `json` function based on the arguments used 
+    // below in the `output` functions.
+    function testmaker (test) {
+        var arr = [ '{\n  "t/foo.t.js": {',
+                     '\n    "time": 0,\n    "expected": 3,',
+                     '\n    "tests": [', '\n      {\n        "message": "message",',
+                     '\n        "time": 1,','\n        "passed": true,',
+                     '\n        "skip": false,',
+                     '\n        "todo": true,\n        "comment": "fix"',
+                     '\n      }\n    ],\n    "actual": 1,\n    "duration": 2,\n    "code": 0\n  }\n}'
+                  ].join('')
+        test = [ arr ]
+        test.push('\n')
+        return test
+    }
 
-   // may we take this vvv out as well? 
+    var test = testmaker(test)
+
     out.on('data', function (chunk) { chunks.push(chunk.toString()) })
 
     var output = json(out)// <-json encapsulates an object in its own scope that interacts with the
@@ -72,4 +77,5 @@ require('../..')(5, function (assert) {
                  type: 'eof'
              })
 
-    assert(chunks, test, 'equal')
+    assert(chunks, test, 'arrays equal')
+})
