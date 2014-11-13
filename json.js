@@ -1,21 +1,9 @@
 var printer = require('./printer')
-var formatter = require('./formatter') // <- new change
-var extend = require('./extend')// <-THIS IS IN PROOF and JSON 
-// ^^^ this is also module.exports
+var extend = require('./extend')
 
-// 'exports collects properties and attaches them to module.exports if module.exports
-// doesn't have something on it already. If there is something attached to module.-
-// exports already, everything in exports is ignored.'
-//
-// how should this be exported? In Proof it  was export will change this to module.exports
-// in order to stay consistent with extend.
-//
-// ````````````````````` STREAM``````````````````````````
-//  It is a sequence of data elements made over time. This particular stream is a passThrough
-//  It is a type of transform stream. A transform stream is a duplex when the read and write
-//  takes place in a causal way. Read requires write to have occured.
 module.exports = function (out) { // <- takes a stream
     var object = {}
+    var arr = [] // <- this is my array
     return function (event) {
         var comment, file, message, passed, skip, time, todo
         switch (event.type) {
@@ -47,18 +35,14 @@ module.exports = function (out) { // <- takes a stream
                 })
                 break
             case 'eof':
-                //var format = formatter(out.write)
-                //format(object)
-                // vv this needs to change
-                console.log(object)
-                out.write(JSON.stringify(object, null, 2)) // how does this make it to chunks?
-                // ^^^ as a PassThrough stream with a `data` event listener, `out` will switch into 
-                // flowing mode, whereas data is read from the underlying system and provided to the
-                // program as fast as possible.
-                out.write('\n') // what is the newline character for in this case? A newline a the end?
-                // there is no difference in the assertion test if it is there or not. 
-                // Regardless, this will be removed.
+                // MY NOTES SAY THIS NEEDS TO RETURN AN ARRAY. Does it need to have a stream
+                // enclosed in it? 
+                arr.push(JSON.stringify(object, null, 2))
+                arr.push('\n')
+                //out.write(JSON.stringify(object, null, 2))
+                //out.write('\n') // what is the newline character for in this case? A newline a the end?
                 break
         }
+        return arr // <- it is returned everytime.
     }
 }
