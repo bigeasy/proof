@@ -1,6 +1,7 @@
+var printer = require('./printer')
+var formatter = require('./formatter') // <- new change
 var extend = require('./extend')// <-THIS IS IN PROOF and JSON 
 // ^^^ this is also module.exports
-
 
 // 'exports collects properties and attaches them to module.exports if module.exports
 // doesn't have something on it already. If there is something attached to module.-
@@ -46,6 +47,8 @@ module.exports = function (out) { // <- takes a stream
                 })
                 break
             case 'eof':
+                //var format = formatter(out.write)
+                //format(object)
                 // vv this needs to change
                 console.log(object)
                 out.write(JSON.stringify(object, null, 2)) // how does this make it to chunks?

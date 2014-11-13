@@ -17,7 +17,7 @@ var jsonRedux = require('./json')// <- do you want this named something else?
 // Moved exports.json to its own file.
 function json () {
     process.stdin.resume()
-    parse(process.stdin, jsonRedux(process.stdout))
+    parse(process.stdin, jsonRedux(process.stdout)) // <- change needed here
 }
 
 var colorization = require('./colorization')
