@@ -12,10 +12,13 @@ var overwrite
 var extend = require('./extend')
 var parser = require('./parser')
 var parseRedux = require('./parse')
-var jsonRedux = require('./json')// <- do you want this named something else?
+var jsonRedux = require('./json')
+var formatter = require('./formatter')
+var printer = require('./printer')
 
 // Moved exports.json to its own file.
 function json () {
+    // keep variables in this context.
     process.stdin.resume()
     parse(process.stdin, jsonRedux(process.stdout)) // <- change needed here
 }
