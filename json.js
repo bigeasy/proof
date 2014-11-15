@@ -35,14 +35,23 @@ module.exports = function (out) { // <- takes a stream
                 })
                 break
             case 'eof':
-                // MY NOTES SAY THIS NEEDS TO RETURN AN ARRAY. Does it need to have a stream
-                // enclosed in it? 
-                arr.push(JSON.stringify(object, null, 2))
-                arr.push('\n')
-                //out.write(JSON.stringify(object, null, 2))
-                //out.write('\n') // what is the newline character for in this case? A newline a the end?
+                // NEEDS TO RETURN AN ARRAY. Does it need to have a stream enclosed in it? 
+
+                // vvv ONE:
+                //arr.push(JSON.stringify(object, null, 2))
+                //arr.push('\n')
+
+                // vvv TWO:
+                // Each call to push vvv, pushes the string from write as well as a boolean.  
+                // These 2 function produce an array with 4 elements.
+                //arr.push(out.write(JSON.stringify(object, null, 2)))
+                //arr.push(out.write('\n'))
+
+                // vvv OLD:
+                out.write(JSON.stringify(object, null, 2))
+                out.write('\n')
                 break
         }
-        return arr // <- it is returned everytime.
+        //return arr // <- it is returned everytime.
     }
 }

@@ -19,8 +19,12 @@ var printer = require('./printer')
 // Moved exports.json to its own file.
 function json () {
     // keep variables in this context.
+
+    // The resume method is called here because standard input is paused by default.
     process.stdin.resume()
-    parse(process.stdin, jsonRedux(process.stdout)) // <- change needed here
+
+    // Remember that this vvvv argument is a function with an enclosed stream. 
+    parse(process.stdin, jsonRedux(process.stdout)) // Its the call back.
 }
 
 var colorization = require('./colorization')
