@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
 require('../..')(5, function (assert) {
-    //var proof = require('../../proof')
     var json = require('../../json')
     var stream = require('stream')
-    var out = new stream.PassThrough // <- may we take out the stream?
 
     var chunks = []
     
@@ -26,11 +24,8 @@ require('../..')(5, function (assert) {
 
     var test = testmaker(test)
 
-    out.on('data', function (chunk) { chunks.push(chunk.toString()) })
 
-    var output = json(out)// <-json encapsulates an object in its own scope that interacts with the
-                          //   enclosed stream that is in this scope but passed into the function
-                          //   as an argument.
+    var output = json()
 
     chunks = output({
                  type: 'run',
