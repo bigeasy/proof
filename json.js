@@ -1,7 +1,7 @@
 var printer = require('./printer')
 var extend = require('./extend')
 
-module.exports = function (out) { // <- takes a stream
+module.exports = function (out) { // <- takes a stream, but is it necessary?
     var object = {}
     var arr = [] // <- this is my array
     return function (event) {
@@ -36,22 +36,14 @@ module.exports = function (out) { // <- takes a stream
                 break
             case 'eof':
                 // NEEDS TO RETURN AN ARRAY. Does it need to have a stream enclosed in it? 
+                arr.push(JSON.stringify(object, null, 2))
+                arr.push('\n')
 
-                // vvv ONE:
-                //arr.push(JSON.stringify(object, null, 2))
-                //arr.push('\n')
-
-                // vvv TWO:
-                // Each call to push vvv, pushes the string from write as well as a boolean.  
-                // These 2 function produce an array with 4 elements.
-                //arr.push(out.write(JSON.stringify(object, null, 2)))
-                //arr.push(out.write('\n'))
-
-                // vvv OLD:
-                out.write(JSON.stringify(object, null, 2))
-                out.write('\n')
+                // vvv this was replaced:
+                // out.write(JSON.stringify(object, null, 2))
+                // out.write('\n')
                 break
         }
-        //return arr // <- it is returned everytime.
+        return arr // <- it is returned everytime.
     }
 }

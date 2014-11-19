@@ -18,13 +18,10 @@ var printer = require('./printer')
 
 // Moved exports.json to its own file.
 function json () {
-    // keep variables in this context.
-
-    // The resume method is called here because standard input is paused by default.
+    // While json has been built to take this stream vvv is it a needed componant of proof? 
+    var formatterRedux = formatter(jsonRedux(process.stdout))
     process.stdin.resume()
-
-    // Remember that this vvvv argument is a function with an enclosed stream. 
-    parse(process.stdin, jsonRedux(process.stdout)) // Its the call back.
+    parse(process.stdin, printer(formatterRedux, process.stdout))
 }
 
 var colorization = require('./colorization')
@@ -375,7 +372,7 @@ function parse (stream, callback) {
         var lines = (out += chunk).split(/\r?\n/)
         out = lines.pop()
 
-        lines.forEach(parseLine)
+        lines.forEach(parseLine) // <- the function which invokes the call back is invoked here.
     }))
 }
 
