@@ -18,7 +18,6 @@ var printer = require('./printer')
 
 // Moved exports.json to its own file.
 function json () {
-    // While json has been built to take this stream vvv is it a needed componant of proof? 
     var formatterRedux = formatter(jsonRedux())
     process.stdin.resume()
     parse(process.stdin, printer(formatterRedux, process.stdout))
