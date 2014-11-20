@@ -1,16 +1,10 @@
-var extend = require('./extend')// <-THIS IS IN PROOF and JSON 
-// ^^^ this is also module.exports
+var printer = require('./printer')
+var extend = require('./extend')
 
-
-// 'exports collects properties and attaches them to module.exports if module.exports
-// doesn't have something on it already. If there is something attached to module.-
-// exports already, everything in exports is ignored.'
-//
-// how should this be exported? In Proof it  was export will change this to module.exports
-// in order to stay consistent with extend.
-module.exports = function (out) {
+module.exports = function () {
     var object = {}
     return function (event) {
+        var arr = []
         var comment, file, message, passed, skip, time, todo
         switch (event.type) {
             case 'run':
@@ -41,9 +35,10 @@ module.exports = function (out) {
                 })
                 break
             case 'eof':
-                out.write(JSON.stringify(object, null, 2))
-                out.write('\n')
+                arr.push(JSON.stringify(object, null, 2))
+                arr.push('\n')
                 break
         }
+        return arr
     }
 }

@@ -12,12 +12,15 @@ var overwrite
 var extend = require('./extend')
 var parser = require('./parser')
 var parseRedux = require('./parse')
-var jsonRedux = require('./json')// <- do you want this named something else?
+var jsonRedux = require('./json')
+var formatter = require('./formatter')
+var printer = require('./printer')
 
 // Moved exports.json to its own file.
 function json () {
+    var formatterRedux = formatter(jsonRedux())
     process.stdin.resume()
-    parse(process.stdin, jsonRedux(process.stdout))
+    parse(process.stdin, printer(formatterRedux, process.stdout))
 }
 
 var colorization = require('./colorization')
@@ -368,7 +371,7 @@ function parse (stream, callback) {
         var lines = (out += chunk).split(/\r?\n/)
         out = lines.pop()
 
-        lines.forEach(parseLine)
+        lines.forEach(parseLine) // <- the function which invokes the call back is invoked here.
     }))
 }
 

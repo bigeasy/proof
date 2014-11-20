@@ -1,5 +1,5 @@
 module.exports = function (func, stream) {
     return function(arg) {
-            stream.write(func(arg))
+        stream.write(func(arg))
     }
 }
