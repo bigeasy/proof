@@ -68,7 +68,7 @@ keep running tests.</p>
 ,   &quot;author&quot;:           &quot;Alan Gutierrez&quot;
 ,   &quot;directories&quot;:      { &quot;lib&quot; : &quot;./lib&quot; }
 ,   &quot;devDependencies&quot;:  { &quot;proof&quot;: &quot;&lt;=0.0.1&quot; }
-,   &quot;scripts&quot;:          { &quot;test&quot;: &quot;proof t/*/*.t&quot; }
+,   &quot;scripts&quot;:          { &quot;test&quot;: &quot;proof test t/*/*.t&quot; }
 ,   &quot;main&quot;:             &quot;./lib/fibonacci&quot;
 }</code></pre>
 <p>Now you can run <code>npm test</code> to test your project.</p>
@@ -522,20 +522,20 @@ t/regex/complex.t
 $</code></pre>
 <p>You can run a test with the proof test runner to get gaudy console output with
 colors and non-ASCII characters (approximated below).</p>
-<pre><code>$ proof t/logic/minimal.t
+<pre><code>$ proof test t/logic/minimal.t
  ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
                                       tests (1/1) assertions (2/2) 0.230 Success
 $</code></pre>
 <p>Each test you pass to the test runner is will be run by the test runner. Tests
 in separate suites are run in parallel.</p>
-<pre><code>$ proof t/logic/minimal.t t/regex/minimal.t
+<pre><code>$ proof test t/logic/minimal.t t/regex/minimal.t
  ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
  ✓ t/regex/minimal.t ....................................... (2/2) 0.331 Success
                                       tests (2/2) assertions (4/4) 0.561 Success
 $</code></pre>
 <h3>Tests Run in Parallel</h3>
 <p>As above.</p>
-<pre><code>$ proof t/logic/minimal.t t/regex/minimal.t t/regex/complex.t
+<pre><code>$ proof test t/logic/minimal.t t/regex/minimal.t t/regex/complex.t
  ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
  ✓ t/regex/minimal.t ....................................... (2/2) 0.331 Success
  ✓ t/regex/complex.t ....................................... (2/2) 1.045 Success
@@ -550,7 +550,7 @@ running at once. When a suite it complete, it moves onto the next one.</p>
 specified on the command line.</p>
 <p>If you design your tests so that they can run in any order, then you can run an
 entire suite of tests with globbing.</p>
-<pre><code>$ proof t/*/*.t
+<pre><code>$ proof test t/*/*.t
  ✓ t/logic/minimal.t ....................................... (2/2)  .230 Success
  ✓ t/regex/minimal.t ....................................... (2/2)  .331 Success
  ✓ t/regex/complex.t ....................................... (2/2) 1.045 Success
