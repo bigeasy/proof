@@ -54,6 +54,7 @@ Proof could now work on the browser after minification. No more source code tric
 
 ### Issue by Issue
 
+ * Upgrade Cadence to 0.0.44. #270.
  * Create a line-by-line transform. #253.
  * Upgrade Arguable to 0.0.22. #248.
  * Specify known leaks. #236.
