@@ -364,7 +364,7 @@ function parse (stream, callback) {
     var parseLine = parseRedux(done, abend, parser, extend, callback)
 
     stream.setEncoding('utf8')
-    stream.on('end', function () { if (data && !done) { process.exit(1) } })
+    stream.on('end', function () { if (data && !done[0]) { process.exit(1) } })
     stream.on('data', abender(function (chunk) {
         data = true
 
