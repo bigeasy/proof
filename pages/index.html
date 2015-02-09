@@ -92,7 +92,7 @@ To test via NPM, by extension [Travis CI](http://travis-ci.org/), create a
 ,   "author":           "Alan Gutierrez"
 ,   "directories":      { "lib" : "./lib" }
 ,   "devDependencies":  { "proof": "&lt;=0.0.1" }
-,   "scripts":          { "test": "proof t/*/*.t" }
+,   "scripts":          { "test": "proof test t/*/*.t" }
 ,   "main":             "./lib/fibonacci"
 }
 ```
@@ -639,7 +639,7 @@ You can run a test with the proof test runner to get gaudy console output with
 colors and non-ASCII characters (approximated below).
 
 ```
-$ proof t/logic/minimal.t
+$ proof test t/logic/minimal.t
  &#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
                                       tests (1/1) assertions (2/2) 0.230 Success
 $
@@ -649,7 +649,7 @@ Each test you pass to the test runner is will be run by the test runner. Tests
 in separate suites are run in parallel.
 
 ```
-$ proof t/logic/minimal.t t/regex/minimal.t
+$ proof test t/logic/minimal.t t/regex/minimal.t
  &#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
  &#x2713; t/regex/minimal.t ....................................... (2/2) 0.331 Success
                                       tests (2/2) assertions (4/4) 0.561 Success
@@ -661,7 +661,7 @@ $
 As above.
 
 ```
-$ proof t/logic/minimal.t t/regex/minimal.t t/regex/complex.t
+$ proof test t/logic/minimal.t t/regex/minimal.t t/regex/complex.t
  &#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
  &#x2713; t/regex/minimal.t ....................................... (2/2) 0.331 Success
  &#x2713; t/regex/complex.t ....................................... (2/2) 1.045 Success
@@ -683,7 +683,7 @@ If you design your tests so that they can run in any order, then you can run an
 entire suite of tests with globbing.
 
 ```
-$ proof t/*/*.t
+$ proof test t/*/*.t
  &#x2713; t/logic/minimal.t ....................................... (2/2)  .230 Success
  &#x2713; t/regex/minimal.t ....................................... (2/2)  .331 Success
  &#x2713; t/regex/complex.t ....................................... (2/2) 1.045 Success
