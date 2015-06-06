@@ -6,11 +6,7 @@
     "keywords":         [
                             "test", "unit", "tap", "assert", "tdd"
                         ],
-    "licenses":
-    [{
-                        "type": "MIT",
-                        "url": "http://github.com/bigeasy/proof/raw/master/LICENSE"
-    }],
+    "license":          "MIT",
     "directories":      { "lib" : "./lib" },
     "repository":       {
                             "url": "https://github.com/bigeasy/proof",
