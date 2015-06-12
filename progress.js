@@ -32,8 +32,8 @@ module.exports = function (options, overwrite) {
             if (program.passed < program.actual) return true
             if (program.bailed) return true
             if (program.planless) return true
-            if (program.code != null) {
-                if (program.code) return true
+            if ('code' in program) {
+                if (program.code !== 0) return true
                 if (program.actual != program.expected) return true
             }
         }

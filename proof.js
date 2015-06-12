@@ -178,10 +178,10 @@ function run (options) {
                 })
             })
             var version = process.versions.node.split('.')
-            close(test, function (code) {
+            close(test, function (code, signal) {
                 clearTimeout(timer)
                 var time
-                emit(program, 'exit', code)
+                emit(program, 'exit', (code == null ? 'null' : code) + ' ' + (signal == null ? 'null' : 0))
                 parallel[index].time = time = 0
                 if (parallel[index].programs.length) {
                     execute(parallel[index].programs.shift(), index)
@@ -282,6 +282,7 @@ function main (options) {
     if (command) {
         command(options)
     } else {
+        console.log('here')
         var executable = argv.length && !/[-.\/]/.test(argv[0])
                        ? 'proof-' + (argv.shift())
                        : 'proof-default'

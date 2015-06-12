@@ -60,12 +60,21 @@ module.exports = function (done, abend, parser, extend, callback) {
                 }))
                 break
             case 'exit':
-                code = parseInt(rest, 10)
-                if (isNaN(code)) {
+                var exit = /^([0-9]+|null) (.*)$/.exec(rest)
+                if (exit) {
+                    if (exit[1] === 'null') {
+                        code = null
+                        signal = exit[1]
+                    } else {
+                        signal = null
+                        code = parseInt(exit[0], 10)
+                    }
+                } else {
                     abend('cannot parse runner test exit code at line ' + count + ': exit code ' + rest)
                 }
                 callback(extend({}, program, {
                     code: code,
+                    signal: signal,
                     file: file,
                     type: type,
                     time: time
