@@ -18,23 +18,24 @@ module.exports = cadence(function (async, platform, program, parameters) {
         default:
             async(function () {
                 fs.readFile(program, async())
+                fs.stat(program, async())
             }, function (buffer, stat) {
-                var first, $
-                if (buffer[0] == 0x23 && buffer[1] == 0x21
-                    && (first = buffer.toString().split(/\n/).shift())) {
-                    if ($ = /^#!\/usr\/bin\/env\s+(\S+)/.exec(first)) {
-                        parameters.unshift(program)
-                        program = $[1]
-                    } else if ($ = /^#!\/.*\/(.*)/.exec(first)) {
-                        parameters.unshift(program)
-                        program = $[1]
-                    }
-                    candidate(program, async())
-                } else {
-                    return [ 'node' ]
+                var resolve, first = '', $
+                if (buffer[0] == 0x23 && buffer[1] == 0x21) {
+                    var first = buffer.toString().split(/\n/).shift()
                 }
-            }, function (resolved) {
-                return [ resolved, [ program ].concat(parameters) ]
+                if ($ = /^#!\/usr\/bin\/env\s+(\S+)/.exec(first)) {
+                    resolve = $[1]
+                } else if ($ = /^#!\/.*\/(.*)/.exec(first)) {
+                    resolve = $[1]
+                } else {
+                    return [ 'node', [ program ].concat(parameters) ]
+                }
+                async(function () {
+                    candidate(process.env.PATH, resolve, async())
+                }, function (resolved) {
+                    return [ resolved, [ program ].concat(parameters) ]
+                })
             })
         }
     } else {
