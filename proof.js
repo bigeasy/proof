@@ -140,27 +140,22 @@ function run (options) {
                 lines.forEach(function (line) { emit(program, 'err', line) })
             })
             out = ''
-            test.stdout.setEncoding('utf8')
-            test.stdout.on('data', function (chunk) {
+            var stdout = byline.createStream(test.stdout)
+            stdout.on('data', function (line) {
                 resetTimer()
-                out += chunk
-                var lines = out.split(/\n/)
-                out = lines.pop()
-                lines.forEach(function (line) {
-                    if (bailed) {
-                        emit(program, 'out', line)
-                    } else if (parser.assertion(line)) {
-                        emit(program, 'test', line)
-                    } else if (!planned && (plan = parser.plan(line))) {
-                        planned = true
-                        emit(program, 'plan', plan.expected)
-                    } else if (parser.bailout(line)) {
-                        testing = true
-                        emit(program, 'bail', line)
-                    } else {
-                        emit(program, 'out', line)
-                    }
-                })
+                if (bailed) {
+                    emit(program, 'out', line)
+                } else if (parser.assertion(line)) {
+                    emit(program, 'test', line)
+                } else if (!planned && (plan = parser.plan(line))) {
+                    planned = true
+                    emit(program, 'plan', plan.expected)
+                } else if (parser.bailout(line)) {
+                    testing = true
+                    emit(program, 'bail', line)
+                } else {
+                    emit(program, 'out', line)
+                }
             })
             var version = process.versions.node.split('.')
             close(test, function (code, signal) {
