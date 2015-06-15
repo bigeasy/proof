@@ -8,11 +8,10 @@ var cadence = require('cadence/redux')
 var candidate = require('./candidate')
 var shebang = require('./shebang')
 var __slice = [].slice
-var overwrite = [ false ]
 var byline = require('byline')
 var extend = require('./extend')
 var tap = require('./tap')
-var parseRedux = require('./parse')
+var parse = require('./parse')
 var jsonRedux = require('./json')
 var formatter = require('./formatter')
 var printer = require('./printer')
@@ -23,54 +22,19 @@ var _errors = require('./errors')
 function json () {
     var formatterRedux = formatter(jsonRedux())
     process.stdin.resume()
-    parse(process.stdin, printer(formatterRedux, process.stdout))
+    parse(process.stdin, printer(formatterRedux, process.stdout, process.stderr))
 }
 
 function progress (options) {
-    var formatterRedux = formatter(_progress(options, overwrite))
+    var formatterRedux = formatter(_progress(options))
     process.stdin.resume()
-    parse(process.stdin, printer(formatterRedux, process.stdout))
+    parse(process.stdin, printer(formatterRedux, process.stdout, process.stderr))
 }
 
 function errors (options) {
     var formatterRedux = formatter(_errors(options))
     process.stdin.resume()
-    parse(process.stdin, printer(formatterRedux, process.stdout))
-}
-
-var abender = new Error
-function abend (message, use) {
-    if (overwrite[0]) console.log('')
-    if (message) console.error('error: ' + message)
-    if (use) usage()
-    process.on('exit', function () { process.exit(message ? 1 : 0) })
-    throw abender
-}
-
-function parse (stream, consumer) {
-    var abended, lines = 0
-    var done = [ false ]
-
-    var parseLine = new parseRedux(consumer, abend)
-
-    stream = byline.createStream(stream)
-
-    stream.on('end', function () {
-        if (parseLine.count && !parseLine.eof) {
-            process.exit(1)
-        }
-    })
-
-    stream.on('data', data)
-
-    function data (line) {
-        try {
-            parseLine.consumeLine(line)
-        } catch (e) {
-            stream.removeListener('data', data)
-            if (e !== abender) throw e
-        }
-    }
+    parse(process.stdin, printer(formatterRedux, process.stdout, process.stderr))
 }
 
 var badabing = cadence(function (step, program, parameters, options) {

@@ -1,10 +1,11 @@
 var colorization = require('./colorization')
 var extend = require('./extend')
 
-module.exports = function (options, overwrite) {
+module.exports = function (options) {
     var colorize = colorization(options)
     var durations = {}
     var programs = {}
+    var overwrite = [ false ] // todo: not an array
     var displayed
 
     function fill (character, count) {
@@ -148,6 +149,10 @@ module.exports = function (options, overwrite) {
             overwrite[0] = false
             if (summary.status == 'Failure') {
                 process.on('exit', function () { process.exit(1) })
+            }
+        } else if (event.type == 'error') {
+            if (overwrite[0]) {
+                array.push('\n')
             }
         } else {
             programs[event.file].duration = event.time - event.start
