@@ -6,8 +6,6 @@ var spawn = require('child_process').spawn
 var byline = require('byline')
 var tap = require('./tap')
 
-var argv = process.argv.slice(2)
-
 var badabing = cadence(function (step, program, parameters, options) {
     step(function () {
         shebang(process.platform, program, parameters, step())
@@ -41,7 +39,7 @@ function run (options) {
     var parallel = {}
     var i, next
     if (!options.params.processes) options.params.processes = 1
-    argv.forEach(function (glob) {
+    options.argv.forEach(function (glob) {
         var dirname
         if (/\s+/.test(glob)) {
             options.abend('spaces', glob)
