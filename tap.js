@@ -8,13 +8,13 @@ module.exports = {
     bailout: function (bailout) {
         var $
         if ($ = /^Bail out!(?:\s+(.*))?$/.exec(bailout)) {
-            return { message: $[1] }
+            return { message: $[1] ? $[1] : null }
         }
     },
     assertion: function (assert) {
         var $, failed, message, ok, comment, skip, todo
-        if ($ = /^(not\s+)?ok\s+\d+\s*(.*?)\s*$/.exec(assert)) {
-            failed = $[1], message = $[2]
+        if ($ = /^(not\s+)?ok\s+\d+(?:\s+(.*?)\s*)?$/.exec(assert)) {
+            failed = $[1], message = $[2] ? $[2] : null
             ok = !failed
             comment = null, skip = false, todo = false
             if (message != null) {

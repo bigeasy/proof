@@ -11,7 +11,7 @@ var __slice = [].slice
 var overwrite = [ false ]
 var byline = require('byline')
 var extend = require('./extend')
-var parser = require('./parser')
+var tap = require('./tap')
 var parseRedux = require('./parse')
 var jsonRedux = require('./json')
 var formatter = require('./formatter')
@@ -148,12 +148,12 @@ function run (options) {
                 resetTimer()
                 if (bailed) {
                     emit(program, 'out', line)
-                } else if (parser.assertion(line)) {
+                } else if (tap.assertion(line)) {
                     emit(program, 'test', line)
-                } else if (!planned && (plan = parser.plan(line))) {
+                } else if (!planned && (plan = tap.plan(line))) {
                     planned = true
                     emit(program, 'plan', plan.expected)
-                } else if (parser.bailout(line)) {
+                } else if (tap.bailout(line)) {
                     testing = true
                     emit(program, 'bail', line)
                 } else {

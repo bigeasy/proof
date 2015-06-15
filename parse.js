@@ -1,5 +1,5 @@
 var extend = require('./extend')
-var parser = require('./parser')
+var tap = require('./tap')
 
 function Parse (consumer, abend) {
     this.count = 0
@@ -31,7 +31,7 @@ Parse.prototype.consumeLine = function (line, abend) {
     program = this._programs[file]
     switch (type) {
         case 'test':
-            event = parser.assertion(rest)
+            event = tap.assertion(rest)
             program.actual++
             if (event.ok) {
                 program.passed++
@@ -60,7 +60,7 @@ Parse.prototype.consumeLine = function (line, abend) {
             }))
             break
         case 'bail':
-            event = parser.bailout(rest)
+            event = tap.bailout(rest)
             program.bailed = true
             this._consumer(extend(event, program, {
                 time: time,
