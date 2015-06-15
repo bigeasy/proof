@@ -18,6 +18,8 @@ var printer = require('./printer')
 var _progress = require('./progress')
 var _errors = require('./errors')
 
+require('cadence/ee')
+
 // Moved exports.json to its own file.
 function json () {
     var formatterRedux = formatter(jsonRedux())
@@ -184,6 +186,10 @@ function close (child, callback) {
 }
 
 function test (options) {
+    _test(options, function (error) { if (error) throw error })
+}
+
+var _test = cadence(function (async, options) {
     var executable = path.join(__dirname, 'proof.bin.js')
     var progress = {}
     var run = {}
@@ -201,16 +207,17 @@ function test (options) {
     run = spawn('node', arguable.flatten(executable, 'run', run, options.argv),
                         { stdio: [ 'pipe', 'pipe', process.stderr ] })
     run.stdout.pipe(progress.stdin)
-
-    var count = 0
-    var code = 0
-    function closed ($code) {
-        if (!code) code = $code
-        if (++count == 2) process.exit(code)
-    }
-    close(run, closed)
-    close(progress, closed)
-}
+    async(function () {
+        async.ee(run).end('close')
+        async.ee(progress).end('close')
+    }, function (runCode, runSignal, progressCode, progressSignal) {
+        async(function () {
+            async.ee(process).end('exit')
+        }, function () {
+            process.exit(runCode || progressCode)
+        })
+    })
+})
 
 function main (options) {
     if (!options.command) {
