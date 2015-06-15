@@ -233,19 +233,7 @@ function main (options) {
         test: test
     })[options.command]
 
-    if (command) {
-        command(options)
-    } else {
-        console.log('here')
-        var executable = argv.length && !/[-.\/]/.test(argv[0])
-                       ? 'proof-' + (argv.shift())
-                       : 'proof-default'
-        candidate(process.env.PATH, executable, function (error, resolved) {
-            badabing(resolved, argv, { customFds: [ 0, 1, 2 ] }, function (error, child) {
-                close(child, function (code) { process.exit(code) })
-            })
-        })
-    }
+    command(options)
 }
 
 function abended (e) {
