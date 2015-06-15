@@ -1,5 +1,8 @@
-module.exports = function (func, stream) {
+module.exports = function (func, out, err) {
     return function(arg) {
-        stream.write(func(arg))
+        out.write(func(arg))
+        if (arg.type === 'error') {
+            err.write('error: ' + arg.message + '\n')
+        }
     }
 }
