@@ -38,34 +38,37 @@ function errors (options) {
     parse(process.stdin, printer(formatterRedux, process.stdout))
 }
 
-function Abend () { Error.call(this) }
-
+var abender = new Error
 function abend (message, use) {
     if (overwrite[0]) console.log('')
     if (message) console.error('error: ' + message)
     if (use) usage()
     process.on('exit', function () { process.exit(message ? 1 : 0) })
-    throw new Abend(message)
+    throw abender
 }
 
 function parse (stream, consumer) {
     var abended, lines = 0
     var done = [ false ]
 
-    var parseLine = parseRedux(done, abend, parser, extend, consumer)
+    var parseLine = new parseRedux(consumer, abend)
 
     stream = byline.createStream(stream)
 
-    stream.on('end', function () { if (lines && !done[0]) { process.exit(1) } })
+    stream.on('end', function () {
+        if (parseLine.count && !parseLine.eof) {
+            process.exit(1)
+        }
+    })
+
     stream.on('data', data)
 
     function data (line) {
         try {
-            lines++
-            if (!abended) parseLine(line)
+            parseLine.consumeLine(line)
         } catch (e) {
-            if (!(e instanceof Abend)) throw e
-            byline.removeListener('data', data)
+            stream.removeListener('data', data)
+            if (e !== abender) throw e
         }
     }
 }
