@@ -1,4 +1,4 @@
-module.exports = function (done, abend, parser, extend, callback) {
+module.exports = function (done, abend, parser, extend, consumer) {
     var programs = {}
     var out = [''][0]
     var count = 0
@@ -27,7 +27,7 @@ module.exports = function (done, abend, parser, extend, callback) {
                 if (event.ok) {
                     program.passed++
                 }
-                callback(extend(event, program, {
+                consumer(extend(event, program, {
                     time: time,
                     file: file,
                     type: type
@@ -35,7 +35,7 @@ module.exports = function (done, abend, parser, extend, callback) {
                 break
             case 'run':
                 program.start = time
-                callback(extend(program, {
+                consumer(extend(program, {
                     time: time,
                     type: type,
                     file: file
@@ -43,7 +43,7 @@ module.exports = function (done, abend, parser, extend, callback) {
                 break
             case 'plan':
                 expected = parseInt(rest, 10)
-                callback(extend(program, {
+                consumer(extend(program, {
                     time: time,
                     file: file,
                     type: type,
@@ -53,7 +53,7 @@ module.exports = function (done, abend, parser, extend, callback) {
             case 'bail':
                 event = parser.bailout(rest)
                 program.bailed = true
-                callback(extend(event, program, {
+                consumer(extend(event, program, {
                     time: time,
                     file: file,
                     type: type
@@ -72,7 +72,7 @@ module.exports = function (done, abend, parser, extend, callback) {
                 } else {
                     abend('cannot parse runner test exit code at line ' + count + ': exit code ' + rest)
                 }
-                callback(extend({}, program, {
+                consumer(extend({}, program, {
                     code: code,
                     signal: signal,
                     file: file,
@@ -82,7 +82,7 @@ module.exports = function (done, abend, parser, extend, callback) {
                 break
             case 'err':
             case 'out':
-                callback({
+                consumer({
                     time: time,
                     type: type,
                     file: file,
@@ -90,7 +90,7 @@ module.exports = function (done, abend, parser, extend, callback) {
                 })
                 break
             case 'eof':
-                callback({
+                consumer({
                     time: time,
                     type: type
                 })

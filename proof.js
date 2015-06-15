@@ -9,6 +9,7 @@ var candidate = require('./candidate')
 var shebang = require('./shebang')
 var __slice = [].slice
 var overwrite = [ false ]
+var byline = require('byline')
 var extend = require('./extend')
 var parser = require('./parser')
 var parseRedux = require('./parse')
@@ -37,9 +38,6 @@ function errors (options) {
     parse(process.stdin, printer(formatterRedux, process.stdout))
 }
 
-var colorization = require('./colorization')
-
-
 function Abend () { Error.call(this) }
 
 function abend (message, use) {
@@ -50,39 +48,26 @@ function abend (message, use) {
     throw new Abend(message)
 }
 
-
-function parse (stream, callback) {
-    var programs = {}
-    var out = [''][0]
-    var count = 0
-    var done = false
-    var abended, data
+function parse (stream, consumer) {
+    var abended, lines = 0
     var done = [ false ]
 
-    function abender (forward) {
-        return function () {
-            try {
-                if (!abended) forward.apply(this, arguments)
-            } catch (e) {
-                if (!(e instanceof Abend)) throw e
-                abended = true
-                stream.destroy()
-            }
+    var parseLine = parseRedux(done, abend, parser, extend, consumer)
+
+    stream = byline.createStream(stream)
+
+    stream.on('end', function () { if (lines && !done[0]) { process.exit(1) } })
+    stream.on('data', data)
+
+    function data (line) {
+        try {
+            lines++
+            if (!abended) parseLine(line)
+        } catch (e) {
+            if (!(e instanceof Abend)) throw e
+            byline.removeListener('data', data)
         }
     }
-
-    var parseLine = parseRedux(done, abend, parser, extend, callback)
-
-    stream.setEncoding('utf8')
-    stream.on('end', function () { if (data && !done[0]) { process.exit(1) } })
-    stream.on('data', abender(function (chunk) {
-        data = true
-
-        var lines = (out += chunk).split(/\r?\n/)
-        out = lines.pop()
-
-        lines.forEach(parseLine) // <- the function which invokes the call back is invoked here.
-    }))
 }
 
 var badabing = cadence(function (step, program, parameters, options) {
