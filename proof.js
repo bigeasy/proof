@@ -19,6 +19,7 @@ var printer = require('./printer')
 var _progress = require('./progress')
 var _errors = require('./errors')
 var run = require('./run')
+var platform = require('./platform')
 
 require('cadence/ee')
 
@@ -39,16 +40,6 @@ function errors (options) {
     var formatterRedux = formatter(_errors(options))
     process.stdin.resume()
     parse(process.stdin, printer(formatterRedux, process.stdout, process.stderr))
-}
-
-var argv = process.argv.slice(2)
-
-function platform (options) {
-    if (options.params.help) options.help()
-    argv.forEach(function (platform) {
-        if (process.platform == platform) process.exit(0)
-    })
-    process.exit(1)
 }
 
 function main (options) {
