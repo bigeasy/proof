@@ -1,6 +1,7 @@
 var fs = require('fs')
 var util = require('util')
 var path = require('path')
+var test = require('./test')
 var spawn = require('child_process').spawn
 var arguable = require('arguable')
 var expandable = require('expandable')
@@ -184,40 +185,6 @@ function close (child, callback) {
         closed()
     })
 }
-
-function test (options) {
-    _test(options, function (error) { if (error) throw error })
-}
-
-var _test = cadence(function (async, options) {
-    var executable = path.join(__dirname, 'proof.bin.js')
-    var progress = {}
-    var run = {}
-    options.given.forEach(function (name) {
-        if ('help' == name) {
-            options.usage()
-        } else if (/^(monochrome|width|digits)$/.test(name)) {
-            progress[name] = options.params[name]
-        } else {
-            run[name] = options.params[name]
-        }
-    })
-    progress = spawn('node', arguable.flatten(executable, 'progress', progress),
-                             { stdio: [ 'pipe', process.stdout, process.stderr ] })
-    run = spawn('node', arguable.flatten(executable, 'run', run, options.argv),
-                        { stdio: [ 'pipe', 'pipe', process.stderr ] })
-    run.stdout.pipe(progress.stdin)
-    async(function () {
-        async.ee(run).end('close')
-        async.ee(progress).end('close')
-    }, function (runCode, runSignal, progressCode, progressSignal) {
-        async(function () {
-            async.ee(process).end('exit')
-        }, function () {
-            process.exit(runCode || progressCode)
-        })
-    })
-})
 
 function main (options) {
     if (!options.command) {
