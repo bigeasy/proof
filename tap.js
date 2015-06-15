@@ -26,6 +26,8 @@ module.exports = {
                     if (todo = ($ = /^todo\s(.*)$/i.exec(comment)) != null) {
                         comment = $[1]
                     }
+                } else {
+                    comment = null
                 }
             }
             return {
