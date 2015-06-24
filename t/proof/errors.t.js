@@ -1,5 +1,7 @@
 require('../..')(1, prove)
 
 function prove (assert) {
-    assert(require('../../errors'), 'require')
+    var errors = require('../../errors')({ params: {} })
+
+    assert(errors({ type: 'run' }), [], 'run')
 }

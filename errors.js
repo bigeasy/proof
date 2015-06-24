@@ -24,6 +24,7 @@ module.exports = function (options) {
     var backlog = {}
     var offset = 2
     var colorize = colorization(options)
+    var planned
 
     return function (event) {
         var out = []
