@@ -1,4 +1,4 @@
-require('../..')(14, require('cadence/redux')(prove))
+require('../..')(14, require('cadence')(prove))
 
 function prove (async, assert) {
     var path = require('path')

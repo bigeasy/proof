@@ -1,8 +1,6 @@
-var cadence = require('cadence/redux')
+var cadence = require('cadence')
 var spawn = require('child_process').spawn
 var path = require('path')
-
-require('cadence/ee')
 
 function test (options) {
     _test(options, function (error) { if (error) throw error })

@@ -1,7 +1,7 @@
 var fs = require('fs'), path = require('path')
-var cadence = require('cadence'), ev = require('cadence/event')
+var cadence = require('cadence')
 
-var candidate = cadence(function (step, PATH, executable) {
+var candidate = cadence(function (async, PATH, executable) {
     var parts = PATH.split(path.delimiter), files = []
     parts.forEach(function (part) {
         files.push(path.resolve(part, executable + '.bat'))
@@ -9,16 +9,16 @@ var candidate = cadence(function (step, PATH, executable) {
         files.push(path.resolve(part, executable + '.exe'))
         files.push(path.resolve(part, executable))
     })
-    var file = step(function () {
-        if (!files.length) return [ file ]
+    var file = async(function () {
+        if (!files.length) return [ file.break ]
     }, [function () {
-        fs.stat(files[0], step())
+        fs.stat(files[0], async())
     }, /^ENOENT$/, function () {
         files.shift()
-        return [ file() ]
+        return [ file.continue ]
     }], function (stat) {
         if (stat.isFile()) {
-            return [ file, files[0] ]
+            return [ file.break, files[0] ]
         } else {
             files.shift()
         }

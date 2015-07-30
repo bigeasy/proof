@@ -5,7 +5,7 @@ var test = require('./test')
 var spawn = require('child_process').spawn
 var arguable = require('arguable')
 var expandable = require('expandable')
-var cadence = require('cadence/redux')
+var cadence = require('cadence')
 var candidate = require('./candidate')
 var shebang = require('./shebang')
 var __slice = [].slice
@@ -20,8 +20,6 @@ var _progress = require('./progress')
 var _errors = require('./errors')
 var run = require('./run')
 var platform = require('./platform')
-
-require('cadence/ee')
 
 // Moved exports.json to its own file.
 function json () {
