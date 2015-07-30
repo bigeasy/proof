@@ -1,4 +1,4 @@
-var cadence = require('cadence/redux')
+var cadence = require('cadence')
 var expandable = require('expandable')
 var path = require('path')
 var shebang = require('./shebang')

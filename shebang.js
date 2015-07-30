@@ -1,5 +1,5 @@
 var fs = require('fs'), path = require('path'), spawn = require('child_process').spawn
-var cadence = require('cadence/redux')
+var cadence = require('cadence')
 var candidate = require('./candidate')
 var executable = require('./executable')
 
