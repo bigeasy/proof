@@ -20,6 +20,7 @@ var _progress = require('./progress')
 var _errors = require('./errors')
 var run = require('./run')
 var platform = require('./platform')
+var raw_x = require('./raw')
 
 require('cadence/ee')
 
@@ -28,6 +29,11 @@ function json () {
     var formatterRedux = formatter(jsonRedux())
     process.stdin.resume()
     parse(process.stdin, printer(formatterRedux, process.stdout, process.stderr))
+}
+
+function raw () {
+    process.stdin.resume()
+    parse(process.stdin, printer(formatter(raw_x()), process.stdout, process.stderr))
 }
 
 function progress (options) {
@@ -50,6 +56,7 @@ function main (options) {
     var command = ({
         json: json,
         run: run,
+        raw: raw,
         progress: progress,
         errors: errors,
         platform: platform,
