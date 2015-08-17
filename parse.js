@@ -1,27 +1,34 @@
 var byline = require('byline')
+var Delta = require('delta')
 var extend = require('./extend')
 var tap = require('./tap')
+var cadence = require('cadence')
 
-function parse (stream, consumer) {
-    var count = 0, eof = false, programs = {}
+var parse = cadence(function (async, options, consumer) {
+    var count = 0, eof = false, programs = {}, failed = false, delta, stream
 
-    stream = byline.createStream(stream)
-
-    stream.on('end', function () {
-        if (count && !eof) {
-            process.exit(1)
+    async(function () {
+        stream = byline.createStream(options.stdin)
+        delta = new Delta(async())
+        delta.ee(stream).on('data', data).on('end')
+    }, function () {
+        if (!count || eof) {
+            return
         }
+        options.abend()
     })
 
-    stream.on('data', data)
-
     function abend (message) {
-        consumer({ type: 'error', message: message })
+        consumer({ type: 'error' })
+        options.stderr.write(message)
+        options.stderr.write('\n')
     }
 
     function data (line) {
         if (!consume(line)) {
-            stream.removeListener('data', data)
+            // delta.off('data')
+            // delta.off('data', data)
+            delta.off(stream, 'data')
         }
     }
 
@@ -30,7 +37,7 @@ function parse (stream, consumer) {
         var $
         if (!($ = /^(\d+)\s+(\w+)\s+([^\s]+)\s?(.*)$/.exec(line))) {
             // todo: use sprintf
-            return abend('cannot parse runner output at line ' + count + ': invalid syntax')
+            return abend('error: cannot parse runner output at line ' + count + ': invalid syntax')
         }
         var time = parseInt($[1], 10)
         var type = $[2]
@@ -94,7 +101,7 @@ function parse (stream, consumer) {
                         code = parseInt(exit[0], 10)
                     }
                 } else {
-                    return abend('cannot parse runner test exit code at line ' + count + ': exit code ' + rest)
+                    return abend('error: cannot parse runner test exit code at line ' + count + ': exit code ' + rest)
                 }
                 consumer(extend({}, program, {
                     code: code,
@@ -121,10 +128,10 @@ function parse (stream, consumer) {
                 eof = true
                 break
             default:
-                return abend('cannot parse runner output at line ' + count + ': unknown line type ' + type)
+                return abend('error: cannot parse runner output at line ' + count + ': unknown line type ' + type)
         }
         return true
     }
-}
+})
 
 module.exports = parse

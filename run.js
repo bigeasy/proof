@@ -3,143 +3,117 @@ var expandable = require('expandable')
 var path = require('path')
 var shebang = require('./shebang')
 var spawn = require('child_process').spawn
+var Delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
+var turnstile = require('turnstile')
 
-var badabing = cadence(function (step, program, parameters, options) {
-    step(function () {
-        shebang(process.platform, program, parameters, step())
+var execute = cadence(function (async, program) {
+    async(function () {
+        shebang(process.platform, program, [], async())
     }, function (program, parameters) {
-        return [ spawn(program, parameters, options) ]
+        return spawn(program, parameters, {})
     })
 })
 
-function close (child, callback) {
-    var count = 0
-    var done
-    function closed () {
-        if (++count == 3) done()
-    }
-    if (child.stdout) child.stdout.on('close', closed)
-    else count++
-    if (child.stderr) child.stderr.on('close', closed)
-    else count++
-    child.on('exit', function (code, signal) {
-        done = function () {
-            callback(code, signal)
-        }
-        closed()
-    })
-}
+var run = cadence(function (async, clock, execute, options) {
+    var programs = []
 
-function run (options) {
-    var displayed = 0
-    var failures = []
-    var seen = {}
-    var parallel = {}
-    var i, next
     if (!options.params.processes) options.params.processes = 1
+
     options.argv.forEach(function (glob) {
         var dirname
         if (/\s+/.test(glob)) {
             options.abend('spaces', glob)
         }
         expandable.glob(process.cwd(), [ glob ])[0].files.forEach(function (program) {
-            if (seen[program]) {
+            if (programs.indexOf(program) != -1) {
                 options.abend('once', program)
             }
-            seen[program] = true
-            dirname = path.dirname(program)
-            if (!parallel[dirname]) {
-                parallel[dirname] = {
-                    programs: [],
-                    time: 0,
-                    running: true
-                }
-            }
-            parallel[dirname].programs.push(program)
+            programs.push(program)
         })
     })
-    parallel = Object.keys(parallel).map(function (key) { return parallel[key] })
+
     // Happens often enough that we shouldn't freak out.
-    process.stdout.on('error', function (error) {
-        if (error.code == 'EPIPE')  process.exit(1)
+    var operation = cadence(function (async, programs) {
+        async(function () {
+            async.forEach(function (program) {
+                async(function () {
+                    execute(program, async())
+                }, function (executable) {
+                    var timer = null
+
+                    emit('run')
+
+                    async(function () {
+                        var delta = new Delta(async()), bailed = false, planned = false, plan
+
+                        byline.createStream(executable.stderr).on('data', function (line) {
+                            emit('err', line)
+                        })
+
+                        byline.createStream(executable.stdout).on('data', function (line) {
+                            if (bailed) {
+                                emit('out', line)
+                            } else if (tap.assertion(line)) {
+                                emit('test', line)
+                            } else if (!planned && (plan = tap.plan(line))) {
+                                planned = true
+                                emit('plan', plan.expected)
+                            } else if (tap.bailout(line)) {
+                                emit('bail', line)
+                            } else {
+                                emit('out', line)
+                            }
+                        })
+
+                        delta.ee(executable.stdout)
+                             .ee(executable.stderr)
+                             .ee(executable).on('close')
+                    }, function (code, signal) {
+                        emit('exit', (code == null ? 'null' : code) + ' ' + (signal == null ? 'null' : 0))
+                        clearTimeout(timer)
+                    })
+
+                    function emit (type, message) {
+                        if (timer) {
+                            clearTimeout(timer)
+                        }
+                        timer = setTimeout(kill, options.params.timeout * 1000 || 30000)
+                        stamp(program, type, message)
+                    }
+
+                    function kill () {
+                        timer = null
+                        executable.kill()
+                    }
+                })
+            })(programs)
+        })
     })
-    function emit (file, type, message) {
+
+    var reservoir = new turnstile.Reservoir({
+        turnstile: new turnstile.Turnstile({ workers: 1 }),
+        groupBy: function (value) {
+            return path.dirname(value)
+        },
+        operation: operation
+    })
+
+    async(function () {
+        reservoir.write(programs, async())
+    }, function () {
+        stamp('*', 'eof')
+    })
+
+    function stamp (program, type, message) {
         message = message != null ? ' ' + message : ''
         type = ('' + type + '      ').slice(0, 4)
-        process.stdout.write('' + (+new Date()) + ' ' + type + ' ' + file + message + '\n')
+        options.stdout.write('' + clock() + ' ' + type + ' ' + program + message + '\n')
     }
-    function execute (program, index) {
-        var bailed, err, out, test, planned; // after a test is emitted, any plans are just stdout
-        emit(program, 'run')
-        badabing(program, [], {}, function (error, test) {
-            if (error) throw error
-            var timer;
-            function resetTimer() {
-                if (timer) clearTimeout(timer)
-                timer = setTimeout(function () {
-                    test.kill();
-                }, options.params.timeout * 1000 || 30000)
-            }
-            resetTimer()
-            bailed = false
-            err = ''
-            test.stderr.setEncoding('utf8')
-            test.stderr.on('data', function (chunk) {
-                resetTimer()
-                err += chunk
-                var lines = err.split(/\n/)
-                err = lines.pop()
-                lines.forEach(function (line) { emit(program, 'err', line) })
-            })
-            out = ''
-            var stdout = byline.createStream(test.stdout)
-            stdout.on('data', function (line) {
-                resetTimer()
-                if (bailed) {
-                    emit(program, 'out', line)
-                } else if (tap.assertion(line)) {
-                    emit(program, 'test', line)
-                } else if (!planned && (plan = tap.plan(line))) {
-                    planned = true
-                    emit(program, 'plan', plan.expected)
-                } else if (tap.bailout(line)) {
-                    testing = true
-                    emit(program, 'bail', line)
-                } else {
-                    emit(program, 'out', line)
-                }
-            })
-            var version = process.versions.node.split('.')
-            close(test, function (code, signal) {
-                clearTimeout(timer)
-                var time
-                emit(program, 'exit', (code == null ? 'null' : code) + ' ' + (signal == null ? 'null' : 0))
-                parallel[index].time = time = 0
-                if (parallel[index].programs.length) {
-                    execute(parallel[index].programs.shift(), index)
-                } else {
-                    parallel[index].running = false
-                    if (next < parallel.length) {
-                        if (displayed === index) {
-                            displayed = next + 1
-                        }
-                        index = next++
-                        execute(parallel[index].programs.shift(), index)
-                    } else if (parallel.every(function (p) { return ! p.running })) {
-                        emit('*', 'eof')
-                    }
-                }
-            })
-        })
-    }
-    next = options.params.processes
-    for (i = 0; i < next; i++) {
-        if (parallel[i]) {
-            execute(parallel[i].programs.shift(), i)
-        }
-    }
-}
+})
 
-module.exports = run
+exports.raw = run
+exports.run = function (options, callback) {
+    run(function () { return Date.now() }, execute, options, callback)
+}

@@ -17,7 +17,9 @@
     "dependencies":     { 
                             "byline":       "4.2.1",
                             "cadence":      "0.2.4",
-                            "arguable":     "0.0.22",
+                            "turnstile":    "0.0.13",
+                            "arguable":     "0.0.27",
+                            "delta":        "0.0.4",
                             "expandable":   "0.0.6"
                         },
     "devDependencies":  {

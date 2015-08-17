@@ -87,10 +87,10 @@ description:
 ___ strings ___
 
   spaces:
-    program names cannot contain spaces: %s
+    error: program names cannot contain spaces: %s
 
   once:
-    a program must only run once in a test run: %s
+    error: a program must only run once in a test run: %s
 
 ___ errors _ usage: en_US ___
 usage: proof errors [options] [<test>...]
@@ -203,7 +203,5 @@ ___ usage: en_US ___
 usage: proof [command] <arguments> <tests>
 ___ usage ___
 */
-var arguable = require('arguable')
-var proof = require('./proof')
 
-arguable.parse('en_US', __filename, process.argv.slice(2), proof.main, proof.abended)
+require('arguable')(module, require('./proof').main)
