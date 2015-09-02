@@ -1,6 +1,7 @@
 var cadence = require('cadence')
 var spawn = require('child_process').spawn
 var path = require('path')
+var Delta = require('delta')
 
 function test (options) {
     _test(options, function (error) { if (error) throw error })
@@ -23,11 +24,12 @@ var _test = cadence(function (async, options) {
     run = spawn('node', run, { stdio: [ 'pipe', 'pipe', process.stderr ] })
     run.stdout.pipe(progress.stdin)
     async(function () {
-        async.ee(run).end('close')
-        async.ee(progress).end('close')
+        var delta = new Delta(async())
+        delta.ee(run).on('close')
+        delta.ee(progress).on('close')
     }, function (runCode, runSignal, progressCode, progressSignal) {
         async(function () {
-            async.ee(process).end('exit')
+            new Delta(async()).ee(process).on('exit')
         }, function () {
             process.exit(runCode || progressCode)
         })

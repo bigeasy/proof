@@ -2,22 +2,20 @@
 
 var spawn = require('child_process').spawn
 var path = require('path'), stderr = []
+var Delta = require('delta')
 
 // FIXME: NO! Make this a real Cadnece function. Bad!
 function execute (proc, input, async) {
     var stdout = [], stderr = []
     async(function () {
-        async.ee(proc).end('close').error()
-        async.ee(proc.stderr).on('data', function (chunk) {
-                                stderr.push(chunk.toString())
-                             })
-                             .end('close')
-                             .error()
-        async.ee(proc.stdout).on('data', function (chunk) {
-                                stdout.push(chunk.toString())
-                             })
-                             .end('close')
-                             .error()
+        var delta = new Delta(async())
+        delta.ee(proc).on('close')
+        delta.ee(proc.stderr)
+             .on('data', function (chunk) { stderr.push(chunk.toString()) })
+             .on('close')
+        delta.ee(proc.stdout)
+             .on('data', function (chunk) { stdout.push(chunk.toString()) })
+             .on('close')
         if (typeof input == "string") {
             proc.stdin.write('%t\n')
             proc.stdin.end()
