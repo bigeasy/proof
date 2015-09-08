@@ -2,7 +2,7 @@
 
 /*
 
-___ json _ usage: en_US ___
+___ json, usage ___ en_US ___
 usage: proof json [<test>...]
 
   Display proof output as JSON.
@@ -26,7 +26,7 @@ description:
   use with JavaScript utilities of your own creation; Node.js command
   line utilities or web applications.
 
-___ progress _ usage: en_US ___
+___ progress, usage ___ en_US ___
 usage: proof progress [options] [<files>...]
 
   Display proof output using a colorized progress meter.
@@ -54,7 +54,7 @@ description:
   like `tee`, you can both pipe `proof run` output to `proof progress`
   and save it to file for later reporting.
 
-___ run _ usage: en_US ___
+___ run, usage ___ en_US ___
 usage: proof run [options] [<test>...]
 
   Run test programs and emit unified runner output.
@@ -84,7 +84,7 @@ description:
   The output can be saved to file or piped back into proof with one of
   the other proof commands to report progress or emit alternate formats.
 
-___ strings ___
+___ run, $ ___ en_US ___
 
   spaces:
     error: program names cannot contain spaces: %s
@@ -92,7 +92,7 @@ ___ strings ___
   once:
     error: a program must only run once in a test run: %s
 
-___ errors _ usage: en_US ___
+___ errors, usage ___ en_US ___
 usage: proof errors [options] [<test>...]
 
   Display output of failed assertions.
@@ -117,7 +117,7 @@ description:
   context, with the program output and error output that preceded and
   follow the failure.
 
-___ platform _ usage: en_US ___
+___ platform, usage ___ en_US ___
 usage: platform [options] [<name>..]
 
   Exit success if running on one of the given platforms.
@@ -141,7 +141,7 @@ description:
   globbing capabilities absent in Windows Power Shell, indirectly through a
   shell program that performs additional testing on UNIX platforms.
 
-___ test _ usage: en_US ___
+___ test, usage ___ en_US ___
 usage: proof test [options] [<files>...]
 
   Run tests and display progress a colorized progress meter.
@@ -169,7 +169,7 @@ description:
   running. Using a utility like `tee`, you can both pipe `proof run`
   output to `proof progress` and save it to file for later reporting.
 
-___ raw _ usage: en_US ___
+___ raw, usage ___ en_US ___
 usage: proof raw [options] [<files>...]
 
   Run tests and display progress a colorized progress meter.
@@ -197,11 +197,10 @@ description:
   running. Using a utility like `tee`, you can both pipe `proof run`
   output to `proof progress` and save it to file for later reporting.
 
-___ usage: en_US ___
-
-___ usage: en_US ___
+___ usage ___ en_US ___
 usage: proof [command] <arguments> <tests>
-___ usage ___
+___ ___ ___
+
 */
 
 require('arguable')(module, require('./proof').main)
