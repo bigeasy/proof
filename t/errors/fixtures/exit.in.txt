@@ -1,0 +1,6 @@
+1340312168589 run  t/compiler/delete.t
+1340312168884 plan t/compiler/delete.t 2
+1340312169005 test t/compiler/delete.t ok 1 table only
+1340312169008 test t/compiler/delete.t ok 2 with key
+1340312169010 exit t/compiler/delete.t 1 null
+1340312174527 eof  *

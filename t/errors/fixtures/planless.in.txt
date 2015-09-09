@@ -1,0 +1,6 @@
+1441774685966 run  t/executable/planless
+1441774686010 test t/executable/planless ok 1 gerg
+1441774686012 out  t/executable/planless 0..2
+1441774686012 test t/executable/planless ok 2 blurgh
+1441774686016 exit t/executable/planless 0 null
+1441774686016 eof  *

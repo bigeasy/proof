@@ -1,0 +1,3 @@
+
+> ✘ t/executable/planless: no plan given: exited with code 0
+

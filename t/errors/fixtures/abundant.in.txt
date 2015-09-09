@@ -1,5 +1,5 @@
 1441757903686 run  t/executable/abundant
-1441757903729 plan t/executable/abundant 2
+1441757903729 plan t/executable/abundant 1
 1441757903731 test t/executable/abundant ok 1 one
 1441757903731 test t/executable/abundant ok 1 two
 1441757903731 test t/executable/abundant ok 1 three

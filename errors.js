@@ -65,7 +65,7 @@ module.exports = function (options) {
             delete backlog[event.file]
         } else if (event.type !== 'eof') {
             backlog[event.file].push(event)
-        } else if (event.type === 'eof' && offset !== 2) {
+        } else if (offset !== 2) {
             out.push('\n')
             state.code = 1
         }

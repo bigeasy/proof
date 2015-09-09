@@ -1,0 +1,5 @@
+1441773222378 run  t/executable/missing
+1441773222422 plan t/executable/missing 2
+1441773222424 test t/executable/missing ok 1 one
+1441773222428 exit t/executable/missing 0 null
+1441773222428 eof  *

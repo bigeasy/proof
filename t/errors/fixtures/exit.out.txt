@@ -1,0 +1,3 @@
+
+> ✘ t/compiler/delete.t: exited with code 1
+

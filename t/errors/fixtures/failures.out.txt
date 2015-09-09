@@ -1,0 +1,11 @@
+
+out hello
+out hello 1
+out hello 2
+> ✘ foo/example: failure
+out hello 3
+err hello
+out hello 4
+out hello 5
+out hello 6
+
