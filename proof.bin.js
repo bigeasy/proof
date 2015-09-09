@@ -36,6 +36,7 @@ options:
     -d,   --digits    [count]     number of timing digits to display
     -h,   --help                  display this usage information
     -M,   --monochrome            do not display color
+    -t,   --tty                   force tty output
     -w,   --width     [count]     width in characters of progress display
 
 invocation:

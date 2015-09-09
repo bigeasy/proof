@@ -67,6 +67,8 @@ module.exports = function (options) {
         options.params.digits = 10
     }
 
+    var tty = options.params.tty || process.stdout.isTTY
+
     return function (event) {
         var program, status, summary, tests, array = [], array = []
 
@@ -159,21 +161,21 @@ module.exports = function (options) {
             switch (event.type) {
                 case 'run':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && process.stdout.isTTY && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
                         overwrite[0] = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'plan':
                     programs[event.file].expected = event.expected
-                    if (event.file === displayed && process.stdout.isTTY && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
                         overwrite[0] = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'test':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && process.stdout.isTTY && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
                         overwrite[0] = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
