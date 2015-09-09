@@ -5,7 +5,7 @@ require('../..')(1, prove)
 function prove (assert) {
     var progress = require('../../progress')
 
-    var f = progress({ params: { monochrome: true } })
+    var f = progress({ param: { monochrome: true } })
 
     var chunks = f({
         type: 'run',

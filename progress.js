@@ -19,9 +19,9 @@ module.exports = function (options) {
             str = ('000' + str).slice(-4)
         }
         str = str.replace(/(\d{3})$/, '.$1')
-        fit = ('        ' + str).slice(-(+options.params.digits + 1))
+        fit = ('        ' + str).slice(-(+options.param.digits + 1))
         if (fit.length < str.length) {
-            options.params.digits = str.length - 1
+            options.param.digits = str.length - 1
             return str
         }
         return fit
@@ -52,22 +52,22 @@ module.exports = function (options) {
 
         var summary = '(' + program.passed + '/' + (program.expected || 0) + ') ' + (time(program))
 
-        var dots = fill('.', options.params.width - 6 - file.length - summary.length - status.length)
+        var dots = fill('.', options.param.width - 6 - file.length - summary.length - status.length)
 
         return ' ' + color(icon) + ' ' + file + ' ' + dots + ' ' + summary + ' ' + color(status) + terminal
     }
 
-    options.params.width || (options.params.width = 76)
+    options.param.width || (options.param.width = 76)
 
-    options.params.digits || (options.params.digits = 4)
-    if (options.params.digits < 4) {
-        options.params.digits = 4
+    options.param.digits || (options.param.digits = 4)
+    if (options.param.digits < 4) {
+        options.param.digits = 4
     }
-    if (options.params.digits > 10) {
-        options.params.digits = 10
+    if (options.param.digits > 10) {
+        options.param.digits = 10
     }
 
-    var tty = options.params.tty || process.stdout.isTTY
+    var tty = options.param.tty || process.stdout.isTTY
 
     return function (event) {
         var program, status, summary, tests, array = [], array = []
@@ -144,7 +144,7 @@ module.exports = function (options) {
             var icon = summary.icon
             var file = summary.file
             var status = summary.status
-            var dots = fill(' ', options.params.width - 6 - summary.file.length - stats.length - status.length)
+            var dots = fill(' ', options.param.width - 6 - summary.file.length - stats.length - status.length)
 
             array.push(' ' + (color(' ')) + ' ' + dots + ' ' + file + ' ' + stats + ' ' + (color(status)) + '\n')
 
@@ -161,21 +161,21 @@ module.exports = function (options) {
             switch (event.type) {
                 case 'run':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
                         overwrite[0] = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'plan':
                     programs[event.file].expected = event.expected
-                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
                         overwrite[0] = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'test':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
                         overwrite[0] = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
