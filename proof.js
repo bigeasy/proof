@@ -20,7 +20,7 @@ var printer = require('./printer')
 var _progress = require('./progress')
 var _errors = require('./errors')
 var run = require('./run').run
-var platform = require('./platform')
+var platform = require('./platform').platform
 var raw_x = require('./raw')
 
 // Moved exports.json to its own file.
