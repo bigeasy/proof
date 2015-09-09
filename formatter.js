@@ -1,6 +1,6 @@
 module.exports = function (func) {
-    return function (arg) {
-        var arr = func(arg)
+    return function (event, state) {
+        var arr = func(event, state)
         return arr.join('')
     }
 }

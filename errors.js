@@ -23,9 +23,10 @@ module.exports = function (options) {
     var prefix = ''
     var backlog = {}
     var offset = 2
+    var planned
     var colorize = colorization(options)
 
-    return function (event) {
+    return function (event, state) {
         var out = []
         if (event.type === 'run') {
             planned = false
@@ -66,7 +67,7 @@ module.exports = function (options) {
             backlog[event.file].push(event)
         } else if (event.type === 'eof' && offset !== 2) {
             out.push('\n')
-            process.on('exit', function () { process.exit(1) })
+            state.code = 1
         }
         while (queue.length && queue[0].events.length) {
             event = queue[0].events.shift()

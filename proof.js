@@ -62,7 +62,5 @@ exports.main = cadence(function (async, options) {
         test: test
     })[options.command]
 
-    async(function () {
-        command(options, async())
-    })
+    command(options, async())
 })

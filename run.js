@@ -104,6 +104,7 @@ var run = cadence(function (async, clock, execute, options) {
         reservoir.write(programs, async())
     }, function () {
         stamp('*', 'eof')
+        return 0
     })
 
     function stamp (program, type, message) {

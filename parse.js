@@ -5,21 +5,20 @@ var tap = require('./tap')
 var cadence = require('cadence')
 
 var parse = cadence(function (async, options, consumer) {
-    var count = 0, eof = false, programs = {}, failed = false, delta, stream
+    var count = 0, eof = false, programs = {}, failed = false, delta, stream,
+        state = {}
 
     async(function () {
         stream = byline.createStream(options.stdin)
         delta = new Delta(async())
         delta.ee(stream).on('data', data).on('end')
     }, function () {
-        if (!count || eof) {
-            return
-        }
-        options.abend()
+        if (state.code != null) return state.code
+        return (!count || eof) ? 0 : 1
     })
 
     function abend (message) {
-        consumer({ type: 'error' })
+        consumer({ type: 'error' }, state)
         options.stderr.write(message)
         options.stderr.write('\n')
     }
@@ -43,7 +42,7 @@ var parse = cadence(function (async, options, consumer) {
         var type = $[2]
         var file = $[3]
         var rest = $[4]
-        var event, program, expected, code
+        var event, program, expected, code, signal
         if (!programs[file]) {
             programs[file] = {
                 passed: 0,
@@ -62,7 +61,7 @@ var parse = cadence(function (async, options, consumer) {
                     time: time,
                     file: file,
                     type: type
-                }))
+                }), state)
                 break
             case 'run':
                 program.start = time
@@ -70,7 +69,7 @@ var parse = cadence(function (async, options, consumer) {
                     time: time,
                     type: type,
                     file: file
-                }))
+                }), state)
                 break
             case 'plan':
                 expected = parseInt(rest, 10)
@@ -79,7 +78,7 @@ var parse = cadence(function (async, options, consumer) {
                     file: file,
                     type: type,
                     expected: expected
-                }))
+                }), state)
                 break
             case 'bail':
                 event = tap.bailout(rest)
@@ -88,7 +87,7 @@ var parse = cadence(function (async, options, consumer) {
                     time: time,
                     file: file,
                     type: type
-                }))
+                }), state)
                 break
             case 'exit':
                 var exit = /^([0-9]+|null) (.*)$/.exec(rest)
@@ -109,7 +108,7 @@ var parse = cadence(function (async, options, consumer) {
                     file: file,
                     type: type,
                     time: time
-                }))
+                }), state)
                 break
             case 'err':
             case 'out':
@@ -118,13 +117,13 @@ var parse = cadence(function (async, options, consumer) {
                     type: type,
                     file: file,
                     line: rest
-                })
+                }, state)
                 break
             case 'eof':
                 consumer({
                     time: time,
                     type: type
-                })
+                }, state)
                 eof = true
                 break
             default:

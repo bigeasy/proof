@@ -1,5 +1,5 @@
 module.exports = function (func, out, err) {
-    return function(arg) {
-        out.write(func(arg))
+    return function(event, state) {
+        out.write(func(event, state))
     }
 }
