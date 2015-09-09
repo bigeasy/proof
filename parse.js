@@ -43,7 +43,7 @@ var parse = cadence(function (async, options, consumer) {
         var type = $[2]
         var file = $[3]
         var rest = $[4]
-        var event, program, expected, code
+        var event, program, expected, code, signal
         if (!programs[file]) {
             programs[file] = {
                 passed: 0,

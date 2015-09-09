@@ -33,6 +33,7 @@ module.exports = function (sigil, outer, globals, die, process) {
             invalid = true
         }
     } catch (e) {
+        console.log('here')
         die(e)
     }
 
