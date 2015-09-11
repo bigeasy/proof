@@ -69,7 +69,7 @@ module.exports = function (options) {
 
     var tty = options.param.tty || process.stdout.isTTY
 
-    return function (event) {
+    return function (event, state) {
         var program, status, summary, tests, array = [], array = []
 
         if (!displayed) displayed = event.file
@@ -150,7 +150,7 @@ module.exports = function (options) {
 
             overwrite[0] = false
             if (summary.status == 'Failure') {
-                process.on('exit', function () { process.exit(1) })
+                state.code = 1
             }
         } else if (event.type == 'error') {
             if (overwrite[0]) {

@@ -5,7 +5,7 @@ var prove = cadence(function (async, assert) {
     var fs = require('fs')
     var path = require('path')
     var stream = require('stream')
-    var test = cadence(function (async, name, stdout) {
+    var test = cadence(function (async, name, exit, stdout) {
         stdout || (stdout = new stream.PassThrough)
         var stdin = new stream.PassThrough
         var input = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
@@ -16,10 +16,14 @@ var prove = cadence(function (async, assert) {
             stdin.end()
         }, function (code) {
             assert(stdout.read().toString().replace(/\d{3}/g, 'XXX'), JSON.parse(output), name)
-            assert(code, 0, name + ' exit')
+            assert(code, exit, name + ' exit')
         })
     })
-    test('success', async())
+    async(function () {
+        test('success', 0, async())
+    }, function () {
+        test('bailout', 1, async())
+    })
 })
 
-require('../..')(2, prove)
+require('../..')(4, prove)
