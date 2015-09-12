@@ -21,18 +21,12 @@ var _progress = require('./progress')
 var _errors = require('./errors')
 var run = require('./run').run
 var platform = require('./platform').platform
-var raw_x = require('./raw')
 
 // Moved exports.json to its own file.
 function json () {
     var formatterRedux = formatter(jsonRedux())
     options.stdin.resume()
     parse(options, printer(formatterRedux, options.stdout, options.stderr))
-}
-
-function raw (options, callback) {
-    options.stdin.resume()
-    parse(options, printer(formatter(raw_x()), options.stdout, options.stderr), callback)
 }
 
 function progress (options, callback) {
@@ -55,7 +49,6 @@ exports.main = cadence(function (async, options) {
     var command = ({
         json: json,
         run: run,
-        raw: raw,
         progress: progress,
         errors: errors,
         platform: platform,
