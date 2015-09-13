@@ -1,7 +1,8 @@
-var fs = require('fs'), path = require('path')
+var fs = require('fs')
+var path = require('path')
 var cadence = require('cadence')
 
-var candidate = cadence(function (async, PATH, executable) {
+module.exports = cadence(function (async, PATH, executable) {
     var parts = PATH.split(path.delimiter), files = []
     parts.forEach(function (part) {
         files.push(path.resolve(part, executable + '.bat'))
@@ -24,5 +25,3 @@ var candidate = cadence(function (async, PATH, executable) {
         }
     })()
 })
-
-module.exports = candidate
