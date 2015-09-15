@@ -23,10 +23,10 @@ var run = require('./run').run
 var platform = require('./platform').platform
 
 // Moved exports.json to its own file.
-function json () {
+function json (options, callback) {
     var formatterRedux = formatter(jsonRedux())
     options.stdin.resume()
-    parse(options, printer(formatterRedux, options.stdout, options.stderr))
+    parse(options, printer(formatterRedux, options.stdout, options.stderr), callback)
 }
 
 function progress (options, callback) {

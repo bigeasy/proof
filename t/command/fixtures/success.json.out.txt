@@ -1,0 +1,19 @@
+{
+  "foo/example": {
+    "time": 1441776335854,
+    "expected": 1,
+    "tests": [
+      {
+        "message": "success",
+        "time": 1441776335861,
+        "passed": 1,
+        "skip": false,
+        "todo": false,
+        "comment": null
+      }
+    ],
+    "actual": 1,
+    "duration": 10,
+    "code": 0
+  }
+}
