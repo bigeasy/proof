@@ -1,0 +1,4 @@
+1441776335854 run  foo/example
+1441776335861 test foo/example ok 1 success
+1441776335860 plan foo/example 1
+!

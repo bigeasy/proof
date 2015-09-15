@@ -8,15 +8,17 @@ var prove = cadence(function (async, assert) {
     var test = cadence(function (async, name, exit, argv, stdout) {
         stdout || (stdout = new stream.PassThrough)
         var stdin = new stream.PassThrough
+        var stderr = new stream.PassThrough
         var input = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
         var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.progress.out.txt'), 'utf8')
         async(function () {
-            proof({ env: {} }, [ 'progress', '-t', '-M' ].concat(argv || []), { stdin: stdin, stdout: stdout }, async())
+            proof({ env: {} }, [ 'progress', '-t', '-M' ].concat(argv || []), { stdin: stdin, stdout: stdout, stderr: stderr }, async())
             stdin.write(input)
             stdin.end()
         }, function (code) {
             assert(stdout.read().toString(), JSON.parse(output), name)
             assert(code, exit, name + ' exit')
+            return [ stderr ]
         })
     })
     async(function () {
@@ -30,10 +32,16 @@ var prove = cadence(function (async, assert) {
     }, function () {
         test('after', 0, async())
     }, function () {
+        test('overwrite', 1, async())
+    }, function (stderr) {
+        assert(stderr.read().toString(), 'error: cannot parse runner output at line 4: invalid syntax\n', 'overwrite stderr')
+        test('error', 1, async())
+    }, function (stderr) {
+        assert(stderr.read().toString(), 'error: cannot parse runner output at line 5: invalid syntax\n', 'error stderr')
         test('parallel', 1, async())
     }, function () {
         test('bailout', 1, async())
     })
 })
 
-require('../..')(14, prove)
+require('../..')(20, prove)
