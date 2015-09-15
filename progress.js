@@ -75,18 +75,16 @@ module.exports = function (options) {
         if (!displayed) displayed = event.file
 
         if (event.type == 'run') {
-            if (programs[event.file] == null) {
-                programs[event.file] = {
-                    actual: 0,
-                    expected: '?',
-                    color: colorize.green,
-                    file: event.file,
-                    start: Number.MAX_VALUE,
-                    status: 'Success',
-                    time: 0,
-                    passed: 0,
-                    icon: '\u2713'
-                }
+            programs[event.file] = {
+                actual: 0,
+                expected: '?',
+                color: colorize.green,
+                file: event.file,
+                start: Number.MAX_VALUE,
+                status: 'Success',
+                time: 0,
+                passed: 0,
+                icon: '\u2713'
             }
         }
 
@@ -120,9 +118,6 @@ module.exports = function (options) {
                 }
                 if (program.bailed) {
                     summary.bailed = true
-                }
-                if (!program.time) {
-                    continue
                 }
                 summary.start = Math.min(summary.start, program.start)
                 summary.time = Math.max(summary.time, program.time)
