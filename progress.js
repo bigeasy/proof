@@ -50,7 +50,7 @@ module.exports = function (options) {
         var file = program.file
         var status = program.status
 
-        var summary = '(' + program.passed + '/' + (program.expected || 0) + ') ' + (time(program))
+        var summary = '(' + program.passed + '/' + program.expected + ') ' + (time(program))
 
         var dots = fill('.', options.param.width - 6 - file.length - summary.length - status.length)
 

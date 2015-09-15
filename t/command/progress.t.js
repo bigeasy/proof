@@ -32,6 +32,8 @@ var prove = cadence(function (async, assert) {
     }, function () {
         test('after', 0, async())
     }, function () {
+        test('planless', 1, async())
+    }, function () {
         test('overwrite', 1, async())
     }, function (stderr) {
         assert(stderr.read().toString(), 'error: cannot parse runner output at line 4: invalid syntax\n', 'overwrite stderr')
@@ -44,4 +46,4 @@ var prove = cadence(function (async, assert) {
     })
 })
 
-require('../..')(20, prove)
+require('../..')(22, prove)
