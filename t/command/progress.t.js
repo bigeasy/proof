@@ -26,8 +26,10 @@ var prove = cadence(function (async, assert) {
     }, function () {
         test('wide', 0, [ '--digits', '11' ], async())
     }, function () {
+        test('time', 0, async())
+    }, function () {
         test('bailout', 1, async())
     })
 })
 
-require('../..')(8, prove)
+require('../..')(10, prove)
