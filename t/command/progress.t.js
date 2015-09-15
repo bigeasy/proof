@@ -28,8 +28,10 @@ var prove = cadence(function (async, assert) {
     }, function () {
         test('time', 0, async())
     }, function () {
+        test('parallel', 1, async())
+    }, function () {
         test('bailout', 1, async())
     })
 })
 
-require('../..')(10, prove)
+require('../..')(12, prove)
