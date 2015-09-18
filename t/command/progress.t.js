@@ -34,6 +34,8 @@ var prove = cadence(function (async, assert) {
     }, function () {
         test('abundant', 1, async())
     }, function () {
+        test('failures', 1, async())
+    }, function () {
         test('planless', 1, async())
     }, function () {
         test('overwrite', 1, async())
@@ -48,4 +50,4 @@ var prove = cadence(function (async, assert) {
     })
 })
 
-require('../..')(24, prove)
+require('../..')(26, prove)
