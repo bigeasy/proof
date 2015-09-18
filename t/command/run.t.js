@@ -22,7 +22,9 @@ var prove = cadence(function (async, assert) {
         test('success', 0, [ '-p', 1 ], async())
     }, function () {
         test('output', 0, async())
+    }, function () {
+        test('signal', 0, async())
     })
 })
 
-require('../..')(4, prove)
+require('../..')(6, prove)
