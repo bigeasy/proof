@@ -42,9 +42,7 @@ function errors (options, callback) {
 }
 
 exports.main = cadence(function (async, options) {
-    if (!options.command) {
-        options.help()
-    }
+    options.helpIf(!options.command)
 
     var command = ({
         json: json,
