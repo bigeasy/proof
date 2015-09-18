@@ -8,18 +8,10 @@ var byline = require('byline')
 var tap = require('./tap')
 var turnstile = require('turnstile')
 
-var execute = cadence(function (async, program) {
-    async(function () {
-        shebang(process.platform, program, [], async())
-    }, function (program, parameters) {
-        return spawn(program, parameters, {})
-    })
-})
-
-var run = cadence(function (async, clock, execute, options) {
+var run = cadence(function (async, options) {
     var programs = []
 
-    if (!options.params.processes) options.params.processes = 1
+    if (!options.param.processes) options.param.processes = 1
 
     options.argv.forEach(function (glob) {
         var dirname
@@ -39,8 +31,10 @@ var run = cadence(function (async, clock, execute, options) {
         async(function () {
             async.forEach(function (program) {
                 async(function () {
-                    execute(program, async())
-                }, function (executable) {
+                    shebang(process.platform, program, [], async())
+                }, function (_program, parameters) {
+                    var executable = spawn(_program, parameters, {})
+
                     var timer = null
 
                     emit('run')
@@ -79,7 +73,7 @@ var run = cadence(function (async, clock, execute, options) {
                         if (timer) {
                             clearTimeout(timer)
                         }
-                        timer = setTimeout(kill, options.params.timeout * 1000 || 30000)
+                        timer = setTimeout(kill, options.param.timeout ? options.param.timeout * 1000 : 30000)
                         stamp(program, type, message)
                     }
 
@@ -110,11 +104,8 @@ var run = cadence(function (async, clock, execute, options) {
     function stamp (program, type, message) {
         message = message != null ? ' ' + message : ''
         type = ('' + type + '      ').slice(0, 4)
-        options.stdout.write('' + clock() + ' ' + type + ' ' + program + message + '\n')
+        options.stdout.write('' + Date.now() + ' ' + type + ' ' + program + message + '\n')
     }
 })
 
-exports.raw = run
-exports.run = function (options, callback) {
-    run(function () { return Date.now() }, execute, options, callback)
-}
+exports.run = run
