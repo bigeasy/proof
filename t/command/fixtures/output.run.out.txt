@@ -1,0 +1,7 @@
+1442553673917 run  t/command/fixtures/output
+1442553673922 out  t/command/fixtures/output 0..1
+1442553673923 test t/command/fixtures/output ok 1 success
+1442553673923 out  t/command/fixtures/output out
+1442553673924 err  t/command/fixtures/output err
+1442553673927 exit t/command/fixtures/output 0 null
+1442553673927 eof  *
