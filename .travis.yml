@@ -2,9 +2,12 @@ sudo: false
 
 language: node_js
 
+# test node.js versions available via nvm
 node_js:
   - '0.10'
   - '0.12'
+  - '4.0.0'
+  - '4.1.0'
 
 branches:
   only:
