@@ -5,11 +5,11 @@ var prove = cadence(function (async, assert) {
     var fs = require('fs')
     var path = require('path')
     var stream = require('stream')
-    var test = cadence(function (async, name, exit, argv) {
+    var test = cadence(function (async, name, qualifier, exit, argv) {
         var stdin = new stream.PassThrough
         var stderr = new stream.PassThrough
         var stdout = new stream.PassThrough
-        var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.run.out.txt'), 'utf8')
+        var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.' + qualifier + '.out.txt'), 'utf8')
         async(function () {
             proof({ env: {} }, [ 'run' ].concat(argv || []).concat('t/command/fixtures/' + name), { stdout: stdout, stderr: stderr }, async())
         }, function (code) {
@@ -27,13 +27,14 @@ var prove = cadence(function (async, assert) {
     }, function (error) {
         assert(error.context.message, 'error: a program must only run once in a test run: t/command/fixtures/success', 'spaces')
     }], function () {
-        test('success', 0, [ '-p', 1 ], async())
+        test('success', 'run', 0, [ '-p', 1 ], async())
     }, function () {
-        test('output', 0, async())
+        test('output', 'run', 0, async())
     }, function () {
-        test('signal', 0, async())
+        test('signal', 'run', 0, async())
     }, function () {
-        test('timeout', 0, [ '-t', 1 ], async())
+        var prefix = /^v0\.10\./.test(process.version) ? 'run.0.10' : 'run'
+        test('timeout', prefix, 0, [ '-t', 1 ], async())
     })
 })
 

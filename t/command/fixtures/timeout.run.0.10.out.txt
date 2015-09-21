@@ -1,0 +1,3 @@
+1442813454092 run  t/command/fixtures/timeout
+1442813455103 exit t/command/fixtures/timeout 143 null
+1442813455103 eof  *

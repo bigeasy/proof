@@ -1,3 +1,3 @@
 1442556582690 run  t/command/fixtures/signal
-1442556582697 exit t/command/fixtures/signal null 0
+1442556582697 exit t/command/fixtures/signal null SIGINT
 1442556582698 eof  *

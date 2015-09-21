@@ -65,7 +65,7 @@ var run = cadence(function (async, options) {
                              .ee(executable.stderr)
                              .ee(executable).on('close')
                     }, function (code, signal) {
-                        emit('exit', (code == null ? 'null' : code) + ' ' + (signal == null ? 'null' : 0))
+                        emit('exit', (code == null ? 'null' : code) + ' ' + (signal == null ? 'null' : signal))
                         clearTimeout(timer)
                     })
 
