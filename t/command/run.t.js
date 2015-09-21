@@ -32,7 +32,9 @@ var prove = cadence(function (async, assert) {
         test('output', 0, async())
     }, function () {
         test('signal', 0, async())
+    }, function () {
+        test('timeout', 0, [ '-t', 1 ], async())
     })
 })
 
-require('../..')(8, prove)
+require('../..')(10, prove)

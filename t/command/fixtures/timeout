@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+
+setTimeout(function () {}, 5000)
