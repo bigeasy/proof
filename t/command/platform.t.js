@@ -4,7 +4,7 @@ var prove = cadence(function (async, assert) {
     var check = require('../../platform').check
     var proof = require('../../proof.bin.js')
     async(function () {
-        check({ argv: [ 'osx' ] }, { platform: 'osx' }, async())
+        check({ argv: [ 'dos', 'osx' ] }, { platform: 'osx' }, async())
     }, function (code) {
         assert(code, 0, 'platform matches')
         proof({}, [ 'platform' ], {}, async())
