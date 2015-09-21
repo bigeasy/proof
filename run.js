@@ -55,6 +55,7 @@ var run = cadence(function (async, options) {
                                 planned = true
                                 emit('plan', plan.expected)
                             } else if (tap.bailout(line)) {
+                                bailed = true
                                 emit('bail', line)
                             } else {
                                 emit('out', line)

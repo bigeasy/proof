@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+
+console.log('1..2');
+console.log('ok 1 test');
+console.log('Bail out! bailed');
+console.log('ok 2 test');

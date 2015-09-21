@@ -31,6 +31,8 @@ var prove = cadence(function (async, assert) {
     }, function () {
         test('output', 'run', 0, async())
     }, function () {
+        test('bailout', 'run', 0, async())
+    }, function () {
         test('signal', 'run', 0, async())
     }, function () {
         var prefix = /^v0\.10\./.test(process.version) ? 'run.0.10' : 'run'
@@ -38,4 +40,4 @@ var prove = cadence(function (async, assert) {
     })
 })
 
-require('../..')(10, prove)
+require('../..')(12, prove)
