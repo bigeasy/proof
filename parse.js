@@ -94,10 +94,10 @@ var parse = cadence(function (async, options, consumer) {
                 if (exit) {
                     if (exit[1] === 'null') {
                         code = null
-                        signal = exit[1]
+                        signal = exit[2]
                     } else {
                         signal = null
-                        code = parseInt(exit[0], 10)
+                        code = parseInt(exit[1], 10)
                     }
                 } else {
                     return abend('error: cannot parse runner test exit code at line ' + count + ': exit code ' + rest)

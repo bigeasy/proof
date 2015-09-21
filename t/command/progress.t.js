@@ -38,6 +38,8 @@ var prove = cadence(function (async, assert) {
     }, function () {
         test('exit', 1, async())
     }, function () {
+        test('signal', 1, async())
+    }, function () {
         test('planless', 1, async())
     }, function () {
         test('overwrite', 1, async())
@@ -52,4 +54,4 @@ var prove = cadence(function (async, assert) {
     })
 })
 
-require('../..')(28, prove)
+require('../..')(30, prove)
