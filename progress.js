@@ -101,9 +101,7 @@ module.exports = function (options) {
             tests = { actual: 0, passed: 0 }
             for (file in programs) {
                 program = programs[file]
-                if ('code' in program) {
-                    summary.code = program.code
-                }
+                summary.code = program.code
                 tests.actual++
                 if (program.expected == program.passed) {
                     tests.passed++
