@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-require('../..')(1, function (assert) {
-    assert.say('Hello')
-    assert.ok(1)
-})

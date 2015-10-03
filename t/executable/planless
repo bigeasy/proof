@@ -1,5 +1,0 @@
-#!/usr/bin/env node
-
-console.log('ok 1 gerg');
-console.log('0..2');
-console.log('ok 2 blurgh');
