@@ -1,7 +1,7 @@
 var util = require('util'), _assert = require('assert'), __slice = [].slice
 
 module.exports = function (sigil, outer, globals, die, process) {
-    var context = {}, passed = 0, actual = 0
+    var passed = 0, actual = 0
     var name, expected, invalid, delayedPlan, synchronicity
 
     die = die(comment, process)
@@ -21,7 +21,7 @@ module.exports = function (sigil, outer, globals, die, process) {
     try {
         if (typeof sigil == 'number') {
             expected = expect(sigil)
-            outer.call(context, assert, callback)
+            outer.call(null, assert, callback)
             if (outer.length == 1) callback()
         } else {
             invalid = true
