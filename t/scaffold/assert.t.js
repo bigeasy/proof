@@ -19,7 +19,7 @@ require('../..')(4, function (assert) {
     scaffold(1, function (assert) {
         assert(false, 'boolean')
         assert(1, 2, 'equal')
-    }, globals, function () {}, {
+    })(globals, function () {}, {
         stdout: stdout
     })
 
