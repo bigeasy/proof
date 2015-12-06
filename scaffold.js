@@ -19,13 +19,7 @@ module.exports = function (sigil, outer, globals, die, process) {
     assert.leak = leak
 
     try {
-        if (typeof sigil == 'object' && !Array.isArray(sigil)) {
-            sigil.exports = function (count, inner) {
-                expected = expect(count)
-                outer.call(context, inner, assert, callback)
-                if (outer.length == 2) callback()
-            }
-        } else if (typeof sigil == 'number') {
+        if (typeof sigil == 'number') {
             expected = expect(sigil)
             outer.call(context, assert, callback)
             if (outer.length == 1) callback()
