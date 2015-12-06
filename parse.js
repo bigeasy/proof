@@ -35,7 +35,7 @@ var parse = cadence(function (async, options, consumer) {
         count++
         var $
         if (!($ = /^(\d+)\s+(\w+)\s+([^\s]+)\s?(.*)$/.exec(line))) {
-            // todo: use sprintf
+            // TODO Use sprintf.
             return abend('error: cannot parse runner output at line ' + count + ': invalid syntax')
         }
         var time = parseInt($[1], 10)

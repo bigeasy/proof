@@ -5,7 +5,7 @@ module.exports = function (options) {
     var colorize = colorization(options)
     var durations = {}
     var programs = {}
-    var overwrite = [ false ] // todo: not an array
+    var overwrite = [ false ] // TODO Do not use array.
     var displayed
 
     function fill (character, count) {
