@@ -4,6 +4,9 @@ module.exports = function (sigil, outer) {
     if (typeof sigil != 'number') {
         throw new Error('invalid arguments')
     }
+    // TODO Come back and implement with Cadence. Cadence will correctly recover
+    // from an exception. Just as in Arguable, I can use Interrupt to throw and
+    // catch namespaced exceptions.
     return function (globals, die, process) {
         var passed = 0, actual = 0
         var name, expected, invalid, delayedPlan, synchronicity
