@@ -1,6 +1,9 @@
 var util = require('util'), _assert = require('assert'), __slice = [].slice
 
 module.exports = function (sigil, outer) {
+    if (typeof sigil != 'number') {
+        throw new Error('invalid arguments')
+    }
     return function (globals, die, process) {
         var passed = 0, actual = 0
         var name, expected, invalid, delayedPlan, synchronicity
@@ -20,20 +23,13 @@ module.exports = function (sigil, outer) {
         die = die(comment, process)
 
         try {
-            if (typeof sigil == 'number') {
-                expected = expect(sigil)
-                outer.call(null, assert, callback)
-                if (outer.length == 1) callback()
-            } else {
-                invalid = true
-            }
+            expected = expect(sigil)
+            outer.call(null, assert, callback)
+            if (outer.length == 1) callback()
         } catch (e) {
             die(e)
         }
 
-        if (invalid) {
-            throw new Error('invalid arguments')
-        }
 
         if (synchronicity) {
             finish()
