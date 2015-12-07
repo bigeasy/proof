@@ -1,6 +1,6 @@
 {
     "name":             "proof",
-    "version":          "0.0.56",
+    "version":          "0.0.57",
     "author":           "Alan Gutierrez <alan@prettyrobots.com>",
     "description":      "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
     "keywords":         [
