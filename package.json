@@ -17,7 +17,7 @@
     "dependencies":     { 
                             "byline":       "4.2.1",
                             "cadence":      "1.0.x",
-                            "arguable":     "0.0.41",
+                            "arguable":     "0.0.42",
                             "delta":        "0.0.4",
                             "expandable":   "0.0.6",
                             "reactor":      "0.0.14"
