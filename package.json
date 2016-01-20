@@ -16,7 +16,7 @@
     "bugs":             "https://github.com/bigeasy/proof/issues",
     "dependencies":     { 
                             "byline":       "4.2.1",
-                            "cadence":      "0.4.0",
+                            "cadence":      "1.0.x",
                             "turnstile":    "0.0.14",
                             "arguable":     "0.0.35",
                             "delta":        "0.0.4",
