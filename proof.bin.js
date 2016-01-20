@@ -200,7 +200,7 @@ description:
 
 ___ usage ___ en_US ___
 usage: proof [command] <arguments> <tests>
-___ ___ ___
+___ . ___
 
 */
 

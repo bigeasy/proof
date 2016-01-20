@@ -21,11 +21,11 @@ var prove = cadence(function (async, assert) {
     async([function () {
         proof({ env: {} }, [ 'run', 'space separated' ], {}, async())
     }, function (error) {
-        assert(error.context.message, 'error: program names cannot contain spaces: space separated', 'spaces')
+        assert(error.stderr, 'error: program names cannot contain spaces: space separated', 'spaces')
     }], [function () {
         proof({ env: {} }, [ 'run', 't/command/fixtures/success', 't/command/fixtures/success' ], {}, async())
     }, function (error) {
-        assert(error.context.message, 'error: a program must only run once in a test run: t/command/fixtures/success', 'spaces')
+        assert(error.stderr, 'error: a program must only run once in a test run: t/command/fixtures/success', 'spaces')
     }], function () {
         test('success', 'run', 0, [ '-p', 1 ], async())
     }, function () {
