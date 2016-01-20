@@ -6,7 +6,7 @@ var spawn = require('child_process').spawn
 var Delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
-var turnstile = require('turnstile')
+var Reactor = require('reactor')
 
 var run = cadence(function (async, options) {
     var programs = []
@@ -26,8 +26,15 @@ var run = cadence(function (async, options) {
         })
     })
 
+    var directories = {}
+    programs.forEach(function (program) {
+        var programs = directories[path.dirname(program)] || []
+        directories[path.dirname(program)] = programs
+        programs.push(program)
+    })
+
     // Happens often enough that we shouldn't freak out.
-    var operation = cadence(function (async, programs) {
+    var operation = cadence(function (async, timeout, programs) {
         async(function () {
             async.forEach(function (program) {
                 async(function () {
@@ -87,16 +94,13 @@ var run = cadence(function (async, options) {
         })
     })
 
-    var reservoir = new turnstile.Reservoir({
-        turnstile: new turnstile.Turnstile({ workers: 1 }),
-        groupBy: function (value) {
-            return path.dirname(value)
-        },
-        operation: operation
-    })
+    var reactor = new Reactor(operation)
 
     async(function () {
-        reservoir.write(programs, async())
+        Object.keys(directories).forEach(function (directory) {
+            reactor.push(directories[directory])
+        })
+        reactor.push([], async())
     }, function () {
         stamp('*', 'eof')
         return 0

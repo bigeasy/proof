@@ -17,10 +17,10 @@
     "dependencies":     { 
                             "byline":       "4.2.1",
                             "cadence":      "1.0.x",
-                            "turnstile":    "0.0.14",
                             "arguable":     "0.0.41",
                             "delta":        "0.0.4",
-                            "expandable":   "0.0.6"
+                            "expandable":   "0.0.6",
+                            "reactor":      "0.0.14"
                         },
     "devDependencies":  {
                             "coffee-script": ">=1.1.3"
