@@ -3,32 +3,37 @@
     "version":          "1.0.0",
     "author":           "Alan Gutierrez <alan@prettyrobots.com>",
     "description":      "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
-    "keywords":         [
+    "keywords":
+    [
                             "test", "unit", "tap", "assert", "tdd"
-                        ],
+    ],
     "license":          "MIT",
-    "directories":      { "lib" : "./lib" },
-    "repository":       {
+    "repository":
+    {
                             "url": "https://github.com/bigeasy/proof",
                             "type": "git"
-                        },
+    },
     "homepage":         "https://bigeasy.github.io/proof",
     "bugs":             "https://github.com/bigeasy/proof/issues",
-    "dependencies":     { 
+    "dependencies":
+    {
                             "byline":       "4.2.1",
                             "cadence":      "1.0.x",
                             "arguable":     "0.0.42",
                             "delta":        "0.0.4",
                             "expandable":   "0.0.6",
                             "reactor":      "0.0.14"
-                        },
-    "devDependencies":  {
+    },
+    "devDependencies":
+    {
                             "coffee-script": ">=1.1.3"
-                        },
-    "bin":              {
+    },
+    "bin":
+    {
                             "proof": "proof.bin.js"
-                        },
-    "scripts" :         {
-      "test": "(node proof.bin.js run t/*/*.t.* t/*/*/*.t.* | tee .proof.out | node proof.bin.js progress) || (node proof.bin.js errors < .proof.out)"
+    },
+    "scripts" :
+    {
+                            "test": "(node proof.bin.js run t/*/*.t.* t/*/*/*.t.* | tee .proof.out | node proof.bin.js progress) || (node proof.bin.js errors < .proof.out)"
     }
 }
