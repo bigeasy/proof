@@ -20,7 +20,7 @@
                             "byline":       "4.2.1",
                             "cadence":      "1.x",
                             "arguable":     "1.x",
-                            "delta":        "0.0.4",
+                            "delta":        "1.x",
                             "expandable":   "0.0.6",
                             "reactor":      "0.0.14"
     },
