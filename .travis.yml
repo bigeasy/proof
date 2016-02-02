@@ -2,7 +2,6 @@ sudo: false
 
 language: node_js
 
-# test node.js versions available via nvm
 node_js:
   - '0.10'
   - '0.12'
@@ -13,10 +12,6 @@ branches:
   only:
     - master
     - travis-ci
-
-# Not using `npm install --dev` because it is recursive. It will pull in the all
-# development dependencies for CoffeeScript. Way too much spew in the Travis CI
-# build output.
 
 before_install:
   - npm install
