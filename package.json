@@ -21,7 +21,7 @@
                             "cadence":      "1.x",
                             "arguable":     "1.x",
                             "delta":        "1.x",
-                            "expandable":   "1.x",
+                            "expandable":   "0.0.6",
                             "reactor":      "1.x"
     },
     "devDependencies":
