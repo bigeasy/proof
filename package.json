@@ -22,7 +22,7 @@
                             "arguable":     "1.x",
                             "delta":        "1.x",
                             "expandable":   "1.x",
-                            "reactor":      "0.0.14"
+                            "reactor":      "1.x"
     },
     "devDependencies":
     {
