@@ -17,9 +17,9 @@
     "bugs":             "https://github.com/bigeasy/proof/issues",
     "dependencies":
     {
+                            "arguable":     "1.x",
                             "byline":       "4.2.1",
                             "cadence":      "1.x",
-                            "arguable":     "1.x",
                             "delta":        "1.x",
                             "expandable":   "0.0.6",
                             "reactor":      "1.x"
