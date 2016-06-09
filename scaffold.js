@@ -27,6 +27,7 @@ module.exports = function (sigil, outer) {
 
         try {
             expected = expect(sigil)
+            // TODO Do not pass callback when synchronous.
             outer.call(null, assert, callback)
             if (outer.length == 1) callback()
         } catch (e) {
