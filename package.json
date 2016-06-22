@@ -1,28 +1,31 @@
 {
-    "name":             "proof",
-    "version":          "1.0.1",
-    "author":           "Alan Gutierrez <alan@prettyrobots.com>",
-    "description":      "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
+    "name":                 "proof",
+    "version":              "1.0.1",
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "description":
+
+        "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
+
     "keywords":
     [
                             "test", "unit", "tap", "assert", "tdd"
     ],
-    "license":          "MIT",
+    "license":              "MIT",
     "repository":
     {
                             "url": "https://github.com/bigeasy/proof",
                             "type": "git"
     },
-    "homepage":         "https://bigeasy.github.io/proof",
-    "bugs":             "https://github.com/bigeasy/proof/issues",
+    "homepage":             "https://bigeasy.github.io/proof",
+    "bugs":                 "https://github.com/bigeasy/proof/issues",
     "dependencies":
     {
-                            "arguable":     "1.x",
-                            "byline":       "4.2.1",
-                            "cadence":      "1.x",
-                            "delta":        "1.x",
-                            "expandable":   "0.0.6",
-                            "reactor":      "1.x"
+                            "arguable":                     "1.x",
+                            "byline":                       "4.2.1",
+                            "cadence":                      "1.x",
+                            "delta":                        "1.x",
+                            "expandable":                   "0.0.6",
+                            "reactor":                      "1.x"
     },
     "devDependencies":
     {
@@ -30,7 +33,7 @@
     },
     "bin":
     {
-                            "proof": "proof.bin.js"
+                            "proof":                        "proof.bin.js"
     },
     "scripts" :
     {
