@@ -2,7 +2,8 @@ var colorization = require('./colorization')
 var extend = require('./extend')
 
 module.exports = function (options) {
-    var colorize = colorization(options)
+    var params = options.command.command.param
+    var colorize = colorization(params)
     var durations = {}
     var programs = {}
     var overwrite = [ false ] // TODO Do not use array.
@@ -19,9 +20,9 @@ module.exports = function (options) {
             str = ('000' + str).slice(-4)
         }
         str = str.replace(/(\d{3})$/, '.$1')
-        fit = ('        ' + str).slice(-(+options.param.digits + 1))
+        fit = ('        ' + str).slice(-(+params.digits + 1))
         if (fit.length < str.length) {
-            options.param.digits = str.length - 1
+            params.digits = str.length - 1
             return str
         }
         return fit
@@ -52,22 +53,22 @@ module.exports = function (options) {
 
         var summary = '(' + program.passed + '/' + program.expected + ') ' + (time(program))
 
-        var dots = fill('.', options.param.width - 6 - file.length - summary.length - status.length)
+        var dots = fill('.', params.width - 6 - file.length - summary.length - status.length)
 
         return ' ' + color(icon) + ' ' + file + ' ' + dots + ' ' + summary + ' ' + color(status) + terminal
     }
 
-    options.param.width || (options.param.width = 76)
+    params.width || (params.width = 76)
 
-    options.param.digits || (options.param.digits = 4)
-    if (options.param.digits < 4) {
-        options.param.digits = 4
+    params.digits || (params.digits = 4)
+    if (params.digits < 4) {
+        params.digits = 4
     }
-    if (options.param.digits > 10) {
-        options.param.digits = 10
+    if (params.digits > 10) {
+        params.digits = 10
     }
 
-    var tty = options.param.tty || process.stdout.isTTY
+    var tty = params.tty || process.stdout.isTTY
 
     return function (event, state) {
         var program, status, summary, tests, array = [], array = []
@@ -137,7 +138,7 @@ module.exports = function (options) {
             var icon = summary.icon
             var file = summary.file
             var status = summary.status
-            var dots = fill(' ', options.param.width - 6 - summary.file.length - stats.length - status.length)
+            var dots = fill(' ', params.width - 6 - summary.file.length - stats.length - status.length)
 
             array.push(' ' + (color(' ')) + ' ' + dots + ' ' + file + ' ' + stats + ' ' + (color(status)) + '\n')
 

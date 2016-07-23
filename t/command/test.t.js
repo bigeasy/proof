@@ -22,7 +22,7 @@ var prove = cadence(function (async, assert) {
     }, [function () {
         proof({}, [ 'test', '-h' ], {}, async())
     }, function (error) {
-        assert(error.message, 'help', 'help')
+        assert(/^bigeasy.arguable#help/m.test(error.message), 'help')
     }])
 })
 

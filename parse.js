@@ -4,12 +4,12 @@ var extend = require('./extend')
 var tap = require('./tap')
 var cadence = require('cadence')
 
-var parse = cadence(function (async, options, consumer) {
+var parse = cadence(function (async, program, consumer) {
     var count = 0, eof = false, programs = {}, failed = false, delta, stream,
         state = {}
 
     async(function () {
-        stream = byline.createStream(options.stdin)
+        stream = byline.createStream(program.stdin)
         delta = new Delta(async())
         delta.ee(stream).on('data', data).on('end')
     }, function () {
@@ -19,8 +19,8 @@ var parse = cadence(function (async, options, consumer) {
 
     function abend (message) {
         consumer({ type: 'error' }, state)
-        options.stderr.write(message)
-        options.stderr.write('\n')
+        program.stderr.write(message)
+        program.stderr.write('\n')
     }
 
     function data (line) {

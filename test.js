@@ -4,14 +4,14 @@ var path = require('path')
 var Delta = require('delta')
 
 var test = cadence(function (async, options) {
-    if (options.param.help) options.help()
+    if (options.command.param.help) options.help()
     var executable = path.join(__dirname, 'proof.bin.js')
     var progress = [ executable, 'progress' ], run = [ executable, 'run' ]
-    options.given.forEach(function (name) {
+    options.command.command.given.forEach(function (name) {
         if (/^(monochrome|width|digits)$/.test(name)) {
-            progress.push('--' + name, options.params[name])
+            progress.push('--' + name, options.command.command.param[name])
         } else {
-            run.push('--' + name, options.params[name])
+            run.push('--' + name, options.command.command.param[name])
         }
     })
     run.push.apply(run, options.argv)

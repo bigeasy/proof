@@ -3,8 +3,7 @@
 require('../..')(8, function (assert) {
     var colorization = require('../../colorization')
 
-    var options = { param: { monochrome: true } }
-    var colors = colorization(options)
+    var colors = colorization({ monochrome: true })
 
     /*
     // Uncomment and learn the different ways to invoke `assert`.
@@ -20,8 +19,7 @@ require('../..')(8, function (assert) {
     assert(colors.blue('test'),  'test', 'equal')
     assert(colors.gray('test'), 'test', 'equal')
 
-    options = { param: { monochrome: false } }
-    colors = colorization(options)
+    colors = colorization({ monochrome: false })
     assert(colors.red('test'), '\u001B[31mtest\u001B[0m', 'equal')
     assert(colors.green('test'), '\u001B[32mtest\u001B[0m', 'equal')
     assert(colors.blue('test'), '\u001B[34mtest\u001B[0m', 'equal')

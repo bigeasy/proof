@@ -23,26 +23,28 @@ var run = require('./run').run
 var platform = require('./platform').platform
 
 // Moved exports.json to its own file.
-function json (options, callback) {
+function json (program, callback) {
     var formatterRedux = formatter(jsonRedux())
-    options.stdin.resume()
-    parse(options, printer(formatterRedux, options.stdout, options.stderr), callback)
+    program.stdin.resume()
+    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
 }
 
-function progress (options, callback) {
-    var formatterRedux = formatter(_progress(options))
-    options.stdin.resume()
-    parse(options, printer(formatterRedux, options.stdout, options.stderr), callback)
+function progress (program, callback) {
+    var formatterRedux = formatter(_progress(program))
+    program.stdin.resume()
+    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
 }
 
-function errors (options, callback) {
-    var formatterRedux = formatter(_errors(options))
-    options.stdin.resume()
-    parse(options, printer(formatterRedux, options.stdout, options.stderr), callback)
+function errors (program, callback) {
+    var formatterRedux = formatter(_errors(program))
+    program.stdin.resume()
+    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
 }
 
-exports.main = cadence(function (async, options) {
-    options.helpIf(!options.command)
+exports.main = cadence(function (async, program) {
+    program.helpIf(program.command.param.help)
+    program.helpIf(!program.command.command)
+    program.helpIf(program.command.command.param.help)
 
     var command = ({
         json: json,
@@ -51,7 +53,7 @@ exports.main = cadence(function (async, options) {
         errors: errors,
         platform: platform,
         test: test
-    })[options.command[0]]
+    })[program.command.command.name]
 
-    command(options, async())
+    command(program, async())
 })

@@ -1,13 +1,13 @@
 // Generate a set of colorization functions to colorize console output, or a set
 // a no-op functions if the `--monochrome` switch is selected.
-module.exports = function (options) {
-    if (!options.param.monochrome) {
-        options.param.monochrome = false
+module.exports = function (params) {
+    if (!params.monochrome) {
+        params.monochrome = false
     }
 
     function monochrome (text) { return text }
 
-    if (options.param.monochrome) {
+    if (params.monochrome) {
         return {
             red: monochrome, green: monochrome, blue: monochrome, gray: monochrome
         }

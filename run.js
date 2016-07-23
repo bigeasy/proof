@@ -8,21 +8,21 @@ var byline = require('byline')
 var tap = require('./tap')
 var Reactor = require('reactor')
 
-var run = cadence(function (async, options) {
-    var programs = []
+var run = cadence(function (async, program) {
+    var programs = [], params = program.command.command.param
 
-    if (!options.param.processes) options.param.processes = 1
+    if (!params.processes) params.processes = 1
 
-    options.argv.forEach(function (glob) {
+    program.argv.forEach(function (glob) {
         var dirname
         if (/\s+/.test(glob)) {
-            options.abend('spaces', glob)
+            program.abend('spaces', glob)
         }
-        expandable.glob(process.cwd(), [ glob ])[0].files.forEach(function (program) {
-            if (programs.indexOf(program) != -1) {
-                options.abend('once', program)
+        expandable.glob(process.cwd(), [ glob ])[0].files.forEach(function (_program) {
+            if (programs.indexOf(_program) != -1) {
+                program.abend('once', _program)
             }
-            programs.push(program)
+            programs.push(_program)
         })
     })
 
@@ -81,7 +81,7 @@ var run = cadence(function (async, options) {
                         if (timer) {
                             clearTimeout(timer)
                         }
-                        timer = setTimeout(kill, options.param.timeout ? options.param.timeout * 1000 : 30000)
+                        timer = setTimeout(kill, params.timeout ? params.timeout * 1000 : 30000)
                         stamp(program, type, message)
                     }
 
@@ -106,10 +106,10 @@ var run = cadence(function (async, options) {
         return 0
     })
 
-    function stamp (program, type, message) {
+    function stamp (_program, type, message) {
         message = message != null ? ' ' + message : ''
         type = ('' + type + '      ').slice(0, 4)
-        options.stdout.write('' + Date.now() + ' ' + type + ' ' + program + message + '\n')
+        program.stdout.write('' + Date.now() + ' ' + type + ' ' + _program + message + '\n')
     }
 })
 

@@ -10,6 +10,5 @@ exports.check = cadence(function (async, options, process) {
 })
 
 exports.platform = function (options, callback) {
-    if (options.params.help) options.help()
     exports.check(options, process, callback)
 }
