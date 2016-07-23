@@ -2,7 +2,7 @@ var colorization = require('./colorization')
 var extend = require('./extend')
 
 module.exports = function (options) {
-    var params = options.command.command.param
+    var params = options.command.param
     var colorize = colorization(params)
     var durations = {}
     var programs = {}

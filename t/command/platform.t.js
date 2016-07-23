@@ -1,7 +1,7 @@
 var cadence = require('cadence')
 
 var prove = cadence(function (async, assert) {
-    var check = require('../../platform').check
+    var check = require('../../platform')
     var proof = require('../../proof.bin.js')
     async(function () {
         check({ argv: [ 'dos', 'osx' ] }, { platform: 'osx' }, async())
