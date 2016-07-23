@@ -1,7 +1,6 @@
 {
     "name":                 "proof",
     "version":              "1.0.2",
-    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
     "description":
 
         "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
@@ -10,14 +9,15 @@
     [
                             "test", "unit", "tap", "assert", "tdd"
     ],
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "homepage":             "https://bigeasy.github.io/proof",
+    "bugs":                 "https://github.com/bigeasy/proof/issues",
     "license":              "MIT",
     "repository":
     {
                             "url": "https://github.com/bigeasy/proof",
                             "type": "git"
     },
-    "homepage":             "https://bigeasy.github.io/proof",
-    "bugs":                 "https://github.com/bigeasy/proof/issues",
     "dependencies":
     {
                             "interrupt":                    "1.0.1",
