@@ -7,11 +7,11 @@ var prove = cadence(function (async, assert) {
         check({ argv: [ 'dos', 'osx' ] }, { platform: 'osx' }, async())
     }, function (code) {
         assert(code, 0, 'platform matches')
-        proof({}, [ 'platform' ], {}, async())
+        proof([ 'platform' ], {}, async())
     }, function (code) {
         assert(code, 1, 'no platoform match')
     }, [function () {
-        proof({}, [ 'platform', '-h' ], {}, async())
+        proof([ 'platform', '-h' ], {}, async())
     }, function (error) {
         assert(error.interrupt, 'bigeasy.arguable#help', 'help')
     }])

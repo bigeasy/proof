@@ -30,7 +30,7 @@ description:
 ___ . ___
 */
 require('arguable')(module, require('cadence')(function (async, program) {
-    program.helpIf(program.command.param.help)
+    program.helpIf(program.ultimate.help)
     var test = require('./test')
     test(program, async())
 }))

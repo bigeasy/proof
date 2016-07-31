@@ -9,7 +9,7 @@ var tap = require('./tap')
 var Reactor = require('reactor')
 
 var run = cadence(function (async, program) {
-    var programs = [], params = program.command.param
+    var programs = [], params = program.ultimate
 
     if (!params.processes) params.processes = 1
 

@@ -10,7 +10,7 @@ var prove = cadence(function (async, assert) {
     var input = fs.readFileSync(path.join(__dirname, 'fixtures', 'success.in.txt'), 'utf8')
     var output = fs.readFileSync(path.join(__dirname, 'fixtures', 'success.json.out.txt'), 'utf8')
     async(function () {
-        proof({}, [ 'json' ], { stdin: stdin, stdout: stdout }, async())
+        proof([ 'json' ], { stdin: stdin, stdout: stdout }, async())
         stdin.write(input)
         stdin.end()
     }, function (code) {

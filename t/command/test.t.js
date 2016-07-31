@@ -10,7 +10,7 @@ var prove = cadence(function (async, assert) {
     var stdin = new stream.PassThrough
     var stderr = new stream.PassThrough
     async(function () {
-        proof({}, [ 'test', '-p', '1', '-M', 't/command/fixtures/ok' ], {
+        proof([ 'test', '-p', '1', '-M', 't/command/fixtures/ok' ], {
             stdin: stdin,
             stderr: stderr,
             stdout: stdout
@@ -20,7 +20,7 @@ var prove = cadence(function (async, assert) {
         assert(stdout.read().toString().replace(/\d{3}/g, 'XXX'), output, 'stdout')
         assert(code, 0, 'ran')
     }, [function () {
-        proof({}, [ 'test', '-h' ], {}, async())
+        proof([ 'test', '-h' ], {}, async())
     }, function (error) {
         assert(/^bigeasy.arguable#help/m.test(error.message), 'help')
     }])

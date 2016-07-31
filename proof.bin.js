@@ -8,6 +8,7 @@ ___ . ___
 */
 
 require('arguable')(module, require('cadence')(function (async, program) {
-    program.helpIf(program.command.param.help)
-    program.delegate(require, './proof', async())
+    program.helpIf(program.ultimate.help)
+    var argv = program.argv.slice()
+    program.delegate('./proof.' + argv.shift(), argv, async())
 }))

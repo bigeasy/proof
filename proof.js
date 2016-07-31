@@ -42,9 +42,7 @@ function errors (program, callback) {
 }
 
 exports.main = cadence(function (async, program) {
-    program.helpIf(program.command.param.help)
-    program.helpIf(!program.command.command)
-    program.helpIf(program.command.command.param.help)
+    program.helpIf(program.ulimate.help)
 
     var command = ({
         json: json,

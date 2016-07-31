@@ -11,7 +11,7 @@ var prove = cadence(function (async, assert) {
         var input = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
         var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.out.txt'), 'utf8')
         async(function () {
-            proof({}, [ 'errors', '-M' ], { stdin: stdin, stdout: stdout }, async())
+            proof([ 'errors', '-M' ], { stdin: stdin, stdout: stdout }, async())
             stdin.write(input)
             stdin.end()
         }, function (code) {
@@ -36,7 +36,7 @@ var prove = cadence(function (async, assert) {
         var stdout = new stream.PassThrough
         var input = fs.readFileSync(path.join(__dirname, 'fixtures', 'success.in.txt'), 'utf8')
         async(function () {
-            proof({}, [ 'errors', '-M' ], { stdin: stdin, stdout: stdout }, async())
+            proof([ 'errors', '-M' ], { stdin: stdin, stdout: stdout }, async())
             stdin.write(input)
             stdin.end()
         }, function (code) {
