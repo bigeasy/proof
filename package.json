@@ -21,11 +21,11 @@
     "dependencies":
     {
                             "arguable":                     "3.1.x",
-                            "byline":                       "4.2.1",
+                            "byline":                       "5.0.0",
                             "cadence":                      "1.0.x",
                             "delta":                        "1.1.x",
                             "expandable":                   "0.0.6",
-                            "reactor":                      "1.0.x"
+                            "reactor":                      "2.2.x"
     },
     "devDependencies":
     {
