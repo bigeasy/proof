@@ -6,7 +6,7 @@ module.exports = function (options) {
     var colorize = colorization(params)
     var durations = {}
     var programs = {}
-    var overwrite = [ false ] // TODO Do not use array.
+    var overwrite = false
     var displayed
 
     function fill (character, count) {
@@ -142,12 +142,12 @@ module.exports = function (options) {
 
             array.push(' ' + (color(' ')) + ' ' + dots + ' ' + file + ' ' + stats + ' ' + (color(status)) + '\n')
 
-            overwrite[0] = false
+            overwrite = false
             if (summary.status == 'Failure') {
                 state.code = 1
             }
         } else if (event.type == 'error') {
-            if (overwrite[0]) {
+            if (overwrite) {
                 array.push('\n')
             }
         } else {
@@ -156,21 +156,21 @@ module.exports = function (options) {
                 case 'run':
                     extend(programs[event.file], event)
                     if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
-                        overwrite[0] = true
+                        overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'plan':
                     programs[event.file].expected = event.expected
                     if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
-                        overwrite[0] = true
+                        overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'test':
                     extend(programs[event.file], event)
                     if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
-                        overwrite[0] = true
+                        overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
@@ -185,7 +185,7 @@ module.exports = function (options) {
                         displayed = null
                     }
                     program = extend(programs[event.file], event)
-                    overwrite[0] = false
+                    overwrite = false
                     array.push(bar(program, '\n'))
             }
         }
