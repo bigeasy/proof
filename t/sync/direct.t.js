@@ -1,3 +1,3 @@
-require('../..')(1, function (assert) {
+require('../../redux')(1, function (assert) {
     assert(true, 'single assertion')
 })
