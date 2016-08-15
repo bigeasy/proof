@@ -9,7 +9,7 @@ function pad (number, width) {
 }
 
 module.exports = function (count, test) {
-    return function (globals, stream, exit) {
+    return function (globals, stream, exit, _callback) {
         var expected = Math.abs(count), passed = 0, actual = 0, delayed
 
         function comment (lines) {
@@ -107,6 +107,7 @@ module.exports = function (count, test) {
                     exit(failed == 0 && passed == expected ? 0 : 1)
                 }
             }
+            _callback()
         }
 
         if (!(delayed = count < 1)) {
