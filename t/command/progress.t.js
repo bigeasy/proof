@@ -12,7 +12,7 @@ var prove = cadence(function (async, assert) {
         var input = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
         var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.progress.out.txt'), 'utf8')
         async(function () {
-            proof([ 'progress', '-t', '-M' ].concat(argv || []), { stdin: stdin, stdout: stdout, stderr: stderr }, async())
+            proof([ 'progress', '-w76', '-t', '-M' ].concat(argv || []), { stdin: stdin, stdout: stdout, stderr: stderr }, async())
             stdin.write(input)
             stdin.end()
         }, function (code) {

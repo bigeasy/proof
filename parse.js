@@ -3,15 +3,27 @@ var Delta = require('delta')
 var extend = require('./extend')
 var tap = require('./tap')
 var cadence = require('cadence')
+var Staccato = require('staccato')
 
 var parse = cadence(function (async, program, consumer) {
-    var count = 0, eof = false, programs = {}, failed = false, delta, stream,
-        state = {}
-
+    var count = 0, eof = false, programs = {}, failed = false, stream, state = {}
     async(function () {
-        stream = byline.createStream(program.stdin)
-        delta = new Delta(async())
-        delta.ee(stream).on('data', data).on('end')
+        var stream = byline.createStream(program.stdin, { encoding: 'utf8' })
+        stream.on('end', function () { stream.emit('readable') })
+        var staccato = new Staccato(stream)
+        var loop = async(function () {
+            async(function () {
+                staccato.read(async())
+            }, function (line) {
+                if (line == null) {
+                    return [ loop.break ]
+                }
+                consume(line)
+                if (eof) {
+                    return [ loop.break ]
+                }
+            })
+        })()
     }, function () {
         if (state.code != null) return state.code
         return (!count || eof) ? 0 : 1
@@ -21,14 +33,6 @@ var parse = cadence(function (async, program, consumer) {
         consumer({ type: 'error' }, state)
         program.stderr.write(message)
         program.stderr.write('\n')
-    }
-
-    function data (line) {
-        if (!consume(line)) {
-            // delta.off('data')
-            // delta.off('data', data)
-            delta.off(stream, 'data')
-        }
     }
 
     function consume (line) {

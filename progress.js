@@ -58,7 +58,13 @@ module.exports = function (options) {
         return ' ' + color(icon) + ' ' + file + ' ' + dots + ' ' + summary + ' ' + color(status) + terminal
     }
 
-    params.width || (params.width = 76)
+    if (!params.width) {
+        if (process.stdout.isTTY) {
+            params.width = Math.min(process.stdout.columns - 1, 119)
+        } else {
+            params.width = 76
+        }
+    }
 
     params.digits || (params.digits = 4)
     if (params.digits < 4) {

@@ -25,7 +25,8 @@
                             "cadence":                      "1.0.x",
                             "delta":                        "1.1.x",
                             "expandable":                   "0.0.6",
-                            "reactor":                      "2.2.x"
+                            "reactor":                      "2.2.x",
+                            "staccato":                     "1.1.x"
     },
     "devDependencies":
     {
