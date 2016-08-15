@@ -15,8 +15,8 @@ module.exports = function (module, count, test) {
         test = count
         count = 0
     }
-    var prove = module.exports = scaffold(count, require('../exit'), test)
+    var prove = module.exports = scaffold(count, test)
     if (isMainModule) {
-         prove(globals, process.stdout)
+         prove(globals, process.stdout, require('../exit'))
     }
 }

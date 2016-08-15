@@ -8,8 +8,8 @@ function pad (number, width) {
     return (new Array(width + 1).join(' ') + number).substr(-Math.max(width, number.length))
 }
 
-module.exports = function (count, exit, test) {
-    return function (globals, stream) {
+module.exports = function (count, test) {
+    return function (globals, stream, exit) {
         var expected = Math.abs(count), passed = 0, actual = 0, delayed
 
         function comment (lines) {
