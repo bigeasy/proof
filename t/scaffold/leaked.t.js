@@ -8,12 +8,12 @@ require('../..')(2, function (assert) {
     globals = globals.filter(function (global) { return global != 'process' })
 
     scaffold(1, function (assert) {
-    })(globals, function () {
-        return function (message, context) {
-            assert(message, 'Variables leaked into global namespace.', 'message')
-            assert(context, [ 'process' ], 'context')
+    })(globals, null, {
+        stdout: stdout,
+        stderr: new stream.PassThrough,
+        exit: function (code) {
+            assert(code, 1, 'exit')
         }
-    }, {
-        stdout: stdout
     })
+    assert(stdout.read().toString(), '1..1\nBail out! Variables leaked into global namespace.\n# [ \'process\' ]\n# expected 1\n# passed   0\n# failed   1\n', 'message')
 })

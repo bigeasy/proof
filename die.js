@@ -22,6 +22,12 @@ module.exports = function (comment, process) {
             comment(util.format.apply(util.format, vargs))
         }
 
+        // TODO This isn't really going to work, actually. You know by now that
+        // `exit` is harsh, that the only way to prevent forward motion is to
+        // throw an exception and not catch it. You're not using `die` ever. You
+        // can throw an exception to report a leaked variable.
+        //
+        // Man, this is all wrong.
         function tick () {
             if (++count == 2) {
                 process.exit(1)

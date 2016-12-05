@@ -3,23 +3,23 @@ require('../..')(2, function (assert) {
     var scaffold = require('../../scaffold')
     var stdout = new stream.PassThrough
 
-    scaffold(1, function (assert) {
-        throw new Error('exception')
-    })([], function () {
-        return function (error) {
-            assert(error.message, 'exception', 'exception')
-        }
-    }, {
-        stdout: stdout
-    })
+    try {
+        scaffold(1, function (assert) {
+            throw new Error('exception')
+        })([], null, {
+            stdout: stdout
+        })
+    } catch (error) {
+        assert(error.message, 'exception', 'exception')
+    }
 
-    scaffold(1, function (assert, callback) {
-        callback(new Error('error'))
-    })([], function () {
-        return function (error) {
-            assert(error.message, 'error', 'error')
-        }
-    }, {
-        stdout: stdout
-    })
+    try {
+        scaffold(1, function (assert, callback) {
+            callback(new Error('error'))
+        })([], null, {
+            stdout: stdout
+        })
+    } catch (error) {
+        assert(error.message, 'error', 'error')
+    }
 })

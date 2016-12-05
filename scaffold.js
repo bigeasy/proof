@@ -19,20 +19,21 @@ module.exports = function (sigil, outer) {
         }
 
         assert.say = say
-        assert.die = die
+//        assert.die = die
         assert.inc = inc
         assert.leak = leak
 
-        die = die(comment, process)
+        assert.die = die = require('./die')(comment, process)
 
-        try {
-            expected = expect(sigil)
-            // TODO Do not pass callback when synchronous.
-            outer.call(null, assert, callback)
-            if (outer.length == 1) callback()
-        } catch (e) {
-            die(e)
-        }
+        // Catching and wrapping exceptions causes them to lose context that
+        // appears to only be emitted if the exception is handled by Node.js
+        // itself. Although it is possible to have syntax error messages
+        // interpreted as TAP output, the non-zero exit will prevent the test
+        // runner from interpreting the test as successful.
+        expected = expect(sigil)
+        // TODO Do not pass callback when synchronous.
+        outer.call(null, assert, callback)
+        if (outer.length == 1) callback()
 
 
         if (synchronicity) {
@@ -121,7 +122,7 @@ module.exports = function (sigil, outer) {
 
         function callback (error) {
             if (error) {
-                die(error)
+                throw error
             } else {
                 if (synchronicity) {
                     finish()
