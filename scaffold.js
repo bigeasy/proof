@@ -1,4 +1,5 @@
 var util = require('util'), _assert = require('assert'), __slice = [].slice
+var interrupt = require('interrupt').createInterrupter('proof')
 
 module.exports = function (sigil, outer) {
     if (typeof sigil != 'number') {
@@ -105,7 +106,13 @@ module.exports = function (sigil, outer) {
                 return !~globals.indexOf(global)
             })
             if (leaked.length) {
-                die('Variables leaked into global namespace.', leaked)
+                throw interrupt({
+                    name: 'leaked',
+                    message: 'Variables leaked into global namespace.',
+                    context: {
+                        leaked: leaked
+                    }
+                })
             }
             var widths = [ expected, actual, passed ].map(function (number) { return String(number).length })
             var width = Math.max.apply(Math, widths)

@@ -27,7 +27,8 @@
                             "delta":                        "1.1.x",
                             "expandable":                   "0.0.6",
                             "reactor":                      "2.4.x",
-                            "staccato":                     "1.1.x"
+                            "staccato":                     "1.1.x",
+                            "interrupt":                    "2.1.x"
     },
     "devDependencies":
     {
