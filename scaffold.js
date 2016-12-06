@@ -123,6 +123,14 @@ module.exports = function (sigil, outer) {
             if (passed < expected) {
                 process.stdout.write('# failed   ' + pad(expected - passed) + '\n')
             }
+            if (passed != expected) {
+                var version = process.versions.node.split('.').map(function (part) { return +part })
+                if (version[0] > 0 || version[1] > 11 || version[2] >= 8) {
+                    process.errorCode = 1
+                } else {
+                    throw interrupt('failed')
+                }
+            }
         }
 
         function callback (error) {

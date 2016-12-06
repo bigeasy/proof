@@ -20,7 +20,8 @@ require('../..')(4, function (assert) {
         assert(false, 'boolean')
         assert(1, 2, 'equal')
     })(globals, {
-        stdout: stdout
+        stdout: stdout,
+        versions: { node: '4.2.0' }
     })
 
     assert(stdout.read().toString(), expected, 'assert')

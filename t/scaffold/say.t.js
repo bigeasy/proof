@@ -8,7 +8,8 @@ require('../..')(1, function (assert) {
     scaffold(1, function (assert) {
         assert.say(1, 2, 3)
     })(globals, {
-        stdout: stdout
+        stdout: stdout,
+        versions: { node: '4.2.0' }
     })
 
     assert(stdout.read().toString(), '1..1\n# 1 2 3\n# expected 1\n# passed   0\n# failed   1\n', 'say')
