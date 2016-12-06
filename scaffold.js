@@ -8,7 +8,8 @@ module.exports = function (sigil, outer) {
     // TODO Come back and implement with Cadence. Cadence will correctly recover
     // from an exception. Just as in Arguable, I can use Interrupt to throw and
     // catch namespaced exceptions.
-    return function (globals, die, process) {
+    return function (globals, process) {
+        if (arguments.length != 2) throw new Error
         var passed = 0, actual = 0
         var name, expected, invalid, delayedPlan, synchronicity
 
@@ -20,11 +21,8 @@ module.exports = function (sigil, outer) {
         }
 
         assert.say = say
-//        assert.die = die
         assert.inc = inc
         assert.leak = leak
-
-        assert.die = die = require('./die')(comment, process)
 
         // Catching and wrapping exceptions causes them to lose context that
         // appears to only be emitted if the exception is handled by Node.js

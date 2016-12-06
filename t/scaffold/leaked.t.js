@@ -9,7 +9,7 @@ require('../..')(1, function (assert) {
 
     try {
         scaffold(1, function (assert) {
-        })(globals, null, { stdout: stdout })
+        })(globals, { stdout: stdout })
     } catch (error) {
         assert(/^proof#leaked$/m.test(error.message), 'leaked')
         console.log(error.stack)

@@ -7,7 +7,7 @@ require('../..')(1, function (assert) {
 
     scaffold(1, function (assert) {
         assert.say(1, 2, 3)
-    })(globals, function () {}, {
+    })(globals, {
         stdout: stdout
     })
 

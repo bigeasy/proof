@@ -6,7 +6,7 @@ require('../..')(2, function (assert) {
     try {
         scaffold(1, function (assert) {
             throw new Error('exception')
-        })([], null, {
+        })([], {
             stdout: stdout
         })
     } catch (error) {
@@ -16,7 +16,7 @@ require('../..')(2, function (assert) {
     try {
         scaffold(1, function (assert, callback) {
             callback(new Error('error'))
-        })([], null, {
+        })([], {
             stdout: stdout
         })
     } catch (error) {
