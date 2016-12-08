@@ -1,5 +1,4 @@
 var util = require('util'), _assert = require('assert'), __slice = [].slice
-var interrupt = require('interrupt').createInterrupter('proof')
 
 module.exports = function (sigil, outer) {
     if (typeof sigil != 'number') {
@@ -8,8 +7,7 @@ module.exports = function (sigil, outer) {
     // TODO Come back and implement with Cadence. Cadence will correctly recover
     // from an exception. Just as in Arguable, I can use Interrupt to throw and
     // catch namespaced exceptions.
-    return function (globals, process) {
-        if (arguments.length != 2) throw new Error
+    return function (globals, die, process) {
         var passed = 0, actual = 0
         var name, expected, invalid, delayedPlan, synchronicity
 
@@ -21,18 +19,20 @@ module.exports = function (sigil, outer) {
         }
 
         assert.say = say
+        assert.die = die
         assert.inc = inc
         assert.leak = leak
 
-        // Catching and wrapping exceptions causes them to lose context that
-        // appears to only be emitted if the exception is handled by Node.js
-        // itself. Although it is possible to have syntax error messages
-        // interpreted as TAP output, the non-zero exit will prevent the test
-        // runner from interpreting the test as successful.
-        expected = expect(sigil)
-        // TODO Do not pass callback when synchronous.
-        outer.call(null, assert, callback)
-        if (outer.length == 1) callback()
+        die = die(comment, process)
+
+        try {
+            expected = expect(sigil)
+            // TODO Do not pass callback when synchronous.
+            outer.call(null, assert, callback)
+            if (outer.length == 1) callback()
+        } catch (e) {
+            die(e)
+        }
 
 
         if (synchronicity) {
@@ -104,13 +104,7 @@ module.exports = function (sigil, outer) {
                 return !~globals.indexOf(global)
             })
             if (leaked.length) {
-                throw interrupt({
-                    name: 'leaked',
-                    message: 'Variables leaked into global namespace.',
-                    context: {
-                        leaked: leaked
-                    }
-                })
+                die('Variables leaked into global namespace.', leaked)
             }
             var widths = [ expected, actual, passed ].map(function (number) { return String(number).length })
             var width = Math.max.apply(Math, widths)
@@ -123,19 +117,11 @@ module.exports = function (sigil, outer) {
             if (passed < expected) {
                 process.stdout.write('# failed   ' + pad(expected - passed) + '\n')
             }
-            if (passed != expected) {
-                var version = process.versions.node.split('.').map(function (part) { return +part })
-                if (version[0] > 0 || version[1] > 11 || version[2] >= 8) {
-                    process.errorCode = 1
-                } else {
-                    throw interrupt('failed')
-                }
-            }
         }
 
         function callback (error) {
             if (error) {
-                throw error
+                die(error)
             } else {
                 if (synchronicity) {
                     finish()

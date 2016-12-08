@@ -10,6 +10,6 @@ module.exports = function () {
         module.exports = scaffold
     }
     if (!module || require.main === module) {
-        scaffold(globals, process)
+        scaffold(globals, require('./die'), process)
     }
 }

@@ -19,9 +19,8 @@ require('../..')(4, function (assert) {
     scaffold(1, function (assert) {
         assert(false, 'boolean')
         assert(1, 2, 'equal')
-    })(globals, {
-        stdout: stdout,
-        versions: { node: '4.2.0' }
+    })(globals, function () {}, {
+        stdout: stdout
     })
 
     assert(stdout.read().toString(), expected, 'assert')
