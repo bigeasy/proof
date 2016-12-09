@@ -92,13 +92,14 @@ function prove (assert) {
 
     assert(out.read().toString(), 'Bail out!\n# 1\n', 'throw integer')
 
-    var expected = { exitCode: 1, message: 'exit 1 throw error' }
-
-    scaffold(0, function (_assert) {
-        throw new Error('hello')
-    })(globals, out, exit, noop)
-
-    assert(/^# .*hello$/m.test(out.read().toString()), 'throw error')
+    try {
+        scaffold(0, function (_assert) {
+            throw new Error('hello')
+        })(globals, out, exit, noop)
+    } catch (error) {
+        assert(error.message, 'hello', 'throw error')
+        assert(out.read().toString(), 'Bail out!\n', 'throw error bail out')
+    }
 
     var expected = { exitCode: 1, message: 'exit 1 missing tests' }
 

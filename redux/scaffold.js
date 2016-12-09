@@ -72,7 +72,7 @@ module.exports = function (count, test) {
                 } else {
                     stream.write('Bail out!\n')
                     if (error.stack) {
-                        assert.say(error.stack)
+                        throw error
                     } else {
                         assert.inspect(error)
                     }
@@ -114,6 +114,17 @@ module.exports = function (count, test) {
             stream.write('1..' + expected + '\n')
         }
 
+        // Found where line numbers are added, syntax context is added. Will
+        // have to read carefully to see if we can recreate, but then it would
+        // be Node.js/V8 specific, specific to Node.js. Although I have no
+        // intention of running in other JavaScript environments, it is probably
+        // best to treat the Proof scaffold as a minimal process wrapper, let
+        // Node.js do its thing.
+        //
+        // https://github.com/nodejs/node/blob/4db97b832b2522551d1bfacc1b95e3cbbf2df097/src/node.cc#L1440
+        // Hoplessness. Add answer.
+        // http://stackoverflow.com/questions/13746831/how-can-i-get-the-line-number-of-a-syntaxerror-thrown-by-requireid-in-node-js
+        // So, I'm removing a try/catch block here.
         try {
             test.call(null, assert, callback)
             if (test.length == 1) callback()
