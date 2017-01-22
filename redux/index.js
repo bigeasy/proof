@@ -19,7 +19,11 @@ module.exports = function (module, count, test) {
     }
     var scaffolded = scaffold(count, test)
     if (isMainModule) {
-         scaffolded(globals, process.stdout, require('../exit'), noop)
+         scaffolded(globals, process.stdout, function (error, result) {
+         if (error)
+  throw error /*\*-* Proof framework rewthrowing test generated error. See below. *-*\*/
+            else require('../exit')(process)(result)
+         })
     } else {
         module.exports = function (options, callback) {
             var run = {

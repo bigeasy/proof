@@ -30,21 +30,21 @@ function prove (assert) {
         assert(out.read().toString(), 'ok 2\n', 'boolean test passed no message')
         _assert({ a: 1 }, { a: 1 }, 'equal')
         assert(out.read().toString(), 'ok 3 equal\n', 'equal test passed')
-    })(globals, out, exit, noop)
-
-    assert(out.read().toString(), '# expected   3\n# passed     3\n', 'ok summary')
-
-    var expected = { exitCode: 0, message: 'exit 0 delayed' }
+    })(globals, out, function (error, code) {
+        if (error) throw error
+        assert(code, 0, 'exit 0')
+        assert(out.read().toString(), '# expected   3\n# passed     3\n', 'ok summary')
+    })
 
     scaffold(0, function (_assert) {
         assert(out.read(), null, 'defered')
         _assert.inc(1)
         _assert(true, 'truth')
-    })(globals, out, exit, noop)
-
-    assert(out.read().toString(), 'ok 1 truth\n1..1\n# expected   1\n# passed     1\n', 'delayed summary')
-
-    var expected = { exitCode: 1, message: 'exit 1 not ok' }
+    })(globals, out, function (error, code) {
+        if (error) throw error
+        assert(code, 0, 'exit 0 delayed')
+        assert(out.read().toString(), 'ok 1 truth\n1..1\n# expected   1\n# passed     1\n', 'delayed summary')
+    })
 
     scaffold(0, function (_assert) {
         _assert.inc(2)
@@ -52,67 +52,70 @@ function prove (assert) {
         assert(out.read().toString(), 'not ok 1 truth\n# { FALSE: false }\n', 'boolean test failed')
         _assert(1, '1', 'equal')
         assert(out.read().toString(), 'not ok 2 equal\n# { EXPECTED: \'1\', GOT: 1 }\n', 'equal test failed')
-    })(globals, out, exit, noop)
-
-    assert(out.read().toString(), '1..2\n# expected   2\n# passed     0\n# failed     2\n', 'not ok summary')
-
-    var expected = { exitCode: 1, message: 'exit 1 die' }
+    })(globals, out, function (error, code) {
+        if (error) throw error
+        assert(code, 1, 'exit 1 not ok summary')
+        assert(out.read().toString(), '1..2\n# expected   2\n# passed     0\n# failed     2\n', 'not ok summary')
+    })
 
     scaffold(0, function (_assert) {
         _assert.die('goodbye')
-    })(globals, out, exit, noop)
-
-    assert(out.read().toString(), 'Bail out! goodbye\n', 'bail out')
-
-    var expected = { exitCode: 1, message: 'exit 1 die inspect' }
+    })(globals, out, function (error, code) {
+        if (error) throw error
+        assert(code, 1, 'exit 1 die')
+        assert(out.read().toString(), 'Bail out! goodbye\n', 'bail out')
+    })
 
     scaffold(0, function (_assert) {
         _assert.die('goodbye', { a: 1 })
-    })(globals, out, exit, noop)
-
-    assert(out.read().toString(), 'Bail out! goodbye\n# { a: 1 }\n', 'bail out inspect')
+    })(globals, out, function (error, code) {
+        if (error) throw error
+        assert(code, 1, 'exit 1 bail out inspect')
+        assert(out.read().toString(), 'Bail out! goodbye\n# { a: 1 }\n', 'bail out inspect')
+    })
 
     var expected = { exitCode: 1, message: 'exit 1 leaked' }
 
     var shifted = globals.shift()
     scaffold(0, function (_assert) {
-    })(globals, out, exit, noop)
-    globals.unshift(shifted)
+    })(globals, out, function (error, code) {
+        assert(code, 1, 'exit 1 leaked')
+        globals.unshift(shifted)
 
-    var leaked = '1..0\nBail out! Variables leaked into global namespace.\n# ' +
-        util.inspect([ shifted ]) + '\n'
-
-    assert(out.read().toString(), leaked, 'leaked')
-
-    var expected = { exitCode: 1, message: 'exit 1 throw integer' }
+        var leaked = '1..0\nBail out! Variables leaked into global namespace.\n# ' +
+            util.inspect([ shifted ]) + '\n'
+        assert(out.read().toString(), leaked, 'leaked')
+    })
 
     scaffold(0, function (_assert) {
         throw 1
-    })(globals, out, exit, noop)
+    })(globals, out, function (error, code) {
+        assert(code, 1, 'exit 1 throw integer')
+        assert(out.read().toString(), 'Bail out!\n# 1\n', 'throw integer')
+    })
 
-    assert(out.read().toString(), 'Bail out!\n# 1\n', 'throw integer')
-
-    try {
-        scaffold(0, function (_assert) {
-            throw new Error('hello')
-        })(globals, out, exit, noop)
-    } catch (error) {
+    scaffold(0, function (_assert) {
+        throw new Error('hello')
+    })(globals, out, function (error) {
         assert(error.message, 'hello', 'throw error')
         assert(out.read().toString(), 'Bail out!\n', 'throw error bail out')
-    }
-
-    var expected = { exitCode: 1, message: 'exit 1 missing tests' }
+    })
 
     scaffold(1, function (_assert) {
-    })(globals, out, exit, noop)
+    })(globals, out, function (error, code) {
+        if (error) throw error
+        assert(code, 1, 'exit 1 missing tests')
+        assert(out.read().toString(), '1..1\n# expected   1\n# passed     0\n# missing    1\n', 'missing tests')
+    })
 
-    assert(out.read().toString(), '1..1\n# expected   1\n# passed     0\n# missing    1\n', 'missing summary')
 
     var expected = { exitCode: 1, message: 'exit 1 unexpected tests' }
 
-    scaffold(0, function (_assert) {
-        _assert(true, 'truth')
-    })(globals, out, exit, noop)
+    scaffold(0, function (assert) {
+        assert(true, 'truth')
+    })(globals, out, function (error, code) {
+        assert(code, 1, 'exit 1 unexpected tests')
+        assert(out.read().toString(), 'ok 1 truth\n1..0\n# expected   0\n# passed     1\n# unexpected 1\n', 'unexpected summary')
+    })
 
-    assert(out.read().toString(), 'ok 1 truth\n1..0\n# expected   0\n# passed     1\n# unexpected 1\n', 'unexpected summary')
 }

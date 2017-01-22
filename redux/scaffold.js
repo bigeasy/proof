@@ -2,6 +2,7 @@ var slice = [].slice
 var BAILOUT = {}
 var util = require('util')
 var deepEqual = require('deep-equal')
+var cadence = require('cadence')
 
 function pad (number, width) {
     number = String(number)
@@ -9,7 +10,7 @@ function pad (number, width) {
 }
 
 module.exports = function (count, test) {
-    return function (globals, stream, exit, _callback) {
+    return cadence(function (async, globals, stream) {
         var expected = Math.abs(count), passed = 0, actual = 0, delayed
 
         function comment (lines) {
@@ -59,57 +60,6 @@ module.exports = function (count, test) {
             globals.push.apply(globals, arguments)
         }
 
-        function callback (error) {
-            if (error) {
-                if (error.isBailout === BAILOUT) {
-                    var message = typeof error.vargs[0] == 'string'
-                                ? (' ' + error.vargs.shift())
-                                : ''
-                    stream.write('Bail out!' + message + '\n')
-                    if (error.vargs.length != 0) {
-                        assert.inspect(error.vargs.shift())
-                    }
-                } else {
-                    stream.write('Bail out!\n')
-                    if (error.stack) {
-                        throw error
-                    } else {
-                        assert.inspect(error)
-                    }
-                }
-                exit(1)
-            } else {
-                if (delayed) {
-                    stream.write('1..' + expected + '\n')
-                }
-                var leaked = Object.keys(global).filter(function (global) {
-                    return !~globals.indexOf(global)
-                })
-                if (leaked.length) {
-                    stream.write('Bail out! Variables leaked into global namespace.\n')
-                    assert.inspect(leaked)
-                    exit(1)
-                } else {
-                    var failed = actual - passed
-                    var width = Math.max.apply(Math, [
-                        expected, actual, passed
-                    ].map(function (number) { return String(number).length }))
-                    stream.write('# expected   ' + pad(expected, width) + '\n')
-                    stream.write('# passed     ' + pad(passed, width) + '\n')
-                    if (failed != 0) {
-                        stream.write('# failed     ' + pad(failed, width) + '\n')
-                    }
-                    if (actual < expected) {
-                        stream.write('# missing    ' + pad(expected - actual, width) + '\n')
-                    } else if (actual > expected) {
-                        stream.write('# unexpected ' + pad(actual - expected, width) + '\n')
-                    }
-                    exit(failed == 0 && passed == expected ? 0 : 1)
-                }
-            }
-            _callback()
-        }
-
         if (!(delayed = count < 1)) {
             stream.write('1..' + expected + '\n')
         }
@@ -125,11 +75,59 @@ module.exports = function (count, test) {
         // Hoplessness. Add answer.
         // http://stackoverflow.com/questions/13746831/how-can-i-get-the-line-number-of-a-syntaxerror-thrown-by-requireid-in-node-js
         // So, I'm removing a try/catch block here.
-        try {
-            test.call(null, assert, callback)
-            if (test.length == 1) callback()
-        } catch (error) {
-            callback(error)
-        }
-    }
+        async([function () {
+            if (test.length == 1) test.call(null, assert)
+            else test.call(null, assert, async())
+        }, function (error) {
+            if (error.isBailout === BAILOUT) {
+                if (error.cause) {
+                    stream.write('Bail out!\n')
+                    throw error.cause // Rethrowing.
+                }
+                var message = typeof error.vargs[0] == 'string'
+                            ? (' ' + error.vargs.shift())
+                            : ''
+                stream.write('Bail out!' + message + '\n')
+                if (error.vargs.length != 0) {
+                    assert.inspect(error.vargs.shift())
+                }
+            } else {
+                stream.write('Bail out!\n')
+                if (error.stack) {
+                    throw error
+                } else {
+                    assert.inspect(error)
+                }
+            }
+            return [ async.break, 1 ]
+        }], function () {
+            if (delayed) {
+                stream.write('1..' + expected + '\n')
+            }
+            var leaked = Object.keys(global).filter(function (global) {
+                return !~globals.indexOf(global)
+            })
+            if (leaked.length) {
+                stream.write('Bail out! Variables leaked into global namespace.\n')
+                assert.inspect(leaked)
+                return 1
+            } else {
+                var failed = actual - passed
+                var width = Math.max.apply(Math, [
+                    expected, actual, passed
+                ].map(function (number) { return String(number).length }))
+                stream.write('# expected   ' + pad(expected, width) + '\n')
+                stream.write('# passed     ' + pad(passed, width) + '\n')
+                if (failed != 0) {
+                    stream.write('# failed     ' + pad(failed, width) + '\n')
+                }
+                if (actual < expected) {
+                    stream.write('# missing    ' + pad(expected - actual, width) + '\n')
+                } else if (actual > expected) {
+                    stream.write('# unexpected ' + pad(actual - expected, width) + '\n')
+                }
+                return failed == 0 && passed == expected ? 0 : 1
+            }
+        })
+    })
 }
