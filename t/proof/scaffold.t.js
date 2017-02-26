@@ -49,9 +49,9 @@ function prove (assert) {
     scaffold(0, function (_assert) {
         _assert.inc(2)
         _assert(false, 'truth')
-        assert(out.read().toString(), 'not ok 1 truth\n# { FALSE: false }\n', 'boolean test failed')
+        assert(out.read().toString(), 'not ok 1 truth\n', 'boolean test failed')
         _assert(1, '1', 'equal')
-        assert(out.read().toString(), 'not ok 2 equal\n# { EXPECTED: \'1\', GOT: 1 }\n', 'equal test failed')
+        assert(out.read().toString(), 'not ok 2 equal\n# ACTUAL 1\n# EXPECTED \'1\'\n# DIFF [ DiffEdit { kind: \'E\', lhs: 1, rhs: \'1\' } ]\n', 'equal test failed')
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 1, 'exit 1 not ok summary')

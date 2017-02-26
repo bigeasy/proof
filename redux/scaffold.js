@@ -1,8 +1,11 @@
 var slice = [].slice
 var BAILOUT = {}
 var util = require('util')
-var deepEqual = require('deep-equal')
 var cadence = require('cadence')
+
+// A strict implementation of deep equal  that will print a diff statement when
+// comparisons fail.
+var departure = require('departure')
 
 function pad (number, width) {
     number = String(number)
@@ -20,9 +23,10 @@ module.exports = function (count, test) {
         }
 
         function assert () {
-            var vargs = slice.call(arguments), ok, message
+            var vargs = slice.call(arguments), ok, message, detail = null
             if (vargs.length == 3) {
-                ok = deepEqual(vargs[0], vargs[1], { strict: true })
+                detail = departure.compare(vargs[0], vargs[1])
+                ok = detail == null
                 message = ' ' + vargs[2]
             } else {
                 ok = !! vargs[0]
@@ -33,10 +37,9 @@ module.exports = function (count, test) {
                 stream.write('ok ' + (++actual) + message + '\n')
             } else {
                 stream.write('not ok ' + (++actual) + message + '\n')
-                var detail = vargs.length == 3
-                           ? { EXPECTED: vargs[1], GOT: vargs[0] }
-                           : { FALSE: vargs[0] }
-                stream.write(comment(util.inspect(detail, { depth: null })))
+            }
+            if (detail != null) {
+                stream.write(comment(detail))
             }
         }
 
