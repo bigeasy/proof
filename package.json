@@ -25,7 +25,7 @@
                             "cadence":                      "1.0.x",
                             "deep-equal":                   "1.0.1",
                             "delta":                        "1.1.x",
-                            "departure":                    "0.0.2",
+                            "departure":                    "0.0.3",
                             "expandable":                   "0.0.6",
                             "reactor":                      "2.2.x",
                             "staccato":                     "1.1.x"

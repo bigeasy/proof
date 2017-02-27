@@ -51,7 +51,7 @@ function prove (assert) {
         _assert(false, 'truth')
         assert(out.read().toString(), 'not ok 1 truth\n', 'boolean test failed')
         _assert(1, '1', 'equal')
-        assert(out.read().toString(), 'not ok 2 equal\n# ACTUAL 1\n# EXPECTED \'1\'\n# DIFF [ DiffEdit { kind: \'E\', lhs: 1, rhs: \'1\' } ]\n', 'equal test failed')
+        assert(out.read().toString(), 'not ok 2 equal\n# ACTUAL 1\n# EXPECTED \'1\'\n# DIFF [ { kind: \'E\', lhs: 1, rhs: \'1\' } ]\n', 'equal test failed')
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 1, 'exit 1 not ok summary')
