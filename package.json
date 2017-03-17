@@ -24,7 +24,7 @@
                             "byline":                       "5.0.0",
                             "cadence":                      "1.0.x",
                             "deep-equal":                   "1.0.1",
-                            "delta":                        "1.1.x",
+                            "delta":                        "1.2.x",
                             "departure":                    "0.0.3",
                             "expandable":                   "0.0.6",
                             "turnstile":                    "2.2.2",
