@@ -28,7 +28,7 @@
                             "departure":                    "0.0.3",
                             "expandable":                   "0.0.6",
                             "reactor":                      "2.2.x",
-                            "staccato":                     "1.1.x"
+                            "staccato":                     "3.0.x"
     },
     "devDependencies":
     {

@@ -10,7 +10,7 @@ var parse = cadence(function (async, program, consumer) {
     async(function () {
         var stream = byline.createStream(program.stdin, { encoding: 'utf8' })
         stream.on('end', function () { stream.emit('readable') })
-        var staccato = new Staccato(stream)
+        var staccato = new Staccato.Readable(stream)
         var loop = async(function () {
             async(function () {
                 staccato.read(async())
