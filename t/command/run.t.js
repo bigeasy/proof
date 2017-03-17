@@ -25,7 +25,7 @@ var prove = cadence(function (async, assert) {
     }], [function () {
         proof([ 'run', 't/command/fixtures/success', 't/command/fixtures/success' ], {}, async())
     }, function (error) {
-        assert(error.stderr, 'error: a program must only run once in a test run: t/command/fixtures/success', 'spaces')
+        assert(error.stderr, 'error: a program must only run once in a test run: t/command/fixtures/success', 'duplicates')
     }], function () {
         test('success', 'run', 0, [ '-p', 1 ], async())
     }, function () {

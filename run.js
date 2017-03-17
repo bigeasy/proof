@@ -6,7 +6,7 @@ var spawn = require('child_process').spawn
 var Delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
-var Reactor = require('reactor')
+var Turnstile = require('turnstile/redux')
 
 var run = cadence(function (async, program) {
     var programs = [], params = program.ultimate
@@ -34,7 +34,7 @@ var run = cadence(function (async, program) {
     })
 
     // Happens often enough that we shouldn't freak out.
-    var operation = cadence(function (async, timeout, programs) {
+    var operation = cadence(function (async, envelope) {
         async(function () {
             async.forEach(function (program) {
                 async(function () {
@@ -90,17 +90,17 @@ var run = cadence(function (async, program) {
                         executable.kill()
                     }
                 })
-            })(programs)
+            })(envelope.body)
         })
     })
 
-    var reactor = new Reactor(operation)
+    var turnstile = new Turnstile(operation)
 
     async(function () {
         Object.keys(directories).forEach(function (directory) {
-            reactor.push(directories[directory])
+            turnstile.push(directories[directory])
         })
-        reactor.push([], async())
+        turnstile.enqueue([], async())
     }, function () {
         stamp('*', 'eof')
         return 0
