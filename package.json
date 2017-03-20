@@ -27,7 +27,7 @@
                             "delta":                        "1.2.x",
                             "departure":                    "0.0.3",
                             "expandable":                   "0.0.6",
-                            "turnstile":                    "2.2.5",
+                            "turnstile":                    "2.2.6",
                             "staccato":                     "3.0.x"
     },
     "devDependencies":
