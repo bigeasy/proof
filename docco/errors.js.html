@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>errors.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+
+
+                <a class="source" href="candidate.js.html">
+                  candidate.js
+                </a>
+
+
+                <a class="source" href="colorization.js.html">
+                  colorization.js
+                </a>
+
+
+                <a class="source" href="convert.js.html">
+                  convert.js
+                </a>
+
+
+                <a class="source" href="die.js.html">
+                  die.js
+                </a>
+
+
+                <a class="source" href="epipe.js.html">
+                  epipe.js
+                </a>
+
+
+                <a class="source" href="errors.js.html">
+                  errors.js
+                </a>
+
+
+                <a class="source" href="executable.js.html">
+                  executable.js
+                </a>
+
+
+                <a class="source" href="exit.js.html">
+                  exit.js
+                </a>
+
+
+                <a class="source" href="extend.js.html">
+                  extend.js
+                </a>
+
+
+                <a class="source" href="formatter.js.html">
+                  formatter.js
+                </a>
+
+
+                <a class="source" href="index.js.html">
+                  index.js
+                </a>
+
+
+                <a class="source" href="json.js.html">
+                  json.js
+                </a>
+
+
+                <a class="source" href="parse.js.html">
+                  parse.js
+                </a>
+
+
+                <a class="source" href="platform.js.html">
+                  platform.js
+                </a>
+
+
+                <a class="source" href="printer.js.html">
+                  printer.js
+                </a>
+
+
+                <a class="source" href="progress.js.html">
+                  progress.js
+                </a>
+
+
+                <a class="source" href="proof.bin.js.html">
+                  proof.bin.js
+                </a>
+
+
+                <a class="source" href="proof.errors.js.html">
+                  proof.errors.js
+                </a>
+
+
+                <a class="source" href="proof.js.html">
+                  proof.js
+                </a>
+
+
+                <a class="source" href="proof.json.js.html">
+                  proof.json.js
+                </a>
+
+
+                <a class="source" href="proof.platform.js.html">
+                  proof.platform.js
+                </a>
+
+
+                <a class="source" href="proof.progress.js.html">
+                  proof.progress.js
+                </a>
+
+
+                <a class="source" href="proof.run.js.html">
+                  proof.run.js
+                </a>
+
+
+                <a class="source" href="proof.test.js.html">
+                  proof.test.js
+                </a>
+
+
+                <a class="source" href="run.js.html">
+                  run.js
+                </a>
+
+
+                <a class="source" href="scaffold.js.html">
+                  scaffold.js
+                </a>
+
+
+                <a class="source" href="shebang.js.html">
+                  shebang.js
+                </a>
+
+
+                <a class="source" href="tap.js.html">
+                  tap.js
+                </a>
+
+
+                <a class="source" href="test.js.html">
+                  test.js
+                </a>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    <ul class="sections">
+
+          <li id="title">
+              <div class="annotation">
+                  <h1>errors.js</h1>
+              </div>
+          </li>
+
+
+
+        <li id="section-1">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> colorization = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./colorization'</span>)</pre></div></div>
+
+        </li>
+
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Problem with errors is that output can be interleaved, so we need to gather
+up the lines of output after a failed assertion, or else the output of other
+assertions get interleaved.</p>
+<p>The first formatting style that comes to mind would be one that grouped all
+the failed assertions under their failed test, but that means waiting for a
+full test to load. There are test with a great many failures, one of the
+automated tests, like the one in Timezone that tests every clock transition
+in the world since the dawn of standardized time. We might run out of memory
+if a test of that nature is really broken and really chatty about it.</p>
+<p>What we’re going to do for a stab at this problem is create a queue, as we do
+with progress, and one go at a time. Chances are the queue will be empty. If
+there is one long running test interleaved with a quick test, then the quick
+test will be done quickly, and the long running test can take over. If two
+long running test are interleaved, then we might want to view the tests one
+at a time by piping the test through <code>grep</code>, or piping it through <code>sort</code>,
+before passing it to <code>proof errors</code>.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">options</span>) </span>{
+    <span class="hljs-keyword">var</span> queue = []
+    <span class="hljs-keyword">var</span> failed = {}
+    <span class="hljs-keyword">var</span> prefix = <span class="hljs-string">''</span>
+    <span class="hljs-keyword">var</span> backlog = {}
+    <span class="hljs-keyword">var</span> offset = <span class="hljs-number">2</span>
+    <span class="hljs-keyword">var</span> planned
+    <span class="hljs-keyword">var</span> colorize = colorization(options.ultimate)
+
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event, state</span>) </span>{
+        <span class="hljs-keyword">var</span> out = []
+        <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">'run'</span>) {
+            planned = <span class="hljs-literal">false</span>
+            backlog[event.file] = [
+                {
+                    <span class="hljs-attr">type</span>: <span class="hljs-string">'out'</span>,
+                    <span class="hljs-attr">line</span>: <span class="hljs-string">''</span>
+                }, {
+                    <span class="hljs-attr">type</span>: <span class="hljs-string">'out'</span>,
+                    <span class="hljs-attr">line</span>: <span class="hljs-string">'&gt;--'</span>
+                }, {
+                    <span class="hljs-attr">type</span>: <span class="hljs-string">'out'</span>,
+                    <span class="hljs-attr">line</span>: <span class="hljs-string">''</span>
+                }
+            ]
+        }
+        <span class="hljs-keyword">if</span> (failed[event.file]) {
+            failed[event.file].events.push(event)
+            <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">'test'</span> &amp;&amp; event.ok) <span class="hljs-keyword">delete</span> failed[event.file]
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ((event.type === <span class="hljs-string">'bail'</span>) ||
+                   (event.type === <span class="hljs-string">'test'</span> &amp;&amp; !(event.ok)) ||
+                   (event.type === <span class="hljs-string">'exit'</span> &amp;&amp; (event.code || !planned || (event.expected != event.actual)))) {
+            queue.push(failed[event.file] = {
+                <span class="hljs-attr">events</span>: backlog[event.file].concat([event])
+            })
+            <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">'test'</span>) {
+                backlog[event.file].length = <span class="hljs-number">3</span>
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">delete</span> backlog[event.file]
+            }
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">'plan'</span>) {
+            planned = <span class="hljs-literal">true</span>
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">'test'</span>) {
+            backlog[event.file].length = <span class="hljs-number">3</span>
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">'exit'</span>) {
+            <span class="hljs-keyword">delete</span> backlog[event.file]
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (event.type !== <span class="hljs-string">'eof'</span>) {
+            backlog[event.file].push(event)
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (offset !== <span class="hljs-number">2</span>) {
+            out.push(<span class="hljs-string">'\n'</span>)
+            state.code = <span class="hljs-number">1</span>
+        }
+        <span class="hljs-keyword">while</span> (queue.length &amp;&amp; queue[<span class="hljs-number">0</span>].events.length) {
+            event = queue[<span class="hljs-number">0</span>].events.shift()
+            <span class="hljs-keyword">if</span> (offset-- &gt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">continue</span>
+            }
+            <span class="hljs-keyword">switch</span> (event.type) {
+                <span class="hljs-keyword">case</span> <span class="hljs-string">'bail'</span>:
+                    out.push(<span class="hljs-string">'&gt; '</span> + (colorize.red(<span class="hljs-string">'\u2718'</span>)) + <span class="hljs-string">' '</span> + event.file + <span class="hljs-string">': Bail Out!\n'</span>)
+                    <span class="hljs-keyword">break</span>
+                <span class="hljs-keyword">case</span> <span class="hljs-string">'test'</span>:
+<span class="hljs-comment">/*                    if (!planned) {
+                        process.stdout.write('&gt; ' + (colorize.red('\u2718')) + ' ' + event.file + ': no plan given: ' + event.message + '\n')
+                        planned = true
+                    } else */</span>
+                    <span class="hljs-keyword">if</span> (event.ok) {
+                        queue.shift()
+                    } <span class="hljs-keyword">else</span> {
+                        out.push(<span class="hljs-string">'&gt; '</span> + (colorize.red(<span class="hljs-string">'\u2718'</span>)) + <span class="hljs-string">' '</span> + event.file + <span class="hljs-string">': '</span> + event.message + <span class="hljs-string">'\n'</span>)
+                    }
+                    <span class="hljs-keyword">break</span>
+                <span class="hljs-keyword">case</span> <span class="hljs-string">'err'</span>:
+                <span class="hljs-keyword">case</span> <span class="hljs-string">'out'</span>:
+                    out.push(<span class="hljs-string">''</span> + event.line + <span class="hljs-string">'\n'</span>)
+                    prefix = <span class="hljs-string">''</span>
+                    <span class="hljs-keyword">break</span>
+                <span class="hljs-keyword">case</span> <span class="hljs-string">'exit'</span>:
+                    <span class="hljs-keyword">if</span> (event.code || !planned || (event.actual != event.expected)) {
+                        <span class="hljs-keyword">var</span> line = []
+                        line.push(<span class="hljs-string">'&gt; '</span> + (colorize.red(<span class="hljs-string">'\u2718'</span>)) + <span class="hljs-string">' '</span> + event.file)
+                        <span class="hljs-keyword">if</span> (!planned) {
+                            line.push(<span class="hljs-string">': no plan given'</span>)
+                        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (event.actual != event.expected) {
+                            line.push(<span class="hljs-string">': expected '</span> + event.expected + <span class="hljs-string">' test'</span> + (event.expected == <span class="hljs-number">1</span> ? <span class="hljs-string">''</span> : <span class="hljs-string">'s'</span>)  + <span class="hljs-string">' but got '</span> + event.actual)
+                        }
+                        line.push(<span class="hljs-string">': exited with code '</span> + event.code)
+                        out.push(line.join(<span class="hljs-string">''</span>) +  <span class="hljs-string">'\n'</span>)
+                        prefix = <span class="hljs-string">'\n\n'</span>
+                    }
+                    queue.shift()
+                    <span class="hljs-keyword">break</span>
+            }
+        }
+        <span class="hljs-keyword">return</span> out
+    }
+}</pre></div></div>
+
+        </li>
+
+    </ul>
+  </div>
+</body>
+</html>

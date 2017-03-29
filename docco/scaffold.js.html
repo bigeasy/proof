@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>scaffold.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+
+
+                <a class="source" href="candidate.js.html">
+                  candidate.js
+                </a>
+
+
+                <a class="source" href="colorization.js.html">
+                  colorization.js
+                </a>
+
+
+                <a class="source" href="convert.js.html">
+                  convert.js
+                </a>
+
+
+                <a class="source" href="die.js.html">
+                  die.js
+                </a>
+
+
+                <a class="source" href="epipe.js.html">
+                  epipe.js
+                </a>
+
+
+                <a class="source" href="errors.js.html">
+                  errors.js
+                </a>
+
+
+                <a class="source" href="executable.js.html">
+                  executable.js
+                </a>
+
+
+                <a class="source" href="exit.js.html">
+                  exit.js
+                </a>
+
+
+                <a class="source" href="extend.js.html">
+                  extend.js
+                </a>
+
+
+                <a class="source" href="formatter.js.html">
+                  formatter.js
+                </a>
+
+
+                <a class="source" href="index.js.html">
+                  index.js
+                </a>
+
+
+                <a class="source" href="json.js.html">
+                  json.js
+                </a>
+
+
+                <a class="source" href="parse.js.html">
+                  parse.js
+                </a>
+
+
+                <a class="source" href="platform.js.html">
+                  platform.js
+                </a>
+
+
+                <a class="source" href="printer.js.html">
+                  printer.js
+                </a>
+
+
+                <a class="source" href="progress.js.html">
+                  progress.js
+                </a>
+
+
+                <a class="source" href="proof.bin.js.html">
+                  proof.bin.js
+                </a>
+
+
+                <a class="source" href="proof.errors.js.html">
+                  proof.errors.js
+                </a>
+
+
+                <a class="source" href="proof.js.html">
+                  proof.js
+                </a>
+
+
+                <a class="source" href="proof.json.js.html">
+                  proof.json.js
+                </a>
+
+
+                <a class="source" href="proof.platform.js.html">
+                  proof.platform.js
+                </a>
+
+
+                <a class="source" href="proof.progress.js.html">
+                  proof.progress.js
+                </a>
+
+
+                <a class="source" href="proof.run.js.html">
+                  proof.run.js
+                </a>
+
+
+                <a class="source" href="proof.test.js.html">
+                  proof.test.js
+                </a>
+
+
+                <a class="source" href="run.js.html">
+                  run.js
+                </a>
+
+
+                <a class="source" href="scaffold.js.html">
+                  scaffold.js
+                </a>
+
+
+                <a class="source" href="shebang.js.html">
+                  shebang.js
+                </a>
+
+
+                <a class="source" href="tap.js.html">
+                  tap.js
+                </a>
+
+
+                <a class="source" href="test.js.html">
+                  test.js
+                </a>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    <ul class="sections">
+
+          <li id="title">
+              <div class="annotation">
+                  <h1>scaffold.js</h1>
+              </div>
+          </li>
+
+
+
+        <li id="section-1">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>), _assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'assert'</span>), __slice = [].slice
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">sigil, outer</span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> sigil != <span class="hljs-string">'number'</span>) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'invalid arguments'</span>)
+    }</pre></div></div>
+
+        </li>
+
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO Come back and implement with Cadence. Cadence will correctly recover
+from an exception. Just as in Arguable, I can use Interrupt to throw and
+catch namespaced exceptions.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">globals, die, process</span>) </span>{
+        <span class="hljs-keyword">var</span> passed = <span class="hljs-number">0</span>, actual = <span class="hljs-number">0</span>
+        <span class="hljs-keyword">var</span> name, expected, invalid, delayedPlan, synchronicity
+
+        <span class="hljs-keyword">for</span> (name <span class="hljs-keyword">in</span> _assert) {
+            <span class="hljs-keyword">if</span> (assert[name] || name === <span class="hljs-string">'AssertionError'</span>) {
+                <span class="hljs-keyword">continue</span>
+            }
+            assert[name] = assertion(name, _assert[name])
+        }
+
+        assert.say = say
+        assert.die = die
+        assert.inc = inc
+        assert.leak = leak
+
+        die = die(comment, process)
+
+        <span class="hljs-keyword">try</span> {
+            expected = expect(sigil)</pre></div></div>
+
+        </li>
+
+
+        <li id="section-3">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>TODO Do not pass callback when synchronous.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>            outer.call(<span class="hljs-literal">null</span>, assert, callback)
+            <span class="hljs-keyword">if</span> (outer.length == <span class="hljs-number">1</span>) callback()
+        } <span class="hljs-keyword">catch</span> (e) {
+            die(e)
+        }
+
+
+        <span class="hljs-keyword">if</span> (synchronicity) {
+            finish()
+        } <span class="hljs-keyword">else</span> {
+            synchronicity = <span class="hljs-literal">true</span>
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">expect</span> (<span class="hljs-params">count</span>) </span>{
+            <span class="hljs-keyword">var</span> expected = <span class="hljs-built_in">Math</span>.abs(count)
+            <span class="hljs-keyword">if</span> (!(delayedPlan = count &lt; <span class="hljs-number">1</span>)) {
+                process.stdout.write(<span class="hljs-string">'1..'</span> + expected + <span class="hljs-string">'\n'</span>)
+            }
+            <span class="hljs-keyword">return</span> expected
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">inc</span> (<span class="hljs-params">count</span>) </span>{
+            expected += count
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">leak</span> (<span class="hljs-params"></span>) </span>{
+            globals.push.apply(globals, <span class="hljs-built_in">arguments</span>)
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">comment</span> (<span class="hljs-params">string</span>) </span>{
+            <span class="hljs-keyword">var</span> lines = string.split(<span class="hljs-regexp">/\n/</span>).map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">line</span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-string">'# '</span> + line })
+            lines.push(<span class="hljs-string">''</span>)
+            process.stdout.write(lines.join(<span class="hljs-string">'\n'</span>))
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">say</span> (<span class="hljs-params"></span>) </span>{
+            comment(util.format.apply(util.format, <span class="hljs-built_in">arguments</span>))
+        }
+
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">assert</span> (<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">var</span> vargs = __slice.call(<span class="hljs-built_in">arguments</span>)
+            <span class="hljs-keyword">if</span> (vargs.length == <span class="hljs-number">3</span>) {
+                assert.deepEqual(vargs[<span class="hljs-number">0</span>], vargs[<span class="hljs-number">1</span>], vargs[<span class="hljs-number">2</span>])
+            } <span class="hljs-keyword">else</span> {
+                assert.ok(vargs[<span class="hljs-number">0</span>], vargs[<span class="hljs-number">1</span>])
+            }
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">assertion</span> (<span class="hljs-params">name, assertion</span>) </span>{
+            <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">var</span> vargs = __slice.call(<span class="hljs-built_in">arguments</span>), message = vargs[vargs.length - <span class="hljs-number">1</span>]
+                <span class="hljs-keyword">try</span> {
+                    assertion.apply(<span class="hljs-keyword">this</span>, vargs)
+                    process.stdout.write(<span class="hljs-string">'ok '</span> + (++actual) + <span class="hljs-string">' '</span> + message + <span class="hljs-string">'\n'</span>)
+                    ++passed
+                    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+                } <span class="hljs-keyword">catch</span> (e) {
+                    process.stdout.write(<span class="hljs-string">'not ok '</span> + (++actual) + <span class="hljs-string">' '</span> + e.message + <span class="hljs-string">'\n'</span>)
+                    comment(util.inspect({
+                        <span class="hljs-attr">EXPECTED</span>: name == <span class="hljs-string">'ok'</span> ? <span class="hljs-literal">true</span> : vargs[<span class="hljs-number">1</span>],
+                        <span class="hljs-attr">GOT</span>: vargs[<span class="hljs-number">0</span>]
+                    }, <span class="hljs-literal">null</span>, <span class="hljs-built_in">Math</span>.MAX_VALUE))
+                    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+                }
+            }
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">finish</span> (<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">if</span> (delayedPlan) {
+                process.stdout.write(<span class="hljs-string">'1..'</span> + expected + <span class="hljs-string">'\n'</span>)
+            }
+            <span class="hljs-keyword">var</span> leaked = <span class="hljs-built_in">Object</span>.keys(global).filter(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">global</span>) </span>{
+                <span class="hljs-keyword">return</span> !~globals.indexOf(global)
+            })
+            <span class="hljs-keyword">if</span> (leaked.length) {
+                die(<span class="hljs-string">'Variables leaked into global namespace.'</span>, leaked)
+            }
+            <span class="hljs-keyword">var</span> widths = [ expected, actual, passed ].map(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">number</span>) </span>{ <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(number).length })
+            <span class="hljs-keyword">var</span> width = <span class="hljs-built_in">Math</span>.max.apply(<span class="hljs-built_in">Math</span>, widths)
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">pad</span> (<span class="hljs-params">number</span>) </span>{
+                number = <span class="hljs-built_in">String</span>(number)
+                <span class="hljs-keyword">return</span> (<span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(width + <span class="hljs-number">1</span>).join(<span class="hljs-string">' '</span>) + number).substr(-<span class="hljs-built_in">Math</span>.max(width, number.length))
+            }
+            process.stdout.write(<span class="hljs-string">'# expected '</span> + pad(expected) + <span class="hljs-string">'\n'</span>)
+            process.stdout.write(<span class="hljs-string">'# passed   '</span> + pad(passed) + <span class="hljs-string">'\n'</span>)
+            <span class="hljs-keyword">if</span> (passed &lt; expected) {
+                process.stdout.write(<span class="hljs-string">'# failed   '</span> + pad(expected - passed) + <span class="hljs-string">'\n'</span>)
+            }
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">callback</span> (<span class="hljs-params">error</span>) </span>{
+            <span class="hljs-keyword">if</span> (error) {
+                die(error)
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">if</span> (synchronicity) {
+                    finish()
+                } <span class="hljs-keyword">else</span> {
+                    synchronicity = <span class="hljs-literal">true</span>
+                }
+            }
+        }
+    }
+}</pre></div></div>
+
+        </li>
+
+    </ul>
+  </div>
+</body>
+</html>

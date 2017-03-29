@@ -1,18 +1,3 @@
-<!DOCTYPE html>
-<html>
-<meta charset="utf-8">
-<title>Proof</title>
-<link href="http://fonts.googleapis.com/css?family=ABeeZee|Inconsolata|Karla:400,700|Oxygen+Mono" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy">
-<link rel="stylesheet" type="text/css" href="css/syntax.css">
-<link rel="stylesheet" type="text/css" href="css/proof.css">
-<body><a href="https://github.com/bigeasy/proof/"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div class="container">
-
-<div class="unit welcome">
-<h1>Proof</h1>
-</div>
-
-<div class="unit description markdown">
 A cross-platform UNIX way test non-framework for JavaScript.
 
 ## Questions?
@@ -1008,16 +993,3 @@ Wed May  9 03:52:57 UTC 2012
  * Correctly summing assertions. #13.
  * Failed assertions no longer repeat message. #11.
  * Initial release.
-</div>
-
-</div></body>
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-20388260-3', 'bigeasy.github.io');
-ga('send', 'pageview');
-</script>
-</html>

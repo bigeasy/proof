@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>parse.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+
+
+                <a class="source" href="candidate.js.html">
+                  candidate.js
+                </a>
+
+
+                <a class="source" href="colorization.js.html">
+                  colorization.js
+                </a>
+
+
+                <a class="source" href="convert.js.html">
+                  convert.js
+                </a>
+
+
+                <a class="source" href="die.js.html">
+                  die.js
+                </a>
+
+
+                <a class="source" href="epipe.js.html">
+                  epipe.js
+                </a>
+
+
+                <a class="source" href="errors.js.html">
+                  errors.js
+                </a>
+
+
+                <a class="source" href="executable.js.html">
+                  executable.js
+                </a>
+
+
+                <a class="source" href="exit.js.html">
+                  exit.js
+                </a>
+
+
+                <a class="source" href="extend.js.html">
+                  extend.js
+                </a>
+
+
+                <a class="source" href="formatter.js.html">
+                  formatter.js
+                </a>
+
+
+                <a class="source" href="index.js.html">
+                  index.js
+                </a>
+
+
+                <a class="source" href="json.js.html">
+                  json.js
+                </a>
+
+
+                <a class="source" href="parse.js.html">
+                  parse.js
+                </a>
+
+
+                <a class="source" href="platform.js.html">
+                  platform.js
+                </a>
+
+
+                <a class="source" href="printer.js.html">
+                  printer.js
+                </a>
+
+
+                <a class="source" href="progress.js.html">
+                  progress.js
+                </a>
+
+
+                <a class="source" href="proof.bin.js.html">
+                  proof.bin.js
+                </a>
+
+
+                <a class="source" href="proof.errors.js.html">
+                  proof.errors.js
+                </a>
+
+
+                <a class="source" href="proof.js.html">
+                  proof.js
+                </a>
+
+
+                <a class="source" href="proof.json.js.html">
+                  proof.json.js
+                </a>
+
+
+                <a class="source" href="proof.platform.js.html">
+                  proof.platform.js
+                </a>
+
+
+                <a class="source" href="proof.progress.js.html">
+                  proof.progress.js
+                </a>
+
+
+                <a class="source" href="proof.run.js.html">
+                  proof.run.js
+                </a>
+
+
+                <a class="source" href="proof.test.js.html">
+                  proof.test.js
+                </a>
+
+
+                <a class="source" href="run.js.html">
+                  run.js
+                </a>
+
+
+                <a class="source" href="scaffold.js.html">
+                  scaffold.js
+                </a>
+
+
+                <a class="source" href="shebang.js.html">
+                  shebang.js
+                </a>
+
+
+                <a class="source" href="tap.js.html">
+                  tap.js
+                </a>
+
+
+                <a class="source" href="test.js.html">
+                  test.js
+                </a>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    <ul class="sections">
+
+          <li id="title">
+              <div class="annotation">
+                  <h1>parse.js</h1>
+              </div>
+          </li>
+
+
+
+        <li id="section-1">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> byline = <span class="hljs-built_in">require</span>(<span class="hljs-string">'byline'</span>)
+<span class="hljs-keyword">var</span> Delta = <span class="hljs-built_in">require</span>(<span class="hljs-string">'delta'</span>)
+<span class="hljs-keyword">var</span> extend = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./extend'</span>)
+<span class="hljs-keyword">var</span> tap = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./tap'</span>)
+<span class="hljs-keyword">var</span> cadence = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cadence'</span>)
+<span class="hljs-keyword">var</span> Staccato = <span class="hljs-built_in">require</span>(<span class="hljs-string">'staccato'</span>)
+
+<span class="hljs-keyword">var</span> parse = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, program, consumer</span>) </span>{
+    <span class="hljs-keyword">var</span> count = <span class="hljs-number">0</span>, eof = <span class="hljs-literal">false</span>, programs = {}, failed = <span class="hljs-literal">false</span>, stream, state = {}
+    <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">var</span> stream = byline.createStream(program.stdin, { <span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf8'</span> })
+        stream.on(<span class="hljs-string">'end'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{ stream.emit(<span class="hljs-string">'readable'</span>) })
+        <span class="hljs-keyword">var</span> staccato = <span class="hljs-keyword">new</span> Staccato.Readable(stream)
+        <span class="hljs-keyword">var</span> loop = <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                staccato.read(<span class="hljs-keyword">async</span>())
+            }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">line</span>) </span>{
+                <span class="hljs-keyword">if</span> (line == <span class="hljs-literal">null</span>) {
+                    <span class="hljs-keyword">return</span> [ loop.break ]
+                }
+                consume(line)
+                <span class="hljs-keyword">if</span> (eof) {
+                    <span class="hljs-keyword">return</span> [ loop.break ]
+                }
+            })
+        })()
+    }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">if</span> (state.code != <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span> state.code
+        <span class="hljs-keyword">return</span> (!count || eof) ? <span class="hljs-number">0</span> : <span class="hljs-number">1</span>
+    })
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">abend</span> (<span class="hljs-params">message</span>) </span>{
+        consumer({ <span class="hljs-attr">type</span>: <span class="hljs-string">'error'</span> }, state)
+        program.stderr.write(message)
+        program.stderr.write(<span class="hljs-string">'\n'</span>)
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">consume</span> (<span class="hljs-params">line</span>) </span>{
+        count++
+        <span class="hljs-keyword">var</span> $
+        <span class="hljs-keyword">if</span> (!($ = <span class="hljs-regexp">/^(\d+)\s+(\w+)\s+([^\s]+)\s?(.*)$/</span>.exec(line))) {</pre></div></div>
+
+        </li>
+
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO Use sprintf.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> abend(<span class="hljs-string">'error: cannot parse runner output at line '</span> + count + <span class="hljs-string">': invalid syntax'</span>)
+        }
+        <span class="hljs-keyword">var</span> time = <span class="hljs-built_in">parseInt</span>($[<span class="hljs-number">1</span>], <span class="hljs-number">10</span>)
+        <span class="hljs-keyword">var</span> type = $[<span class="hljs-number">2</span>]
+        <span class="hljs-keyword">var</span> file = $[<span class="hljs-number">3</span>]
+        <span class="hljs-keyword">var</span> rest = $[<span class="hljs-number">4</span>]
+        <span class="hljs-keyword">var</span> event, program, expected, code, signal
+        <span class="hljs-keyword">if</span> (!programs[file]) {
+            programs[file] = {
+                <span class="hljs-attr">passed</span>: <span class="hljs-number">0</span>,
+                <span class="hljs-attr">actual</span>: <span class="hljs-number">0</span>
+            }
+        }
+        program = programs[file]
+        <span class="hljs-keyword">switch</span> (type) {
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'test'</span>:
+                event = tap.assertion(rest)
+                program.actual++
+                <span class="hljs-keyword">if</span> (event.ok) {
+                    program.passed++
+                }
+                consumer(extend(event, program, {
+                    <span class="hljs-attr">time</span>: time,
+                    <span class="hljs-attr">file</span>: file,
+                    <span class="hljs-attr">type</span>: type
+                }), state)
+                <span class="hljs-keyword">break</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'run'</span>:
+                program.start = time
+                consumer(extend(program, {
+                    <span class="hljs-attr">time</span>: time,
+                    <span class="hljs-attr">type</span>: type,
+                    <span class="hljs-attr">file</span>: file
+                }), state)
+                <span class="hljs-keyword">break</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'plan'</span>:
+                expected = <span class="hljs-built_in">parseInt</span>(rest, <span class="hljs-number">10</span>)
+                consumer(extend(program, {
+                    <span class="hljs-attr">time</span>: time,
+                    <span class="hljs-attr">file</span>: file,
+                    <span class="hljs-attr">type</span>: type,
+                    <span class="hljs-attr">expected</span>: expected
+                }), state)
+                <span class="hljs-keyword">break</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'bail'</span>:
+                event = tap.bailout(rest)
+                program.bailed = <span class="hljs-literal">true</span>
+                consumer(extend(event, program, {
+                    <span class="hljs-attr">time</span>: time,
+                    <span class="hljs-attr">file</span>: file,
+                    <span class="hljs-attr">type</span>: type
+                }), state)
+                <span class="hljs-keyword">break</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'exit'</span>:
+                <span class="hljs-keyword">var</span> exit = <span class="hljs-regexp">/^([0-9]+|null) (.*)$/</span>.exec(rest)
+                <span class="hljs-keyword">if</span> (exit) {
+                    <span class="hljs-keyword">if</span> (exit[<span class="hljs-number">1</span>] === <span class="hljs-string">'null'</span>) {
+                        code = <span class="hljs-literal">null</span>
+                        signal = exit[<span class="hljs-number">2</span>]
+                    } <span class="hljs-keyword">else</span> {
+                        signal = <span class="hljs-literal">null</span>
+                        code = <span class="hljs-built_in">parseInt</span>(exit[<span class="hljs-number">1</span>], <span class="hljs-number">10</span>)
+                    }
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">return</span> abend(<span class="hljs-string">'error: cannot parse runner test exit code at line '</span> + count + <span class="hljs-string">': exit code '</span> + rest)
+                }
+                consumer(extend({}, program, {
+                    <span class="hljs-attr">code</span>: code,
+                    <span class="hljs-attr">signal</span>: signal,
+                    <span class="hljs-attr">file</span>: file,
+                    <span class="hljs-attr">type</span>: type,
+                    <span class="hljs-attr">time</span>: time
+                }), state)
+                <span class="hljs-keyword">break</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'err'</span>:
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'out'</span>:
+                consumer({
+                    <span class="hljs-attr">time</span>: time,
+                    <span class="hljs-attr">type</span>: type,
+                    <span class="hljs-attr">file</span>: file,
+                    <span class="hljs-attr">line</span>: rest
+                }, state)
+                <span class="hljs-keyword">break</span>
+            <span class="hljs-keyword">case</span> <span class="hljs-string">'eof'</span>:
+                consumer({
+                    <span class="hljs-attr">time</span>: time,
+                    <span class="hljs-attr">type</span>: type
+                }, state)
+                eof = <span class="hljs-literal">true</span>
+                <span class="hljs-keyword">break</span>
+            <span class="hljs-keyword">default</span>:
+                <span class="hljs-keyword">return</span> abend(<span class="hljs-string">'error: cannot parse runner output at line '</span> + count + <span class="hljs-string">': unknown line type '</span> + type)
+        }
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+    }
+})
+
+<span class="hljs-built_in">module</span>.exports = parse</pre></div></div>
+
+        </li>
+
+    </ul>
+  </div>
+</body>
+</html>

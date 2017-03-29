@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>proof.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+
+
+                <a class="source" href="candidate.js.html">
+                  candidate.js
+                </a>
+
+
+                <a class="source" href="colorization.js.html">
+                  colorization.js
+                </a>
+
+
+                <a class="source" href="convert.js.html">
+                  convert.js
+                </a>
+
+
+                <a class="source" href="die.js.html">
+                  die.js
+                </a>
+
+
+                <a class="source" href="epipe.js.html">
+                  epipe.js
+                </a>
+
+
+                <a class="source" href="errors.js.html">
+                  errors.js
+                </a>
+
+
+                <a class="source" href="executable.js.html">
+                  executable.js
+                </a>
+
+
+                <a class="source" href="exit.js.html">
+                  exit.js
+                </a>
+
+
+                <a class="source" href="extend.js.html">
+                  extend.js
+                </a>
+
+
+                <a class="source" href="formatter.js.html">
+                  formatter.js
+                </a>
+
+
+                <a class="source" href="index.js.html">
+                  index.js
+                </a>
+
+
+                <a class="source" href="json.js.html">
+                  json.js
+                </a>
+
+
+                <a class="source" href="parse.js.html">
+                  parse.js
+                </a>
+
+
+                <a class="source" href="platform.js.html">
+                  platform.js
+                </a>
+
+
+                <a class="source" href="printer.js.html">
+                  printer.js
+                </a>
+
+
+                <a class="source" href="progress.js.html">
+                  progress.js
+                </a>
+
+
+                <a class="source" href="proof.bin.js.html">
+                  proof.bin.js
+                </a>
+
+
+                <a class="source" href="proof.errors.js.html">
+                  proof.errors.js
+                </a>
+
+
+                <a class="source" href="proof.js.html">
+                  proof.js
+                </a>
+
+
+                <a class="source" href="proof.json.js.html">
+                  proof.json.js
+                </a>
+
+
+                <a class="source" href="proof.platform.js.html">
+                  proof.platform.js
+                </a>
+
+
+                <a class="source" href="proof.progress.js.html">
+                  proof.progress.js
+                </a>
+
+
+                <a class="source" href="proof.run.js.html">
+                  proof.run.js
+                </a>
+
+
+                <a class="source" href="proof.test.js.html">
+                  proof.test.js
+                </a>
+
+
+                <a class="source" href="run.js.html">
+                  run.js
+                </a>
+
+
+                <a class="source" href="scaffold.js.html">
+                  scaffold.js
+                </a>
+
+
+                <a class="source" href="shebang.js.html">
+                  shebang.js
+                </a>
+
+
+                <a class="source" href="tap.js.html">
+                  tap.js
+                </a>
+
+
+                <a class="source" href="test.js.html">
+                  test.js
+                </a>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    <ul class="sections">
+
+          <li id="title">
+              <div class="annotation">
+                  <h1>proof.js</h1>
+              </div>
+          </li>
+
+
+
+        <li id="section-1">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>)
+<span class="hljs-keyword">var</span> cadence = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cadence'</span>)
+<span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>)
+<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>)
+<span class="hljs-keyword">var</span> test = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./test'</span>)
+<span class="hljs-keyword">var</span> spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawn
+<span class="hljs-keyword">var</span> arguable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'arguable'</span>)
+<span class="hljs-keyword">var</span> expandable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'expandable'</span>)
+<span class="hljs-keyword">var</span> cadence = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cadence'</span>)
+<span class="hljs-keyword">var</span> candidate = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./candidate'</span>)
+<span class="hljs-keyword">var</span> shebang = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./shebang'</span>)
+<span class="hljs-keyword">var</span> __slice = [].slice
+<span class="hljs-keyword">var</span> byline = <span class="hljs-built_in">require</span>(<span class="hljs-string">'byline'</span>)
+<span class="hljs-keyword">var</span> extend = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./extend'</span>)
+<span class="hljs-keyword">var</span> tap = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./tap'</span>)
+<span class="hljs-keyword">var</span> parse = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./parse'</span>)
+<span class="hljs-keyword">var</span> jsonRedux = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./json'</span>)
+<span class="hljs-keyword">var</span> formatter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./formatter'</span>)
+<span class="hljs-keyword">var</span> printer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./printer'</span>)
+<span class="hljs-keyword">var</span> _progress = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./progress'</span>)
+<span class="hljs-keyword">var</span> _errors = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./errors'</span>)
+<span class="hljs-keyword">var</span> run = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./run'</span>).run
+<span class="hljs-keyword">var</span> platform = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./platform'</span>).platform</pre></div></div>
+
+        </li>
+
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Moved exports.json to its own file.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">json</span> (<span class="hljs-params">program, callback</span>) </span>{
+    <span class="hljs-keyword">var</span> formatterRedux = formatter(jsonRedux())
+    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">progress</span> (<span class="hljs-params">program, callback</span>) </span>{
+    <span class="hljs-keyword">var</span> formatterRedux = formatter(_progress(program))
+    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">errors</span> (<span class="hljs-params">program, callback</span>) </span>{
+    <span class="hljs-keyword">var</span> formatterRedux = formatter(_errors(program))
+    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
+}
+
+exports.main = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, program</span>) </span>{
+    program.helpIf(program.ulimate.help)
+
+    <span class="hljs-keyword">var</span> command = ({
+        <span class="hljs-attr">json</span>: json,
+        <span class="hljs-attr">run</span>: run,
+        <span class="hljs-attr">progress</span>: progress,
+        <span class="hljs-attr">errors</span>: errors,
+        <span class="hljs-attr">platform</span>: platform,
+        <span class="hljs-attr">test</span>: test
+    })[program.command.command.name]
+
+    command(program, <span class="hljs-keyword">async</span>())
+})</pre></div></div>
+
+        </li>
+
+    </ul>
+  </div>
+</body>
+</html>

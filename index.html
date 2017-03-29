@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html>
-<meta charset="utf-8">
-<title>Proof</title>
-<link href="http://fonts.googleapis.com/css?family=ABeeZee|Inconsolata|Karla:400,700|Oxygen+Mono" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy">
-<link rel="stylesheet" type="text/css" href="css/syntax.css">
-<link rel="stylesheet" type="text/css" href="css/proof.css">
-<body><a href="https://github.com/bigeasy/proof/"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a><div class="container">
-
-<div class="unit welcome">
-<h1>Proof</h1>
-</div>
-
-<div class="unit description markdown"><p>A cross-platform UNIX way test non-framework for JavaScript.</p>
-<h2>Questions?</h2>
-<p>If you have a general question, please ask it. I&#39;ve created a <a href="https://github.com/bigeasy/proof/issues/96">issue to discuss
+  <meta charset="utf-8">
+  <title>Proof</title>
+  <link href="https://fonts.googleapis.com/css?family=Cutive+Mono|Sorts+Mill+Goudy|Mate|Oxygen+Mono|Offside|Raleway:400,700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Sorts+Mill+Goudy">
+  <link rel="stylesheet" type="text/css" href="css/ascetic.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</html>
+<body><a href="https://github.com/bigeasy/proof/"><img style="position: fixed; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+  <div class="container">
+    <div class="unit welcome">
+      <h1>Proof</h1>
+      <!-- todo: code font is too small for body text font-->
+    </div>
+    <div class="unit description markdown include" data-file="index.md"><p>A cross-platform UNIX way test non-framework for JavaScript.</p>
+<h2 id="questions-">Questions?</h2>
+<p>If you have a general question, please ask it. I&apos;ve created a <a href="https://github.com/bigeasy/proof/issues/96">issue to discuss
 Proof</a> to notify you of updates. Use
 it to discuss what version 0.2.0 should be.</p>
 <p>Please ask questions in the issue, on the Node.js listserv or come find me, in
-IRC on freenode as <code>prettyrobots</code>, I&#39;m there most of the time.</p>
-<h2>Philosophy</h2>
+IRC on freenode as <code>prettyrobots</code>, I&apos;m there most of the time.</p>
+<h2 id="philosophy">Philosophy</h2>
 <p>Proof is a UNIX way test non-framework for the mightily lazy programmer.</p>
 <p>In Proof, a <strong>unit test</strong> is a <strong>program</strong>. It does not need a runner to run. A
 program emits minimal <code>Perl</code> <code>Test::Harness</code> output. Failed assertions appear as
@@ -33,46 +34,47 @@ even catastrophically, the test runner tests on.</strong></p>
 even when it fails catastrophically, resources are freed for the next test
 process. The test runner does not load or evaluate JavaScript, set tests up up
 or tear tests down. Why count on what amounts to a fragile program loader, when
-you&#39;ve got a full blown operating system at your disposal?</p>
-<p>When there is housekeeping to be done — databases to be reset, temporary
-files to be deleted — we still don&#39;t clean up after ourselves. <strong>We clean
+you&apos;ve got a full blown operating system at your disposal?</p>
+<p>When there is housekeeping to be done &#x2014; databases to be reset, temporary
+files to be deleted &#x2014; we still don&apos;t clean up after ourselves. <strong>We clean
 up before ourselves.</strong> You use Proof harnesses to clean up after the <em>previous</em>
 test process at the start of the <em>next</em> test process, when everything is stable.</p>
 <p>With this in place, you are encouraged to <strong>be a slob</strong> in your test code.  Each
 test is a short lived process, so feel free to suck up memory, leave file
 handles open, and leave sockets open. The operating system knows how to close
-them when your program exits. It won&#39;t affect the test runner, or test
+them when your program exits. It won&apos;t affect the test runner, or test
 performance.</p>
-<p>Well, you&#39;ll probably always <strong>be a meticulous programmer</strong>, who would never
-leave a file handle open, but still; you don&#39;t have to develop a strategy for
-error handling in code that is supposed to exercise edge cases. You don&#39;t have
+<p>Well, you&apos;ll probably always <strong>be a meticulous programmer</strong>, who would never
+leave a file handle open, but still; you don&apos;t have to develop a strategy for
+error handling in code that is supposed to exercise edge cases. You don&apos;t have
 to <em>try</em> to <em>catch</em> the crazy monkey bananas thrown from code in development.
 You have a simple, universal strategy that works for normal operation, all tests
 passed, as well at the who-would-ever-have-imagined-that failures.</p>
-<p>And that&#39;s not all.</p>
+<p>And that&apos;s not all.</p>
 <p>Proof is convention over configuration until configuration is zero. Programs are
 organized into directories, which act as suites. The test runner will run suites
-in parallel, one test at a time from each suite. <strong>You don&#39;t have to think about
+in parallel, one test at a time from each suite. <strong>You don&apos;t have to think about
 parallel to get parallel.</strong> Your operating system does parallel for you just
 fine, so we use the operating system.</p>
 <p>Proof is a <strong><em>parallel</em></strong> test runner, with a <strong><em>terse</em></strong> syntax that runs
 <strong><em>tests that are programs</em></strong>, and can <strong><em>handle almost any exception</em></strong> and
 keep running tests.</p>
-<h3>Install</h3>
+<h3 id="install">Install</h3>
 <p>Via NPM.</p>
-<pre><code>npm install proof</code></pre>
-<p>To test via NPM, by extension <a href="http://travis-ci.org/">Travis CI</a>, create a
+<pre><code>npm install proof
+</code></pre><p>To test via NPM, by extension <a href="http://travis-ci.org/">Travis CI</a>, create a
 <code>package.json</code> for your project that includes the following properties.</p>
 <pre><code class="lang-json">{   &quot;name&quot;:             &quot;fibonacci&quot;
 ,   &quot;version&quot;:          &quot;1.0.3&quot;
 ,   &quot;author&quot;:           &quot;Alan Gutierrez&quot;
 ,   &quot;directories&quot;:      { &quot;lib&quot; : &quot;./lib&quot; }
-,   &quot;devDependencies&quot;:  { &quot;proof&quot;: &quot;&lt;=0.0.1&quot; }
+,   &quot;devDependencies&quot;:  { &quot;proof&quot;: &quot;&amp;lt;=0.0.1&quot; }
 ,   &quot;scripts&quot;:          { &quot;test&quot;: &quot;proof test t/*/*.t&quot; }
 ,   &quot;main&quot;:             &quot;./lib/fibonacci&quot;
-}</code></pre>
+}
+</code></pre>
 <p>Now you can run <code>npm test</code> to test your project.</p>
-<h3>Every Test is a Program</h3>
+<h3 id="every-test-is-a-program">Every Test is a Program</h3>
 <p>Every test is a program.</p>
 <p>Place your test in a file under a test directory in your project. Add a shebang
 line and make the file executable.</p>
@@ -80,129 +82,125 @@ line and make the file executable.</p>
 language the test is written in. By convention, the test directory is named
 <code>./t</code> relative to the project root, but <code>./test</code> is good too.</p>
 <p>Minimal unit test.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;true is true&#39;</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">ok</span>) </span>{
+  ok(<span class="hljs-literal">true</span>, <span class="hljs-string">&apos;true is true&apos;</span>);
+});
 </code></pre>
 <p>The first argument to test is the number of tests to expect. If to many
 or too few tests are run, the test runner will detect it and report it.</p>
-<p>The call to <code>require(&#39;proof&#39;)</code> returns a function. You can call
+<p>The call to <code>require(&apos;proof&apos;)</code> returns a function. You can call
 it immediately. That makes your test preamble quick and to the point.</p>
 <p>This is analogous to the above.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="kd">var</span> <span class="nx">test</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">);</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-keyword">var</span> test = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>);
 
-<span class="nx">test</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;true is true&#39;</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
+test(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">ok</span>) </span>{
+  ok(<span class="hljs-literal">true</span>, <span class="hljs-string">&apos;true is true&apos;</span>);
+});
 </code></pre>
-<p>Here&#39;s a test with two assertions.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">2</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ok</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;true is true&#39;</span><span class="p">);</span>
-  <span class="nx">equal</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;test addition&#39;</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
+<p>Here&apos;s a test with two assertions.</p>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-number">2</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">ok, equal</span>) </span>{
+  ok(<span class="hljs-literal">true</span>, <span class="hljs-string">&apos;true is true&apos;</span>);
+  equal(<span class="hljs-number">2</span> + <span class="hljs-number">2</span>, <span class="hljs-number">4</span>, <span class="hljs-string">&apos;test addition&apos;</span>);
+});
 </code></pre>
 <p>You can see that the second argument to <code>test</code> is your program. All of the
 assertions in <a href="http://nodejs.org/api/assert.html"><code>require(&quot;assert&quot;)</code></a> are
 available to your test function, all you need to do is ask for them in your
 function arguments. Proof with give them to you as you need them.</p>
-<h3>Step by Step Asynchronous Tests</h3>
+<h3 id="step-by-step-asynchronous-tests">Step by Step Asynchronous Tests</h3>
 <p>Proof has a built in control flow library ala Step, that simplifies testing of
-asynchronous code. Most of the time, you&#39;re going to simply want to step through
+asynchronous code. Most of the time, you&apos;re going to simply want to step through
 a series of calls and bail out on the slightest error. Proof is ergonomically
 optimized for this common case.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>);
 
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">step</span>) </span>{
 
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">__filename</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  fs.readFile(__filename, step());
 
-<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">body</span><span class="p">,</span> <span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">body, ok</span>) </span>{
 
-  <span class="nx">ok</span><span class="p">(</span><span class="sr">/proof/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">body</span><span class="p">),</span> <span class="s1">&#39;found proof&#39;</span><span class="p">);</span>
+  ok(<span class="hljs-regexp">/proof/</span>.test(body), <span class="hljs-string">&apos;found proof&apos;</span>);
 
-<span class="p">});</span>
-</pre></div>
+});
 </code></pre>
-<p>For basic asynchronous testing, there&#39;s no need to nest your code into a temple
+<p>For basic asynchronous testing, there&apos;s no need to nest your code into a temple
 of doom. The control flow library is there to keep your control flow shallow.</p>
 <p>When you do need to some serious asynchronous spelukning, Proof also supports
 supports complicated asynchronous concepts like parallelism and branching.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>);
 
-<span class="c1">// Antidisestablishmentarianism</span>
+<span class="hljs-comment">// Antidisestablishmentarianism</span>
 
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">step</span>) </span>{
 
-  <span class="kd">var</span> <span class="nx">tree</span> <span class="o">=</span> <span class="p">[</span> <span class="nx">__dirname</span> <span class="p">],</span> <span class="nx">count</span><span class="p">;</span>
+  <span class="hljs-keyword">var</span> tree = [ __dirname ], count;
 
-  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="nx">nextDirectory</span> <span class="p">()</span> <span class="p">{</span>
+  step(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nextDirectory</span> (<span class="hljs-params"></span>) </span>{
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">tree</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="k">return</span> <span class="nx">tree</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-    <span class="k">else</span> <span class="nx">step</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">count</span><span class="p">);</span>
+    <span class="hljs-keyword">if</span> (tree.length) <span class="hljs-keyword">return</span> tree.shift();
+    <span class="hljs-keyword">else</span> step(<span class="hljs-literal">null</span>, count);
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">directory</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">directory</span>) </span>{
 
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">readdir</span><span class="p">(</span><span class="nx">directory</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    fs.readdir(directory, step());
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="nx">nextEntry</span> <span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="nx">directory</span><span class="p">,</span> <span class="nx">nextDirectory</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nextEntry</span> (<span class="hljs-params">list, directory, nextDirectory</span>) </span>{
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="k">return</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">directory</span><span class="p">,</span> <span class="nx">file</span><span class="p">);</span>
-    <span class="k">else</span> <span class="nx">step</span><span class="p">(</span><span class="nx">nextDirectory</span><span class="p">)();</span>
+    <span class="hljs-keyword">if</span> (list.length) <span class="hljs-keyword">return</span> path.resolve(directory, file);
+    <span class="hljs-keyword">else</span> step(nextDirectory)();
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
 
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">stat</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    fs.stat(file, step());
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">stat</span><span class="p">,</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">nextEntry</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">stat, file, nextEntry</span>) </span>{
 
-    <span class="k">if</span> <span class="p">(</span><span class="nx">stat</span><span class="p">.</span><span class="nx">isDirectory</span><span class="p">())</span> <span class="p">{</span>
-      <span class="nx">tree</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
-      <span class="nx">step</span><span class="p">(</span><span class="nx">nextEntry</span><span class="p">)();</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">file</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-    <span class="p">}</span>
+    <span class="hljs-keyword">if</span> (stat.isDirectory()) {
+      tree.push(file);
+      step(nextEntry)();
+    } <span class="hljs-keyword">else</span> {
+      fs.readFile(file, <span class="hljs-string">&apos;utf8&apos;</span>, step());
+    }
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">body</span><span class="p">,</span> <span class="nx">nextEntry</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">body, nextEntry</span>) </span>{
 
-    <span class="k">if</span> <span class="p">(</span><span class="sr">/Antidisestablishmentarianism/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">body</span><span class="p">))</span> <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
-    <span class="nx">step</span><span class="p">(</span><span class="nx">nextEntry</span><span class="p">)();</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/Antidisestablishmentarianism/</span>.test(body)) count++;
+    step(nextEntry)();
 
-  <span class="p">});</span>
+  });
 
-<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">count</span>) </span>{
 
-  <span class="nx">ok</span><span class="p">(</span><span class="nx">count</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;one file contains possible seditious and blasphemous language&#39;</span><span class="p">);</span>
+  ok(count, <span class="hljs-number">1</span>, <span class="hljs-string">&apos;one file contains possible seditious and blasphemous language&apos;</span>);
 
-<span class="p">});</span>
-</pre></div>
+});
 </code></pre>
 <p>The test above walks through the test directory asynchronously, looking for the
 word &quot;Antidisestablishmentarianism&quot; in the files it encounters. The above test
 proceeds through the directory tree serially, using named functions as branch
 labels to repeatedly visit each directory and file.</p>
-<h3>Shebang all the Languages</h3>
+<h3 id="shebang-all-the-languages">Shebang all the Languages</h3>
 <p>Actually, you an use any language with Proof. Emit TAP. Proof will report it.</p>
 <pre><code class="lang-bash">#/bin/bash
 
 echo &quot;1..1&quot;
 
-true &amp;&amp; echo &quot;ok 1 truth is true&quot;</code></pre>
+true &amp;&amp; echo &quot;ok 1 truth is true&quot;
+</code></pre>
 <p>You can use Proof to test your next C project, one that that has a dozens of
 little test programs that emit simple TAP.</p>
 <p>You can use other languages to verify the integrity of your JavaScript library.</p>
 <p>In <a href="https://github.com/bigeasy/timezone">Timezone</a>, for example, I verify that
 my  JavaScript time zone compiler correctly parses the IANA Timezone database
-using Ruby&#39;s <code>strftime</code> implementation. I wrote a Ruby program that emits TAP
+using Ruby&apos;s <code>strftime</code> implementation. I wrote a Ruby program that emits TAP
 and tests each clock transition in the database.</p>
-<h3>Create More Tests More Frequently With Harnesses</h3>
+<h3 id="create-more-tests-more-frequently-with-harnesses">Create More Tests More Frequently With Harnesses</h3>
 <p>With an Proof harness you can give a test everything it needs to run with as
 little as two lines of code.</p>
 <p>Write a harness that does the setup for a test.  It will load the libraries
@@ -213,156 +211,148 @@ clever thing to say. The test harness file should have an extension of one of
 the supported languages, either <code>.coffee</code>, <code>._coffee</code>, <code>.js</code> or <code>._js</code>.</p>
 <p>In the harness you create a context <code>Object</code> and stuff it with useful bits and
 pieces for your test.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="nx">context</span> <span class="o">=</span> <span class="p">{}</span>
-  <span class="nx">context</span><span class="p">.</span><span class="nx">example</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">firstName</span><span class="o">:</span> <span class="s2">&quot;Alan&quot;</span><span class="p">,</span> <span class="nx">lastName</span><span class="o">:</span> <span class="s2">&quot;Gutierrez&quot;</span> <span class="p">}</span>
-  <span class="nx">context</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">&quot;../../lib/model&quot;</span><span class="p">)</span>
-  <span class="k">return</span> <span class="nx">context</span><span class="p">;</span>
-<span class="p">});</span>
-</pre></div>
+<pre><code class="lang-javascript"><span class="hljs-built_in">module</span>.exports = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+  context = {}
+  context.example = { <span class="hljs-attr">firstName</span>: <span class="hljs-string">&quot;Alan&quot;</span>, <span class="hljs-attr">lastName</span>: <span class="hljs-string">&quot;Gutierrez&quot;</span> }
+  context.model = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../../lib/model&quot;</span>)
+  <span class="hljs-keyword">return</span> context;
+});
 </code></pre>
 <p>You would place the above in a file named <code>proof.js</code>, for example.</p>
 <p>Now you can write tests with a mere two lines of preamble. The common setup for
 the tests in your test suite is in your harness.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">2</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">example</span><span class="p">,</span> <span class="nx">model</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">equal</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">fullName</span><span class="p">(</span><span class="nx">exmaple</span><span class="p">),</span> <span class="s2">&quot;Alan Gutierrez&quot;</span><span class="p">,</span> <span class="s2">&quot;full name&quot;</span><span class="p">);</span>
-  <span class="nx">equal</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">lastNameFirst</span><span class="p">(</span><span class="nx">exmaple</span><span class="p">),</span> <span class="s2">&quot;Gutierrez, Alan&quot;</span><span class="p">,</span> <span class="s2">&quot;last name first&quot;</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;./proof&apos;</span>)(<span class="hljs-number">2</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">example, model, equal</span>) </span>{
+  equal(model.fullName(exmaple), <span class="hljs-string">&quot;Alan Gutierrez&quot;</span>, <span class="hljs-string">&quot;full name&quot;</span>);
+  equal(model.lastNameFirst(exmaple), <span class="hljs-string">&quot;Gutierrez, Alan&quot;</span>, <span class="hljs-string">&quot;last name first&quot;</span>);
+});
 </code></pre>
-<h3>Asynchronous Harnesses</h3>
+<h3 id="asynchronous-harnesses">Asynchronous Harnesses</h3>
 <p>Some setup will require asynchronous calls. Database connections are a common
 case. You can create asynchronous harnesses by providing a callback function
 instead of an object to the require method in your harness.</p>
 <p>The callback function will itself get a callback that is used to return an
 object that is given to the test program.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="kd">var</span> <span class="nx">mysql</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;mysql&#39;</span><span class="p">),</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+<span class="hljs-keyword">var</span> mysql = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;mysql&apos;</span>), fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>);
 
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">step</span>) </span>{
 
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="s1">&#39;./configuration.json&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  fs.readFile(<span class="hljs-string">&apos;./configuration.json&apos;</span>, <span class="hljs-string">&apos;utf8&apos;</span>, step());
 
-<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
 
-  <span class="kd">var</span> <span class="nx">db</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">mysql</span><span class="p">.</span><span class="nx">Database</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">file</span><span class="p">));</span>
-  <span class="nx">db</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">step</span><span class="p">());</span>
+  <span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> mysql.Database(<span class="hljs-built_in">JSON</span>.stringify(file));
+  db.connect(step());
 
-<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">connection</span><span class="p">)</span> <span class="p">{</span>
+}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">connection</span>) </span>{
 
-  <span class="k">return</span> <span class="p">{</span> <span class="nx">connection</span><span class="o">:</span> <span class="nx">connection</span> <span class="p">};</span>
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">connection</span>: connection };
 
-<span class="p">});</span>
-</pre></div>
+});
 </code></pre>
 <p>The test itself is no more complicated.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env _coffee</span>
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">connection</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env _coffee</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;./proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">connection, step</span>) </span>{
 
-  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  step(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-    <span class="nx">connection</span><span class="p">.</span><span class="nx">sql</span><span class="p">(</span><span class="s2">&quot;SELECT COUNT(*) AS num FROM Employee&quot;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    connection.sql(<span class="hljs-string">&quot;SELECT COUNT(*) AS num FROM Employee&quot;</span>, step());
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">results</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">results</span>) </span>{
 
-    <span class="nx">equal</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="nx">results</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">num</span><span class="p">,</span> <span class="s2">&quot;employee count&quot;</span><span class="p">);</span>
+    equal(<span class="hljs-number">12</span>, results[<span class="hljs-number">0</span>].num, <span class="hljs-string">&quot;employee count&quot;</span>);
 
-    <span class="nx">connection</span><span class="p">.</span><span class="nx">close</span><span class="p">(</span><span class="nx">step</span><span class="p">());</span>
+    connection.close(step());
 
-  <span class="p">});</span>
-<span class="p">});</span>
-</pre></div>
+  });
+});
 </code></pre>
 <p>Note that, you can use asynchronous harnesses with synchronous tests, and create
 asynchronous tests from synchronous harnesses.</p>
-<h3>Assertions</h3>
+<h3 id="assertions">Assertions</h3>
 <p>Proof defines the assertions <code>ok</code>, <code>equal</code>, <code>notEqual</code>, <code>deepEqual</code>,
 <code>notDeepEqual</code>, <code>strictEqual</code>, and <code>notStrictEqual</code>. They are identical to the
 assertions of the same named defined in the
 <a href="http://nodejs.org/api/assert.html">assert</a> Node.js module, except that they
 print a message to <code>stdout</code>, instead of throwing an exception.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">3</span><span class="p">,</span> <span class="nx">funciton</span> <span class="p">(</span><span class="nx">ok</span><span class="p">,</span> <span class="nx">equal</span><span class="p">,</span> <span class="nx">deepEqual</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">ok</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;truth works&#39;</span><span class="p">);</span>
-  <span class="nx">equal</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;math works&#39;</span><span class="p">);</span>
-  <span class="nx">deepEqual</span><span class="p">(</span><span class="s1">&#39;a b&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\s/</span><span class="p">),</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span> <span class="p">],</span> <span class="s1">&#39;strings work&#39;</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-number">3</span>, funciton (ok, equal, deepEqual) {
+  ok(<span class="hljs-literal">true</span>, <span class="hljs-string">&apos;truth works&apos;</span>);
+  equal(<span class="hljs-number">1</span> + <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-string">&apos;math works&apos;</span>);
+  deepEqual(<span class="hljs-string">&apos;a b&apos;</span>.split(<span class="hljs-regexp">/\s/</span>), [ <span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;b&quot;</span> ], <span class="hljs-string">&apos;strings work&apos;</span>);
+});
 </code></pre>
 <p>Proof does not define a <code>throws</code> assertion. Instead, it uses the asynchronous
 control flow to test assertions.</p>
 <p>When a step function in the control flow starts with the argument <code>error</code>, it
 indicates that this is an error handling step.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;oops&#39;</span><span class="p">);</span>
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&apos;oops&apos;</span>);
 
-<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, equal</span>) </span>{
 
-  <span class="nx">equal</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span> <span class="s1">&#39;oops&#39;</span><span class="p">,</span> <span class="s1">&#39;error thrown&#39;</span><span class="p">);</span>
+  equal(error.message, <span class="hljs-string">&apos;oops&apos;</span>, <span class="hljs-string">&apos;error thrown&apos;</span>);
 
-<span class="p">});</span>
-</pre></div>
+});
 </code></pre>
 <p>If no error is thrown, the assertion is not test, the count of passed tests is
 wrong and the test fails.</p>
 <p>You can test asynchronous error the same way.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>);
 
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">,</span> <span class="nx">say</span><span class="p">)</span> <span class="p">{</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">step, say</span>) </span>{
 
-  <span class="nx">say</span><span class="p">(</span><span class="s1">&#39;testing file not found&#39;</span><span class="p">);</span> <span class="c1">// be chatty, why not?</span>
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/i-do-not-exist.txt&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+  say(<span class="hljs-string">&apos;testing file not found&apos;</span>); <span class="hljs-comment">// be chatty, why not?</span>
+  fs.readFile(__dirname + <span class="hljs-string">&apos;/i-do-not-exist.txt&apos;</span>, step());
 
-<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equals</span><span class="p">)</span> <span class="p">{</span>
+}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, equals</span>) </span>{
 
-  <span class="nx">equals</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="s1">&#39;ENOENT&#39;</span><span class="p">,</span> <span class="s1">&#39;file does not exist&#39;</span><span class="p">);</span>
+  equals(error.code, <span class="hljs-string">&apos;ENOENT&apos;</span>, <span class="hljs-string">&apos;file does not exist&apos;</span>);
 
-<span class="p">});</span>
-</pre></div>
+});
 </code></pre>
 <p>Try not to worry about failure being inferred from count. It is actually really
 easy to see what what went wrong with a test with you keep your tests programs
 unit focused.</p>
-<h3>Exception Handling</h3>
+<h3 id="exception-handling">Exception Handling</h3>
 <p>When a test is healthy, it is healthy for the test to release resources. When a
 test fails catastrophically, Proof lets the operating system do the hard work of
 releasing system resources, such as memory, sockets and file handles.</p>
-<p>Here&#39;s a test that opens a file handle, then closes it like a good citizen.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<p>Here&apos;s a test that opens a file handle, then closes it like a good citizen.</p>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;./proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">step</span>) </span>{
 
-  <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+  <span class="hljs-keyword">var</span> buffer = <span class="hljs-keyword">new</span> Buffer(<span class="hljs-number">2</span>), fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>);
 
-  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  step(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="nx">__filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    fs.open(__filename, <span class="hljs-string">&quot;r&quot;</span>, step());
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fd</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">fd</span>) </span>{
 
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="nx">fd</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    fs.read(fd, buffer, <span class="hljs-number">0</span>, buffer.length, <span class="hljs-number">0</span>, step());
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">equal</span>) </span>{
 
-    <span class="nx">equal</span><span class="p">(</span><span class="nx">buffer</span><span class="p">.</span><span class="nx">readInt16BE</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mh">0x2321</span><span class="p">,</span> <span class="s1">&#39;shebang magic number&#39;</span><span class="p">);</span>
+    equal(buffer.readInt16BE(<span class="hljs-number">0</span>), <span class="hljs-number">0x2321</span>, <span class="hljs-string">&apos;shebang magic number&apos;</span>);
 
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">close</span><span class="p">(</span><span class="nx">fd</span><span class="p">,</span> <span class="nx">step</span><span class="p">())</span>
+    fs.close(fd, step())
 
-  <span class="p">});</span>
-<span class="p">});</span>
-</pre></div>
+  });
+});
 </code></pre>
-<p>But, what if there is a catastrophic error? Let&#39;s say that in the code above,
+<p>But, what if there is a catastrophic error? Let&apos;s say that in the code above,
 the <code>Buffer</code> cannot be allocated because the system is out of memory. What
 happens? An exception is thrown, the process exits, and the operating system
 closes the file handle.</p>
-<p>The operating system? Aren&#39;t we always supposed to close our own file handles?</p>
+<p>The operating system? Aren&apos;t we always supposed to close our own file handles?</p>
 <p>Well, we could register an error handler to run at the last minute, or we could
 create a towering pyramid of try/catch blocks, but why bother? None of that will
 matter if your test has hung and you feed it a <code>kill -9</code>.</p>
@@ -372,61 +362,60 @@ not a good use of your time.</p>
 <p>Test code is supposed to raise unexpected exceptions. It is supposed to discover
 the unexpected. Let your tests find the exceptions. Let your operating system
 clean up after your tests when the exceptions are found.</p>
-<h3>Housekeeping</h3>
+<h3 id="housekeeping">Housekeeping</h3>
 <p>Because each test is a short lived program, we can count on the operating system
 to reclaim resources like memory, file handles, and sockets when exceptions
 occur. But there is state that will not be reclaimed automatically. The most
 obvious example is temporary files and directories. We reclaim these using
 <strong><em>cleanup functions</em></strong>.</p>
-<p>We&#39;re so meticulous, we run our cleanup functions twice for each test. Rather
+<p>We&apos;re so meticulous, we run our cleanup functions twice for each test. Rather
 than counting on our test to clean up after itself, when it might be in bad
 shape due to some unforeseen error state, we count on it to always <strong><em>cleanup
 before itself</em></strong>, at the start of the test program, when it is most stable.</p>
-<p>We do try to run our test again at exit. What we don&#39;t do is jump through hoops
+<p>We do try to run our test again at exit. What we don&apos;t do is jump through hoops
 to ensure that our cleanup functions are called at exit. We could register exit
 handlers and create intricate try/catch blocks, but the test still might not run
 its cleanup functions at exit if the test exhausts system memory, segfaults, or
-gets a <code>kill -9</code>. We can&#39;t guarantee a cleanup at exit, so we don&#39;t count on it.</p>
+gets a <code>kill -9</code>. We can&apos;t guarantee a cleanup at exit, so we don&apos;t count on it.</p>
 <p>Because your cleanup functions are run twice, they must be <strong>idempotent</strong>, as
 the kids like to say. You must be able to run a cleanup function over and over
 again and get the same results.  If a cleanup function deletes a temporary file,
-for example, it can&#39;t complain if the temporary file has already been deleted.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+for example, it can&apos;t complain if the temporary file has already been deleted.</p>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="kd">var</span> <span class="nx">mysql</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;mysql&#39;</span><span class="p">),</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+<span class="hljs-keyword">var</span> mysql = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;mysql&apos;</span>), fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>);
 
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;proof&#39;</span><span class="p">)(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">tmp</span> <span class="o">=</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/tmp&#39;</span><span class="p">;</span>
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;proof&apos;</span>)(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">step</span>) </span>{
+  <span class="hljs-keyword">var</span> tmp = __dirname + <span class="hljs-string">&apos;/tmp&apos;</span>;
 
-  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="nx">cleanup</span> <span class="p">()</span> <span class="p">{</span> <span class="c1">// named cleanup, so run again at exit</span>
+  step(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">cleanup</span> (<span class="hljs-params"></span>) </span>{ <span class="hljs-comment">// named cleanup, so run again at exit</span>
 
-    <span class="c1">// nested step delete of tmp directory and contents.</span>
-    <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="nx">fs</span><span class="p">.</span><span class="nx">readdir</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span> <span class="o">==</span> <span class="s1">&#39;ENOENT&#39;</span><span class="p">)</span> <span class="nx">step</span><span class="p">();</span> <span class="c1">// done</span>
-      <span class="k">else</span> <span class="k">throw</span> <span class="nx">error</span><span class="p">;</span> <span class="c1">// unexpected</span>
-    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">list</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">list</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">fs</span><span class="p">.</span><span class="nx">unlink</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">file</span><span class="p">),</span> <span class="nx">step</span><span class="p">());</span>
-      <span class="p">});</span>
-    <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="nx">fs</span><span class="p">.</span><span class="nx">rmdir</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-    <span class="p">}</span>
+    <span class="hljs-comment">// nested step delete of tmp directory and contents.</span>
+    step(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      fs.readdir(tmp, step());
+    }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) </span>{
+      <span class="hljs-keyword">if</span> (error.code == <span class="hljs-string">&apos;ENOENT&apos;</span>) step(); <span class="hljs-comment">// done</span>
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">throw</span> error; <span class="hljs-comment">// unexpected</span>
+    }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">list</span>) </span>{
+      list.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">file</span>) </span>{
+        fs.unlink(path.resolve(tmp, file), step());
+      });
+    }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      fs.rmdir(tmp, step());
+    }
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-    <span class="c1">// create a new tmp directory for our test</span>
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">mkdir</span><span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="mi">0755</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
+    <span class="hljs-comment">// create a new tmp directory for our test</span>
+    fs.mkdir(tmp, <span class="hljs-number">0755</span>, step());
 
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
 
-    <span class="c1">// give our test the tmp directory</span>
-    <span class="k">return</span> <span class="p">{</span> <span class="nx">tmp</span><span class="o">:</span> <span class="nx">tmp</span> <span class="p">};</span>
+    <span class="hljs-comment">// give our test the tmp directory</span>
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">tmp</span>: tmp };
 
-  <span class="p">})</span>
-<span class="p">});</span>
-</pre></div>
+  })
+});
 </code></pre>
 <p>When we register a cleanup function, the cleanup function is called upon
 registration. Cleanup functions are run at the start of a test to cleanup in
@@ -434,62 +423,60 @@ case our last test run exited abnormally. As long as the test does not exit
 abnormally, the cleanup function is called again at exit.</p>
 <p>In the harness above, we register a cleanup function that deletes files in a
 temporary directory, then deletes the temporary directory. If the directory
-doesn&#39;t exist, that&#39;s okay, we catch the <code>ENOENT</code> exception and return. Because
-the cleanup function is called when we pass it to <code>step</code>, we&#39;re assured a clean
+doesn&apos;t exist, that&apos;s okay, we catch the <code>ENOENT</code> exception and return. Because
+the cleanup function is called when we pass it to <code>step</code>, we&apos;re assured a clean
 slate. We call <code>fs.mkdir</code> without checking to see if it already exists. We know
-that it doesn&#39;t.</p>
-<p>Now we can use our temporary directory in a test. The test doesn&#39;t have to
+that it doesn&apos;t.</p>
+<p>Now we can use our temporary directory in a test. The test doesn&apos;t have to
 perform any housekeeping. We can write test after test in the same suite, each
 one making use of this temporary directory, because it is cleaned up after or
 before every run.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">),</span> <span class="nx">exec</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;child_process&#39;</span><span class="p">).</span><span class="nx">exec</span><span class="p">;</span>
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>), exec = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;child_process&apos;</span>).exec;
 
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">program</span> <span class="o">=</span> <span class="nx">tmp</span> <span class="o">+</span> <span class="s1">&#39;/example.sh&#39;</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;./proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">tmp, step</span>) </span>{
+  <span class="hljs-keyword">var</span> program = tmp + <span class="hljs-string">&apos;/example.sh&apos;</span>
 
-  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="s1">&#39;#!/bin/bash\nexit 1\n&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">chmod</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="mi">0755</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">exec</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">equal</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;exit code&#39;</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">});</span>
-</pre></div>
+  step(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    fs.writeFile(program, <span class="hljs-string">&apos;#!/bin/bash\nexit 1\n&apos;</span>, <span class="hljs-string">&apos;utf8&apos;</span>, step());
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    fs.chmod(program, <span class="hljs-number">0755</span>, step());
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    exec(program, step());
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, equal</span>) </span>{
+    equal(error.code, <span class="hljs-number">1</span>, <span class="hljs-string">&apos;exit code&apos;</span>);
+  });
+});
 </code></pre>
 <p>In the test above, we create a bash program to to test that error codes work
 correctly. If no exception is thrown, the test runner will report that a test
 was missed.</p>
 <p>Tests can register cleanup functions too. It is generally easier to keep them in
 the harnesses, but its fine to use them in tests as well.</p>
-<pre><code class="lang-javascript"><div class="highlight"><pre><span class="err">#</span><span class="o">!</span><span class="err">/usr/bin/env node</span>
+<pre><code class="lang-javascript"><span class="hljs-meta">#!/usr/bin/env node</span>
 
-<span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">),</span> <span class="nx">exec</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;child_process&#39;</span><span class="p">).</span><span class="nx">exec</span><span class="p">;</span>
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;fs&apos;</span>), exec = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;child_process&apos;</span>).exec;
 
-<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./proof&#39;</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tmp</span><span class="p">,</span> <span class="nx">step</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">program</span> <span class="o">=</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/example.sh&#39;</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;./proof&apos;</span>)(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">tmp, step</span>) </span>{
+  <span class="hljs-keyword">var</span> program = __dirname + <span class="hljs-string">&apos;/example.sh&apos;</span>
 
-  <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="nx">cleanup</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">step</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="nx">fs</span><span class="p">.</span><span class="nx">unlink</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-    <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span> <span class="o">!=</span> <span class="s1">&#39;ENOENT&#39;</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">error</span><span class="p">;</span>
-    <span class="p">});</span>
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="s1">&#39;#!/bin/bash\nexit 1\n&#39;</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">fs</span><span class="p">.</span><span class="nx">chmod</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="mi">0755</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">exec</span><span class="p">(</span><span class="nx">program</span><span class="p">,</span> <span class="nx">step</span><span class="p">());</span>
-  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">equal</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">equal</span><span class="p">(</span><span class="nx">error</span><span class="p">.</span><span class="nx">code</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;exit code&#39;</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">});</span>
-</pre></div>
+  step(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">cleanup</span>(<span class="hljs-params"></span>) </span>{
+    step(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      fs.unlink(program, step());
+    }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) </span>{
+      <span class="hljs-keyword">if</span> (error.code != <span class="hljs-string">&apos;ENOENT&apos;</span>) <span class="hljs-keyword">throw</span> error;
+    });
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    fs.writeFile(program, <span class="hljs-string">&apos;#!/bin/bash\nexit 1\n&apos;</span>, <span class="hljs-string">&apos;utf8&apos;</span>, step());
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    fs.chmod(program, <span class="hljs-number">0755</span>, step());
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    exec(program, step());
+  }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, equal</span>) </span>{
+    equal(error.code, <span class="hljs-number">1</span>, <span class="hljs-string">&apos;exit code&apos;</span>);
+  });
+});
 </code></pre>
 <p>Here our test creates a temporary file in the same directory as the test,
 instead of in a harness provided temporary directory. It registers a cleanup
@@ -505,43 +492,43 @@ they pass, without having us have to stop and cleanup cruft after each because a
 test is exiting abnormally. If tests are exiting normally, regardless of whether
 they pass or fail, they will clean up after themselves, leaving your project
 directory nice and tidy after each run.</p>
-<h3>Running Tests</h3>
+<h3 id="running-tests">Running Tests</h3>
 <p>A test is a program. You can run a test to see its output.</p>
 <pre><code>$ t/logic/minimal.t
 1..2
 ok 1 true is true
 ok 2 test arithmetic
-$</code></pre>
-<p>By immutable convention, tests are grouped together by directory. The tests
+$
+</code></pre><p>By immutable convention, tests are grouped together by directory. The tests
 within a directory are considered a suite of tests. Test suites are generally
 kept in a directory <code>t</code> off the root of the project.</p>
 <pre><code>$ find t
 t/logic/minimal.t
 t/regex/minimal.t
 t/regex/complex.t
-$</code></pre>
-<p>You can run a test with the proof test runner to get gaudy console output with
+$
+</code></pre><p>You can run a test with the proof test runner to get gaudy console output with
 colors and non-ASCII characters (approximated below).</p>
 <pre><code>$ proof test t/logic/minimal.t
- ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
+ &amp;#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
                                       tests (1/1) assertions (2/2) 0.230 Success
-$</code></pre>
-<p>Each test you pass to the test runner is will be run by the test runner. Tests
+$
+</code></pre><p>Each test you pass to the test runner is will be run by the test runner. Tests
 in separate suites are run in parallel.</p>
 <pre><code>$ proof test t/logic/minimal.t t/regex/minimal.t
- ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
- ✓ t/regex/minimal.t ....................................... (2/2) 0.331 Success
+ &amp;#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
+ &amp;#x2713; t/regex/minimal.t ....................................... (2/2) 0.331 Success
                                       tests (2/2) assertions (4/4) 0.561 Success
-$</code></pre>
-<h3>Tests Run in Parallel</h3>
+$
+</code></pre><h3 id="tests-run-in-parallel">Tests Run in Parallel</h3>
 <p>As above.</p>
 <pre><code>$ proof test t/logic/minimal.t t/regex/minimal.t t/regex/complex.t
- ✓ t/logic/minimal.t ....................................... (2/2) 0.230 Success
- ✓ t/regex/minimal.t ....................................... (2/2) 0.331 Success
- ✓ t/regex/complex.t ....................................... (2/2) 1.045 Success
+ &amp;#x2713; t/logic/minimal.t ....................................... (2/2) 0.230 Success
+ &amp;#x2713; t/regex/minimal.t ....................................... (2/2) 0.331 Success
+ &amp;#x2713; t/regex/complex.t ....................................... (2/2) 1.045 Success
                                       tests (3/3) assertions (6/6) 1.606 Success
-$</code></pre>
-<p>Because each test is a program, parallelism is simply a matter of running more
+$
+</code></pre><p>Because each test is a program, parallelism is simply a matter of running more
 than one test program at once. The default mode of the proof runner is to run four
 test programs a time.</p>
 <p>The runner will run a test program from each suite, for up to four programs
@@ -551,23 +538,23 @@ specified on the command line.</p>
 <p>If you design your tests so that they can run in any order, then you can run an
 entire suite of tests with globbing.</p>
 <pre><code>$ proof test t/*/*.t
- ✓ t/logic/minimal.t ....................................... (2/2)  .230 Success
- ✓ t/regex/minimal.t ....................................... (2/2)  .331 Success
- ✓ t/regex/complex.t ....................................... (2/2) 1.045 Success
+ &amp;#x2713; t/logic/minimal.t ....................................... (2/2)  .230 Success
+ &amp;#x2713; t/regex/minimal.t ....................................... (2/2)  .331 Success
+ &amp;#x2713; t/regex/complex.t ....................................... (2/2) 1.045 Success
                                       tests (3/3) assertions (6/6) 1.606 Success
-$</code></pre>
-<p>Generally avoid making tests depend on being run in a specific order. That way
+$
+</code></pre><p>Generally avoid making tests depend on being run in a specific order. That way
 you can get parallelism easily.</p>
 <p>Suites run in parallel. You can group your tests however you like, by feature,
 subsystem, stages of workflow.</p>
 <p>Make sure they can run in parallel though. You may have a single MySQL database
-to use for testing. You&#39;ll have to  group all your MySQL tests in a suite, you
-can be sure that they won&#39;t stomp on each other. If your application supports
+to use for testing. You&apos;ll have to  group all your MySQL tests in a suite, you
+can be sure that they won&apos;t stomp on each other. If your application supports
 either MySQL or PostgreSQL, you could run those tests in parallel.</p>
 <p>If every test expects to hit a MySQL database, then create a separate MySQL
 database for each suite. Not a big deal, really, and then you have your tests
 running in parallel.</p>
-<h3>Continuous Integration With Travis CI</h3>
+<h3 id="continuous-integration-with-travis-ci">Continuous Integration With Travis CI</h3>
 <p>For an example of Travis CI output, you can look at the <a href="http://travis-ci.org/#!/bigeasy/proof">output from Proof
 itself</a>.</p>
 <p>With a minimal <code>.travis.yml</code> and Proof will work with Travis CI.</p>
@@ -578,8 +565,8 @@ node_js:
 
 before_install:
   - npm install --dev
-  - git submodule init &amp;&amp; git submodule update</code></pre>
-<p>However, <code>npm install --dev</code> will recursively install development dependencies,
+  - git submodule init &amp;&amp; git submodule update
+</code></pre><p>However, <code>npm install --dev</code> will recursively install development dependencies,
 bringing in all of CoffeeScript, which is not necessary. Explicitly installing
 your development dependencies makes your Travis CI output much less verbose.</p>
 <pre><code>language: node_js
@@ -590,39 +577,39 @@ node_js:
 before_install:
   - npm install
   - npm install proof coffee-script streamline
-  - git submodule init &amp;&amp; git submodule update</code></pre>
-<p>If you are not using Streamline.js exclude <code>streamline</code>. If you are not using
+  - git submodule init &amp;&amp; git submodule update
+</code></pre><p>If you are not using Streamline.js exclude <code>streamline</code>. If you are not using
 CoffeeScript exclude <code>coffee-script</code>. Add additional development dependencies to
-suit your project&#39;s needs.</p>
-<h2>Change Log</h2>
+suit your project&apos;s needs.</p>
+<h2 id="change-log">Change Log</h2>
 <p>Changes for each release.</p>
-<h3>Version 0.0.32.</h3>
+<h3 id="version-0-0-32-">Version 0.0.32.</h3>
 <p>Thu Jul 11 01:47:18 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to 0.0.23. #160.</li>
 </ul>
-<h3>Version 0.0.31</h3>
+<h3 id="version-0-0-31">Version 0.0.31</h3>
 <p>Mon Jul  8 14:52:16 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to 0.0.22. #157.</li>
 </ul>
-<h3>Version 0.0.30</h3>
+<h3 id="version-0-0-30">Version 0.0.30</h3>
 <p>Wed Jun 19 03:23:54 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to 0.0.19. #153.</li>
 </ul>
-<h3>Version 0.0.29</h3>
+<h3 id="version-0-0-29">Version 0.0.29</h3>
 <p>Fri Jun 14 00:17:21 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to 0.0.17. #153.</li>
 </ul>
-<h3>Version 0.0.28</h3>
+<h3 id="version-0-0-28">Version 0.0.28</h3>
 <p>Tue Apr  9 23:07:50 UTC 2013</p>
 <ul>
 <li>Renew support for Node.js 0.6. #150.</li>
 <li>Fix global namespace leak detection. #151.</li>
 </ul>
-<h3>Version 0.0.27</h3>
+<h3 id="version-0-0-27">Version 0.0.27</h3>
 <p>Thu Mar 21 08:54:41 UTC 2013</p>
 <ul>
 <li>Implement execute in tests using Cadence events. #147.</li>
@@ -633,12 +620,12 @@ suit your project&#39;s needs.</p>
 <li>Git rid of default action, report usage instead. #146.</li>
 <li>Rename default action to <code>test</code> and move it into the main binary. #145.</li>
 </ul>
-<h3>Version 0.0.26</h3>
+<h3 id="version-0-0-26">Version 0.0.26</h3>
 <p>Tue Mar 19 04:57:56 UTC 2013</p>
 <ul>
 <li>Meld harness and program into single cadence. #144.</li>
 </ul>
-<h3>Version 0.0.25</h3>
+<h3 id="version-0-0-25">Version 0.0.25</h3>
 <p>Mon Mar 18 07:20:00 UTC 2013</p>
 <ul>
 <li>Tidy <code>lib/proof.js</code> variable names for harness and program functions. #143.</li>
@@ -647,42 +634,42 @@ suit your project&#39;s needs.</p>
 <li>Allow user to override assertions. #139.</li>
 <li>Fix export of <code>say</code> and <code>die</code>. #137.</li>
 </ul>
-<h3>Version 0.0.24</h3>
+<h3 id="version-0-0-24">Version 0.0.24</h3>
 <p>Sun Mar 17 06:28:06 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to 0.0.13.</li>
 <li>Add contribution guide.</li>
 </ul>
-<h3>Version 0.0.23</h3>
+<h3 id="version-0-0-23">Version 0.0.23</h3>
 <p>Sat Mar 16 06:03:02 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to 0.0.12.</li>
 <li>Remove dependency on Cadence hidden context. #136.</li>
 </ul>
-<h3>Version 0.0.22</h3>
+<h3 id="version-0-0-22">Version 0.0.22</h3>
 <p>Tue Mar 12 08:00:30 UTC 2013</p>
 <ul>
 <li>Remove arity from <code>t/node/cleanup/test.t.js</code>. #132.</li>
 <li>Upgrade Cadence to 0.0.11. #135.</li>
 </ul>
-<h3>Version 0.0.21</h3>
+<h3 id="version-0-0-21">Version 0.0.21</h3>
 <p>Tue Mar 12 06:52:06 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to 0.0.10. #134.</li>
 <li>Export Cadence. #127.</li>
 <li>Flatten arguments to Cadence. #131.</li>
 </ul>
-<h3>Version 0.0.20</h3>
+<h3 id="version-0-0-20">Version 0.0.20</h3>
 <p>Tue Mar  5 03:50:01 UTC 2013</p>
 <ul>
 <li>Add <code>proof platform</code> Arguable usage message. #130.</li>
 </ul>
-<h3>Version 0.0.19</h3>
+<h3 id="version-0-0-19">Version 0.0.19</h3>
 <p>Tue Mar  5 03:22:27 UTC 2013</p>
 <ul>
 <li>Upgrade Cadence to rename <code>async</code> to <code>step</code>. #129.</li>
 </ul>
-<h3>Version 0.0.18</h3>
+<h3 id="version-0-0-18">Version 0.0.18</h3>
 <p>Fri Mar  1 03:45:03 UTC 2013</p>
 <ul>
 <li>Tidy.</li>
@@ -691,12 +678,12 @@ suit your project&#39;s needs.</p>
 <li>Drop support for Node.js 0.6. #124.</li>
 <li>Wait on test program <code>close</code> instead of <code>exit</code>. #123.</li>
 </ul>
-<h3>Version 0.0.17</h3>
+<h3 id="version-0-0-17">Version 0.0.17</h3>
 <p>Mon Feb 18 07:42:56 UTC 2013</p>
 <ul>
 <li>Report missing tests from errors/progress runners. #121.</li>
 </ul>
-<h3>Version 0.0.16</h3>
+<h3 id="version-0-0-16">Version 0.0.16</h3>
 <p>Sun Dec  9 17:25:16 UTC 2012</p>
 <ul>
 <li>Unclutter root of project directory. #118. #119.</li>
@@ -706,29 +693,29 @@ suit your project&#39;s needs.</p>
 <li>Add source language file suffix to test program files. #115.</li>
 <li>Rewrite <code>README.md</code>. #85. #107. #108.</li>
 </ul>
-<h3>Version 0.0.15</h3>
+<h3 id="version-0-0-15">Version 0.0.15</h3>
 <p>Fri Jul 13 17:00:01 UTC 2012</p>
 <ul>
 <li>Upgrade to Cadence 0.0.5. #104.</li>
 </ul>
-<h3>Version 0.0.14</h3>
+<h3 id="version-0-0-14">Version 0.0.14</h3>
 <p>Thu Jul 12 01:50:03 UTC 2012</p>
 <ul>
 <li>Platform detection program. #102.</li>
 <li>Animate Windows. #103.</li>
 <li>Print summary on <code>run</code> and <code>plan</code>. #28.</li>
 </ul>
-<h3>Version 0.0.13</h3>
+<h3 id="version-0-0-13">Version 0.0.13</h3>
 <p>Wed Jul 11 22:43:24 UTC 2012</p>
 <ul>
 <li>Run on Windows. #101. #99. #98. #47.</li>
 </ul>
-<h3>Version 0.0.12</h3>
+<h3 id="version-0-0-12">Version 0.0.12</h3>
 <p>Sun Jul  8 05:58:51 UTC 2012</p>
 <ul>
 <li>Upgrade to Cadence 0.0.2. #100.</li>
 </ul>
-<h3>Version 0.0.11</h3>
+<h3 id="version-0-0-11">Version 0.0.11</h3>
 <p>Sun Jul  8 05:24:13 UTC 2012</p>
 <ul>
 <li>Extract Cadence control flow library. #97. #90. #52.</li>
@@ -739,12 +726,12 @@ suit your project&#39;s needs.</p>
 <li>Removed the implicit <code>context</code> argument that was used with structured
 assignment in CoffeeScript tests. #80.</li>
 </ul>
-<h3>Version 0.0.10</h3>
+<h3 id="version-0-0-10">Version 0.0.10</h3>
 <p>Sat Jun 30 16:41:44 UTC 2012</p>
 <ul>
 <li><code>proof progress</code> exits non-zero for any failure. #87.</li>
 </ul>
-<h3>Version 0.0.9</h3>
+<h3 id="version-0-0-9">Version 0.0.9</h3>
 <p>Fri Jun 29 13:59:21 UTC 2012</p>
 <ul>
 <li>Preserve leading whitespace in output parsing. #27.</li>
@@ -759,12 +746,12 @@ assignment in CoffeeScript tests. #80.</li>
 <li>Detect tests without plans. #75.</li>
 <li>Display compilation error output. #22.</li>
 </ul>
-<h3>Version 0.0.8</h3>
+<h3 id="version-0-0-8">Version 0.0.8</h3>
 <p>Thu Jun 28 21:05:46 UTC 2012</p>
 <ul>
 <li>Wait on pending output before exit. #72.</li>
 </ul>
-<h3>Version 0.0.7</h3>
+<h3 id="version-0-0-7">Version 0.0.7</h3>
 <p>Wed Jun 27 18:22:41 UTC 2012</p>
 <ul>
 <li>Fixed <code>this</code> binding error in <code>bailout</code>. #68.</li>
@@ -772,7 +759,7 @@ assignment in CoffeeScript tests. #80.</li>
 <li>Populated <code>.npmignore</code>. #67.</li>
 <li>Increase digit width to fit. #26.</li>
 </ul>
-<h3>Version 0.0.6</h3>
+<h3 id="version-0-0-6">Version 0.0.6</h3>
 <p>Wed Jun 27 17:08:41 UTC 2012</p>
 <ul>
 <li>Added <code>TIMELESS</code> environment variable switch to disable timeouts. #60.</li>
@@ -784,7 +771,7 @@ called. #50.</li>
 <li>Nicer error messages. #17.</li>
 <li>Named cleanup functions. #48.</li>
 </ul>
-<h3>Version 0.0.5</h3>
+<h3 id="version-0-0-5">Version 0.0.5</h3>
 <p>Sat Jun 16 10:01:21 UTC 2012</p>
 <ul>
 <li>Exit non-zero if actual does not equal expxected. #46.</li>
@@ -799,13 +786,13 @@ called. #50.</li>
 <li><code>proof-errors</code> non-zero exit. #34.</li>
 <li><code>UNTIDY</code> alias for <code>PROOF_NO_CLEANUP</code>. #29.</li>
 </ul>
-<h3>Version 0.0.4</h3>
+<h3 id="version-0-0-4">Version 0.0.4</h3>
 <p>Sun May 13 19:43:30 UTC 2012</p>
 <ul>
 <li>Showing standard error and standard output prior to a failed test or a bail
 out in failed assertions display. #24.</li>
 </ul>
-<h3>Version 0.0.3</h3>
+<h3 id="version-0-0-3">Version 0.0.3</h3>
 <p>Sun May 13 17:24:09 UTC 2012</p>
 <ul>
 <li><code>proof errors</code> displays bail outs. #20.</li>
@@ -819,7 +806,7 @@ compile. #8.</li>
 <li>Abend when test is specified twice in a run. #4.</li>
 <li>Spell check <code>README.md</code>.</li>
 </ul>
-<h3>Version 0.0.2</h3>
+<h3 id="version-0-0-2">Version 0.0.2</h3>
 <p>Wed May  9 03:52:57 UTC 2012</p>
 <ul>
 <li>Correctly summing assertions. #13.</li>
@@ -827,15 +814,15 @@ compile. #8.</li>
 <li>Initial release.</li>
 </ul>
 </div>
-
-</div></body>
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-20388260-3', 'bigeasy.github.io');
-ga('send', 'pageview');
-</script>
-</html>
+  </div>
+  <!-- todo: move into an edify plugin-->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-20388260-3', 'bigeasy.github.io');
+    ga('send', 'pageview');
+  </script>
+</body>
+<!-- vim: set ts=2 sw=2 nowrap:-->
