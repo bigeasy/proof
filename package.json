@@ -3,7 +3,7 @@
     "version":              "1.2.10",
     "description":
 
-        "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
+      "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
 
     "keywords":
     [
@@ -27,8 +27,8 @@
                             "delta":                        "1.2.x",
                             "departure":                    "0.0.3",
                             "expandable":                   "0.0.6",
-                            "turnstile":                    "2.2.9",
-                            "staccato":                     "3.0.x"
+                            "staccato":                     "3.0.x",
+                            "turnstile":                    "2.2.9"
     },
     "devDependencies":
     {
@@ -38,7 +38,7 @@
     {
                             "proof":                        "proof.bin.js"
     },
-    "scripts" :
+    "scripts":
     {
                             "test": "(node proof.bin.js run t/*/*.t.* t/*/*/*.t.* | tee .proof.out | node proof.bin.js progress) || (node proof.bin.js errors < .proof.out)"
     }
