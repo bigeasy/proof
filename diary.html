@@ -11,6 +11,59 @@
   <div class="container">
     <div class="unit description">
       <div class="entry">
+        <h2><a name="1490847149000">Wed Mar 29 2017 23:12:29 GMT-0500 (CDT)</a></h2>
+        <div class="markdown"><p>Trying to get to a release of 3.0.0. Wondering if the new scaffold interface has
+stabilized. Looking over the new scaffold I see an option to export the test as
+a module that I do not have any use for as of yet. The idea was to make modules
+exportable so that you could use tests as benchmarks, running them repeatedly so
+that they would have a change to get optimized by the JIT compiler.</p>
+<p>At the moment, this is just a lot of dead code though. I&apos;m not using it
+anywhere. I&apos;m not testing it. Thus, I&apos;m going to put the code here for now.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">var</span> scaffold = <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;./scaffold&apos;</span>)
+<span class="hljs-keyword">var</span> globals = <span class="hljs-built_in">Object</span>.keys(global).concat([ <span class="hljs-string">&apos;errno&apos;</span> ])
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">noop</span> (<span class="hljs-params"></span>) </span>{}
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">module, count, test</span>) </span>{
+    <span class="hljs-keyword">var</span> isMainModule
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">module</span> == <span class="hljs-string">&apos;object&apos;</span>) {
+        isMainModule = <span class="hljs-built_in">require</span>.main === <span class="hljs-built_in">module</span>
+    } <span class="hljs-keyword">else</span> {
+        isMainModule = <span class="hljs-literal">true</span>
+        test = count
+        count = <span class="hljs-built_in">module</span>
+        <span class="hljs-built_in">module</span> = {}
+    }
+    <span class="hljs-comment">// TODO No, let&apos;s always insist that this is explicit.</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> count != <span class="hljs-string">&apos;number&apos;</span>) {
+        test = count
+        count = <span class="hljs-number">0</span>
+    }
+    <span class="hljs-keyword">var</span> scaffolded = scaffold(count, test)
+    <span class="hljs-keyword">if</span> (isMainModule) {
+         scaffolded(globals, process.stdout, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, result</span>) </span>{
+            <span class="hljs-keyword">if</span> (error)
+    <span class="hljs-comment">// This is line formatted for it&apos;s display by `node`.</span>
+  <span class="hljs-keyword">throw</span> error <span class="hljs-comment">/**-* Proof framework rewthrowing test generated error. See below. *-**/</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">&apos;../exit&apos;</span>)(process)(result)
+         })
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">options, callback</span>) </span>{
+            <span class="hljs-keyword">var</span> run = {
+                <span class="hljs-attr">stream</span>: options.stream || <span class="hljs-keyword">new</span> stream.PassThrough,
+                <span class="hljs-attr">globals</span>: options.globals || <span class="hljs-built_in">Object</span>.keys(globals).concat([ <span class="hljs-string">&apos;errno&apos;</span> ]),
+                <span class="hljs-attr">exit</span>: options.exit || <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">exitCode</span>) </span>{ run.exitCode = exitCode }
+            }
+            scaffolded(run.globals, run.stream, run.exit, callback || noop)
+        }
+    }
+}
+</code></pre>
+<p>This can be a 3.2 feature. It can be implemented without breaking existing
+tests.</p>
+</div>
+      </div>
+      <div class="entry">
         <h2><a name="1482415022000">Thu Dec 22 2016 07:57:02 GMT-0600 (CST)</a></h2>
         <div class="markdown"><p>For a time this project was building on Circle CI as a part of an evaluation of
 Circle CI, but that evaluation did not result in adoption, and those build hooks
