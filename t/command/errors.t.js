@@ -9,7 +9,7 @@ var prove = cadence(function (async, assert) {
         stdout || (stdout = new stream.PassThrough)
         var stdin = new stream.PassThrough
         var input = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
-        var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.out.txt'), 'utf8')
+        var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.errors.out.txt'), 'utf8')
         async(function () {
             proof([ 'errors', '-M' ], { stdin: stdin, stdout: stdout }, async())
             stdin.write(input)
