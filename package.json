@@ -40,6 +40,6 @@
     },
     "scripts":
     {
-                            "test": "(node proof.bin.js run t/*/*.t.* t/*/*/*.t.* | tee .proof.out | node proof.bin.js progress) || (node proof.bin.js errors < .proof.out)"
+                            "test":                         "t/test"
     }
 }
