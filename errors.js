@@ -76,7 +76,7 @@ module.exports = function (options) {
             }
             switch (event.type) {
                 case 'bail':
-                    out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': Bail Out!\n')
+                    out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': Bail Out! ' + event.message + '\n')
                     break
                 case 'test':
 /*                    if (!planned) {
