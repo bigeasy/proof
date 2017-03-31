@@ -277,7 +277,7 @@ before passing it to <code>proof errors</code>.</p>
             }
             <span class="hljs-keyword">switch</span> (event.type) {
                 <span class="hljs-keyword">case</span> <span class="hljs-string">'bail'</span>:
-                    out.push(<span class="hljs-string">'&gt; '</span> + (colorize.red(<span class="hljs-string">'\u2718'</span>)) + <span class="hljs-string">' '</span> + event.file + <span class="hljs-string">': Bail Out!\n'</span>)
+                    out.push(<span class="hljs-string">'&gt; '</span> + (colorize.red(<span class="hljs-string">'\u2718'</span>)) + <span class="hljs-string">' '</span> + event.file + <span class="hljs-string">': Bail Out! '</span> + event.message + <span class="hljs-string">'\n'</span>)
                     <span class="hljs-keyword">break</span>
                 <span class="hljs-keyword">case</span> <span class="hljs-string">'test'</span>:
 <span class="hljs-comment">/*                    if (!planned) {
