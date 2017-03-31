@@ -1,7 +1,0 @@
-1440918987436 run  t/scaffold/say.t.js
-1440918987484 plan t/scaffold/say.t.js 1
-1440918987488 test t/scaffold/say.t.js ok 1 say
-1440918987488 out  t/scaffold/say.t.js # expected 1
-1440918987488 out  t/scaffold/say.t.js # passed   1
-1440918987493 exit t/scaffold/say.t.js 0 null
-1440918987493 eof  *
