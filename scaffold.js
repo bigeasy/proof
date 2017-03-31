@@ -1,134 +1,136 @@
-var util = require('util'), _assert = require('assert'), __slice = [].slice
+var slice = [].slice
+var BAILOUT = {}
+var util = require('util')
+var cadence = require('cadence')
 
-module.exports = function (sigil, outer) {
-    if (typeof sigil != 'number') {
-        throw new Error('invalid arguments')
-    }
-    // TODO Come back and implement with Cadence. Cadence will correctly recover
-    // from an exception. Just as in Arguable, I can use Interrupt to throw and
-    // catch namespaced exceptions.
-    return function (globals, die, process) {
-        var passed = 0, actual = 0
-        var name, expected, invalid, delayedPlan, synchronicity
+// A strict implementation of deep equal  that will print a diff statement when
+// comparisons fail.
+var departure = require('departure')
 
-        for (name in _assert) {
-            if (assert[name] || name === 'AssertionError') {
-                continue
+function pad (number, width) {
+    number = String(number)
+    return (new Array(width + 1).join(' ') + number).substr(-Math.max(width, number.length))
+}
+
+module.exports = function (count, test) {
+    return cadence(function (async, globals, stream) {
+        var expected = Math.abs(count), passed = 0, actual = 0, delayed
+
+        function comment (lines) {
+            lines = lines.split(/\n/).map(function (line) { return '# ' + line })
+            lines.push('')
+            return lines.join('\n')
+        }
+
+        function assert () {
+            var vargs = slice.call(arguments), ok, message, detail = null
+            if (vargs.length == 3) {
+                detail = departure.compare(vargs[0], vargs[1])
+                ok = detail == null
+                message = ' ' + vargs[2]
+            } else {
+                ok = !! vargs[0]
+                message = vargs.length == 2 ? (' ' + vargs[1]) : ''
             }
-            assert[name] = assertion(name, _assert[name])
-        }
-
-        assert.say = say
-        assert.die = die
-        assert.inc = inc
-        assert.leak = leak
-
-        die = die(comment, process)
-
-        try {
-            expected = expect(sigil)
-            // TODO Do not pass callback when synchronous.
-            outer.call(null, assert, callback)
-            if (outer.length == 1) callback()
-        } catch (e) {
-            die(e)
-        }
-
-
-        if (synchronicity) {
-            finish()
-        } else {
-            synchronicity = true
-        }
-
-        function expect (count) {
-            var expected = Math.abs(count)
-            if (!(delayedPlan = count < 1)) {
-                process.stdout.write('1..' + expected + '\n')
+            if (ok) {
+                passed++
+                stream.write('ok ' + (++actual) + message + '\n')
+            } else {
+                stream.write('not ok ' + (++actual) + message + '\n')
             }
-            return expected
+            if (detail != null) {
+                stream.write(comment(detail))
+            }
         }
 
-        function inc (count) {
+        assert.die = function () {
+            throw { isBailout: BAILOUT, vargs: slice.call(arguments) }
+        }
+
+        assert.inspect = function (value, depth) {
+            stream.write(comment(util.inspect(value, { depth: depth || null })))
+        }
+
+        assert.say = function () {
+            stream.write(comment(util.format.apply(util.format, slice.call(arguments))))
+        }
+
+        assert.inc = function (count) {
             expected += count
         }
 
-        function leak () {
+        assert.leak = function () {
             globals.push.apply(globals, arguments)
         }
 
-        function comment (string) {
-            var lines = string.split(/\n/).map(function (line) { return '# ' + line })
-            lines.push('')
-            process.stdout.write(lines.join('\n'))
+        if (!(delayed = count < 1)) {
+            stream.write('1..' + expected + '\n')
         }
 
-        function say () {
-            comment(util.format.apply(util.format, arguments))
-        }
-
-
-        function assert () {
-            var vargs = __slice.call(arguments)
-            if (vargs.length == 3) {
-                assert.deepEqual(vargs[0], vargs[1], vargs[2])
+        // Found where line numbers are added, syntax context is added. Will
+        // have to read carefully to see if we can recreate, but then it would
+        // be Node.js/V8 specific, specific to Node.js. Although I have no
+        // intention of running in other JavaScript environments, it is probably
+        // best to treat the Proof scaffold as a minimal process wrapper, let
+        // Node.js do its thing.
+        //
+        // https://github.com/nodejs/node/blob/4db97b832b2522551d1bfacc1b95e3cbbf2df097/src/node.cc#L1440
+        // Hoplessness. Add answer.
+        // http://stackoverflow.com/questions/13746831/how-can-i-get-the-line-number-of-a-syntaxerror-thrown-by-requireid-in-node-js
+        // So, I'm removing a try/catch block here.
+        async([function () {
+            if (test.length == 1) test.call(null, assert)
+            else test.call(null, assert, async())
+        }, function (error) {
+            if (error.isBailout === BAILOUT) {
+                if (error.cause) {
+                    stream.write('Bail out!\n')
+                    throw error.cause // Rethrowing.
+                }
+                var message = typeof error.vargs[0] == 'string'
+                            ? (' ' + error.vargs.shift())
+                            : ''
+                stream.write('Bail out!' + message + '\n')
+                if (error.vargs.length != 0) {
+                    assert.inspect(error.vargs.shift())
+                }
             } else {
-                assert.ok(vargs[0], vargs[1])
-            }
-        }
-
-        function assertion (name, assertion) {
-            return function () {
-                var vargs = __slice.call(arguments), message = vargs[vargs.length - 1]
-                try {
-                    assertion.apply(this, vargs)
-                    process.stdout.write('ok ' + (++actual) + ' ' + message + '\n')
-                    ++passed
-                    return true
-                } catch (e) {
-                    process.stdout.write('not ok ' + (++actual) + ' ' + e.message + '\n')
-                    comment(util.inspect({
-                        EXPECTED: name == 'ok' ? true : vargs[1],
-                        GOT: vargs[0]
-                    }, null, Math.MAX_VALUE))
-                    return false
+                stream.write('Bail out!\n')
+                if (error.stack) {
+                    throw error
+                } else {
+                    assert.inspect(error)
                 }
             }
-        }
-
-        function finish () {
-            if (delayedPlan) {
-                process.stdout.write('1..' + expected + '\n')
+            return [ async.break, 1 ]
+        }], function () {
+            if (delayed) {
+                stream.write('1..' + expected + '\n')
             }
             var leaked = Object.keys(global).filter(function (global) {
                 return !~globals.indexOf(global)
             })
             if (leaked.length) {
-                die('Variables leaked into global namespace.', leaked)
-            }
-            var widths = [ expected, actual, passed ].map(function (number) { return String(number).length })
-            var width = Math.max.apply(Math, widths)
-            function pad (number) {
-                number = String(number)
-                return (new Array(width + 1).join(' ') + number).substr(-Math.max(width, number.length))
-            }
-            process.stdout.write('# expected ' + pad(expected) + '\n')
-            process.stdout.write('# passed   ' + pad(passed) + '\n')
-            if (passed < expected) {
-                process.stdout.write('# failed   ' + pad(expected - passed) + '\n')
-            }
-        }
-
-        function callback (error) {
-            if (error) {
-                die(error)
+                stream.write('Bail out! Variables leaked into global namespace.\n')
+                assert.inspect(leaked)
+                return 1
             } else {
-                if (synchronicity) {
-                    finish()
-                } else {
-                    synchronicity = true
+                var failed = actual - passed
+                var width = Math.max.apply(Math, [
+                    expected, actual, passed
+                ].map(function (number) { return String(number).length }))
+                stream.write('# expected   ' + pad(expected, width) + '\n')
+                stream.write('# passed     ' + pad(passed, width) + '\n')
+                if (failed != 0) {
+                    stream.write('# failed     ' + pad(failed, width) + '\n')
                 }
+                if (actual < expected) {
+                    stream.write('# missing    ' + pad(expected - actual, width) + '\n')
+                } else if (actual > expected) {
+                    stream.write('# unexpected ' + pad(actual - expected, width) + '\n')
+                }
+                return failed == 0 && passed == expected ? 0 : 1
             }
-        }
-    }
+        })
+    })
 }

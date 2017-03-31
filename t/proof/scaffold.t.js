@@ -3,7 +3,7 @@ var globals = Object.keys(global).concat([ 'errno' ])
 require('../..')(30, prove)
 
 function prove (assert) {
-    var scaffold = require('../../redux/scaffold')
+    var scaffold = require('../../scaffold')
 
     var util = require('util')
     var stream = require('stream')
