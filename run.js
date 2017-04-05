@@ -1,5 +1,5 @@
 var cadence = require('cadence')
-var expandable = require('expandable')
+var glob = require('expandable')
 var path = require('path')
 var shebang = require('./shebang')
 var spawn = require('child_process').spawn
@@ -13,12 +13,12 @@ var run = cadence(function (async, program) {
 
     if (!params.processes) params.processes = 1
 
-    program.argv.forEach(function (glob) {
+    program.argv.forEach(function (pattern) {
         var dirname
-        if (/\s+/.test(glob)) {
-            program.abend('spaces', glob)
+        if (/\s+/.test(pattern)) {
+            program.abend('spaces', pattern)
         }
-        expandable.glob(process.cwd(), [ glob ])[0].files.forEach(function (_program) {
+        glob(process.cwd(), [ pattern ])[0].files.forEach(function (_program) {
             if (programs.indexOf(_program) != -1) {
                 program.abend('once', _program)
             }

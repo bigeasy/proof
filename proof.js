@@ -5,7 +5,6 @@ var path = require('path')
 var test = require('./test')
 var spawn = require('child_process').spawn
 var arguable = require('arguable')
-var expandable = require('expandable')
 var cadence = require('cadence')
 var candidate = require('./candidate')
 var shebang = require('./shebang')

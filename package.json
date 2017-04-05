@@ -26,7 +26,7 @@
                             "deep-equal":                   "1.0.1",
                             "delta":                        "1.2.x",
                             "departure":                    "0.0.3",
-                            "expandable":                   "0.0.6",
+                            "expandable":                   "0.0.7",
                             "staccato":                     "3.0.x",
                             "turnstile":                    "2.2.9"
     },
