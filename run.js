@@ -6,7 +6,8 @@ var spawn = require('child_process').spawn
 var Delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
-var Turnstile = require('turnstile/redux')
+var Turnstile = require('turnstile')
+Turnstile.Queue = require('turnstile/queue')
 
 var run = cadence(function (async, program) {
     var programs = [], params = program.ultimate
@@ -94,13 +95,14 @@ var run = cadence(function (async, program) {
         })
     })
 
-    var turnstile = new Turnstile(operation)
+    var turnstile = new Turnstile
+    var queue = new Turnstile.Queue(operation, turnstile)
 
     async(function () {
         Object.keys(directories).forEach(function (directory) {
-            turnstile.push(directories[directory])
+            queue.push(directories[directory])
         })
-        turnstile.enqueue([], async())
+        queue.enqueue([], async())
     }, function () {
         stamp('*', 'eof')
         return 0
