@@ -1,5 +1,6 @@
 var colorization = require('./colorization')
 var extend = require('./extend')
+var coalesce = require('extant')
 
 module.exports = function (options) {
     var params = options.ultimate
@@ -58,8 +59,9 @@ module.exports = function (options) {
         return ' ' + color(icon) + ' ' + file + ' ' + dots + ' ' + summary + ' ' + color(status) + terminal
     }
 
+    var tty = coalesce(params.tty, process.stdout.isTTY, false)
     if (!params.width) {
-        if (process.stdout.isTTY) {
+        if (tty) {
             params.width = Math.min(process.stdout.columns - 1, 119)
         } else {
             params.width = 76
@@ -73,8 +75,6 @@ module.exports = function (options) {
     if (params.digits > 10) {
         params.digits = 10
     }
-
-    var tty = params.tty || process.stdout.isTTY
 
     return function (event, state) {
         var program, status, summary, tests, array = [], array = []
