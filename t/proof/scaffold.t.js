@@ -1,6 +1,6 @@
 var globals = Object.keys(global).concat([ 'errno' ])
 
-require('../..')(30, prove)
+require('../..')(32, prove)
 
 function prove (assert) {
     var scaffold = require('../../scaffold')
@@ -64,6 +64,14 @@ function prove (assert) {
         if (error) throw error
         assert(code, 1, 'exit 1 die')
         assert(out.read().toString(), 'Bail out! goodbye\n', 'bail out')
+    })
+
+    scaffold(0, function (_assert) {
+        _assert.die()
+    })(globals, out, function (error, code) {
+        if (error) throw error
+        assert(code, 1, 'exit 1 die no message')
+        assert(out.read().toString(), 'Bail out!\n', 'die bail out no message')
     })
 
     scaffold(0, function (_assert) {

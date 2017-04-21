@@ -83,10 +83,6 @@ module.exports = function (count, test) {
             else test.call(null, assert, async())
         }, function (error) {
             if (error.isBailout === BAILOUT) {
-                if (error.cause) {
-                    stream.write('Bail out!\n')
-                    throw error.cause // Rethrowing.
-                }
                 var message = typeof error.vargs[0] == 'string'
                             ? (' ' + error.vargs.shift())
                             : ''
