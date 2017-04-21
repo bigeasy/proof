@@ -6,7 +6,7 @@ var run = require('./proof.run.js')
 var progress = require('./proof.progress.js')
 
 var test = cadence(function (async, program) {
-    if (program.ultimate.help) program.help()
+    program.helpIf(program.ultimate.help)
     var parameters = { progress: {}, run: {}  }
     program.parameters.forEach(function (parameter) {
         var program = /^(monochrome|width|digits)$/.test(parameter.name) ? 'progress' : 'run'
