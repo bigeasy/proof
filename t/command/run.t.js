@@ -27,6 +27,18 @@ var prove = cadence(function (async, assert) {
     }, function (error) {
         assert(error.stderr, 'error: a program must only run once in a test run: t/command/fixtures/success', 'duplicates')
     }], function () {
+        var stdout = new stream.PassThrough
+        async(function () {
+            proof([ 'run', 't/command/fixtures/parallel/*.js' ], {
+                stdout: stdout
+            }, async())
+        }, function () {
+            var types = stdout.read().toString().split('\n').slice(0, 2).map(function (line) {
+                return line.split(' ')[1]
+            })
+            assert(types, [ 'run', 'run' ], 'parallel')
+        })
+    }, function () {
         test('success', 'run', 0, [ '-p', 1 ], async())
     }, function () {
         test('output', 'run', 0, async())
@@ -40,4 +52,4 @@ var prove = cadence(function (async, assert) {
     })
 })
 
-require('../..')(12, prove)
+require('../..')(13, prove)

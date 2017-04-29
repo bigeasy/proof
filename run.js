@@ -2,6 +2,8 @@ var cadence = require('cadence')
 var glob = require('expandable')
 var path = require('path')
 var shebang = require('./shebang')
+var fs = require('fs')
+var rescue = require('rescue')
 var spawn = require('child_process').spawn
 var Delta = require('delta')
 var byline = require('byline')
@@ -35,9 +37,31 @@ exports.run = cadence(function (async, program) {
     })
 
     var directory = cadence(function (async, envelope) {
-        async.forEach(function (program) {
-            queues.program.enqueue(program, async())
-        })(envelope.body)
+        async(function () {
+            var name = path.dirname(envelope.body[0])
+            var proof = path.join(name, 'proof.json')
+            async([function () {
+                fs.readFile(proof, 'utf8', async())
+            }, rescue(/^code:ENOENT$/, function () {
+                return [ async.break, false ]
+            })], function (file) {
+                try {
+                    return [ JSON.parse(file).parallel ]
+                } catch (e) {
+                    return [ false ]
+                }
+            })
+        }, function (parallel) {
+            if (parallel) {
+                envelope.body.forEach(function (program) {
+                    queues.program.enqueue(program, async())
+                })
+            } else {
+                async.forEach(function (program) {
+                    queues.program.enqueue(program, async())
+                })(envelope.body)
+            }
+        })
     })
 
     var run = cadence(function (async, envelope) {
@@ -80,6 +104,7 @@ exports.run = cadence(function (async, program) {
             }, function (code, signal) {
                 emit('exit', (code == null ? 'null' : code) + ' ' + (signal == null ? 'null' : signal))
                 clearTimeout(timer)
+                return []
             })
 
             function emit (type, message) {
