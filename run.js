@@ -39,27 +39,24 @@ exports.run = cadence(function (async, program) {
     var directory = cadence(function (async, envelope) {
         async(function () {
             var name = path.dirname(envelope.body[0])
-            var proof = path.join(name, 'proof.json')
+            var proof = path.join(name, 'parallel.proof')
             async([function () {
                 fs.readFile(proof, 'utf8', async())
             }, rescue(/^code:ENOENT$/, function () {
-                return [ async.break, false ]
-            })], function (file) {
-                try {
-                    return [ JSON.parse(file).parallel ]
-                } catch (e) {
-                    return [ false ]
-                }
-            })
+                return [ async.break, null ]
+            })])
         }, function (parallel) {
-            if (parallel) {
-                envelope.body.forEach(function (program) {
-                    queues.program.enqueue(program, async())
-                })
-            } else {
+            if (parallel == null) {
                 async.forEach(function (program) {
                     queues.program.enqueue(program, async())
                 })(envelope.body)
+            } else {
+                // TODO Add this to the Turnstile documentation, you use the
+                // implicit loop here to populate the explicit loop, because it
+                // is going take memory anyway.
+                envelope.body.forEach(function (program) {
+                    queues.program.enqueue(program, async())
+                })
             }
         })
     })
