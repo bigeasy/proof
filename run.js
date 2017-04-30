@@ -136,7 +136,7 @@ exports.run = cadence(function (async, program) {
         Object.keys(directories).forEach(function (directory) {
             queues.directory.push(directories[directory])
         })
-        queues.directory.enqueue([], async())
+        queues.directory.wait(async())
     }, function () {
         stamp('*', 'eof')
         return 0
