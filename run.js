@@ -4,7 +4,7 @@ var path = require('path')
 var shebang = require('./shebang')
 var fs = require('fs')
 var rescue = require('rescue')
-var spawn = require('child_process').spawn
+var children = require('child_process')
 var Delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
@@ -66,7 +66,7 @@ exports.run = cadence(function (async, program) {
         async(function () {
             shebang(process.platform, program, [], async())
         }, function (_program, parameters) {
-            var executable = spawn(_program, parameters, {})
+            var executable = children.spawn(_program, parameters, {})
 
             var timer = null
 
