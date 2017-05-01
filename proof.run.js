@@ -43,5 +43,5 @@ ___ . ___
 require('arguable')(module, require('cadence')(function (async, program) {
     program.helpIf(program.ultimate.help)
     var run = require('./run').run
-    run(program, async())
+    run(program, process, async())
 }))

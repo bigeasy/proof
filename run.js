@@ -8,10 +8,11 @@ var children = require('child_process')
 var Delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
+var kill = require('./kill')
 var Turnstile = require('turnstile')
 Turnstile.Queue = require('turnstile/queue')
 
-exports.run = cadence(function (async, program) {
+exports.run = cadence(function (async, program, process) {
     var programs = [], params = program.ultimate
 
     if (!params.processes) params.processes = 1
@@ -66,7 +67,7 @@ exports.run = cadence(function (async, program) {
         async(function () {
             shebang(process.platform, program, [], async())
         }, function (_program, parameters) {
-            var executable = children.spawn(_program, parameters, {})
+            var executable = children.spawn(_program, parameters, { detached: true })
 
             var timer = null
 
@@ -108,13 +109,13 @@ exports.run = cadence(function (async, program) {
                 if (timer) {
                     clearTimeout(timer)
                 }
-                timer = setTimeout(kill, params.timeout ? params.timeout * 1000 : 30000)
+                timer = setTimeout(shutdown, params.timeout ? params.timeout * 1000 : 30000)
                 stamp(program, type, message)
             }
 
-            function kill () {
+            function shutdown () {
                 timer = null
-                executable.kill()
+                kill(process, executable.pid, 'SIGTERM')
             }
         })
     })
