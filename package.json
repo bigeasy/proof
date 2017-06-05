@@ -26,7 +26,7 @@
                             "deep-equal":                   "1.0.1",
                             "delta":                        "1.2.x",
                             "departure":                    "0.0.3",
-                            "expandable":                   "0.0.7",
+                            "expandable":                   "0.0.x",
                             "extant":                       "1.0.x",
                             "recuperate":                   "0.0.x",
                             "rescue":                       "3.0.x",
