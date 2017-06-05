@@ -30,7 +30,7 @@
                             "extant":                       "1.0.x",
                             "recuperate":                   "0.0.x",
                             "rescue":                       "3.0.x",
-                            "staccato":                     "3.0.x",
+                            "staccato":                     "3.6.x",
                             "turnstile":                    "2.5.x"
     },
     "devDependencies":
