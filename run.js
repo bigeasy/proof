@@ -37,6 +37,10 @@ exports.run = cadence(function (async, program, process) {
         programs.push(program)
     })
 
+    for (var name in directories) {
+        directories[name].sort()
+    }
+
     var directory = cadence(function (async, envelope) {
         async(function () {
             var name = path.dirname(envelope.body[0])
