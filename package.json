@@ -1,6 +1,6 @@
 {
     "name":                 "proof",
-    "version":              "3.0.10",
+    "version":              "3.0.11",
     "description":
 
       "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
