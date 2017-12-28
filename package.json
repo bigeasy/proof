@@ -15,7 +15,7 @@
     "license":              "MIT",
     "repository":
     {
-                            "url": "https://github.com/bigeasy/proof",
+                            "url": "bigeasy/proof",
                             "type": "git"
     },
     "dependencies":
