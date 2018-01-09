@@ -30,21 +30,6 @@
                 </a>
 
 
-                <a class="source" href="convert.js.html">
-                  convert.js
-                </a>
-
-
-                <a class="source" href="die.js.html">
-                  die.js
-                </a>
-
-
-                <a class="source" href="epipe.js.html">
-                  epipe.js
-                </a>
-
-
                 <a class="source" href="errors.js.html">
                   errors.js
                 </a>
@@ -77,6 +62,11 @@
 
                 <a class="source" href="json.js.html">
                   json.js
+                </a>
+
+
+                <a class="source" href="kill.js.html">
+                  kill.js
                 </a>
 
 
@@ -189,26 +179,30 @@
             </div>
 
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> cadence = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cadence'</span>)
-<span class="hljs-keyword">var</span> expandable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'expandable'</span>)
+<span class="hljs-keyword">var</span> glob = <span class="hljs-built_in">require</span>(<span class="hljs-string">'expandable'</span>)
 <span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>)
 <span class="hljs-keyword">var</span> shebang = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./shebang'</span>)
-<span class="hljs-keyword">var</span> spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawn
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>)
+<span class="hljs-keyword">var</span> rescue = <span class="hljs-built_in">require</span>(<span class="hljs-string">'rescue'</span>)
+<span class="hljs-keyword">var</span> children = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>)
 <span class="hljs-keyword">var</span> Delta = <span class="hljs-built_in">require</span>(<span class="hljs-string">'delta'</span>)
 <span class="hljs-keyword">var</span> byline = <span class="hljs-built_in">require</span>(<span class="hljs-string">'byline'</span>)
 <span class="hljs-keyword">var</span> tap = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./tap'</span>)
-<span class="hljs-keyword">var</span> Turnstile = <span class="hljs-built_in">require</span>(<span class="hljs-string">'turnstile/redux'</span>)
+<span class="hljs-keyword">var</span> kill = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./kill'</span>)
+<span class="hljs-keyword">var</span> Turnstile = <span class="hljs-built_in">require</span>(<span class="hljs-string">'turnstile'</span>)
+Turnstile.Queue = <span class="hljs-built_in">require</span>(<span class="hljs-string">'turnstile/queue'</span>)
 
-<span class="hljs-keyword">var</span> run = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, program</span>) </span>{
+exports.run = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, program, process</span>) </span>{
     <span class="hljs-keyword">var</span> programs = [], params = program.ultimate
 
     <span class="hljs-keyword">if</span> (!params.processes) params.processes = <span class="hljs-number">1</span>
 
-    program.argv.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">glob</span>) </span>{
+    program.argv.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">pattern</span>) </span>{
         <span class="hljs-keyword">var</span> dirname
-        <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/\s+/</span>.test(glob)) {
-            program.abend(<span class="hljs-string">'spaces'</span>, glob)
+        <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/\s+/</span>.test(pattern)) {
+            program.abend(<span class="hljs-string">'spaces'</span>, pattern)
         }
-        expandable.glob(process.cwd(), [ glob ])[<span class="hljs-number">0</span>].files.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">_program</span>) </span>{
+        glob(process.cwd(), [ pattern ])[<span class="hljs-number">0</span>].files.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">_program</span>) </span>{
             <span class="hljs-keyword">if</span> (programs.indexOf(_program) != <span class="hljs-number">-1</span>) {
                 program.abend(<span class="hljs-string">'once'</span>, _program)
             }
@@ -221,7 +215,28 @@
         <span class="hljs-keyword">var</span> programs = directories[path.dirname(program)] || []
         directories[path.dirname(program)] = programs
         programs.push(program)
-    })</pre></div></div>
+    })
+
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> name <span class="hljs-keyword">in</span> directories) {
+        directories[name].sort()
+    }
+
+    <span class="hljs-keyword">var</span> directory = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, envelope</span>) </span>{
+        <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+            <span class="hljs-keyword">var</span> name = path.dirname(envelope.body[<span class="hljs-number">0</span>])
+            <span class="hljs-keyword">var</span> proof = path.join(name, <span class="hljs-string">'parallel.proof'</span>)
+            <span class="hljs-keyword">async</span>([<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                fs.readFile(proof, <span class="hljs-string">'utf8'</span>, <span class="hljs-keyword">async</span>())
+            }, rescue(<span class="hljs-regexp">/^code:ENOENT$/</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">return</span> [ <span class="hljs-keyword">async</span>.break, <span class="hljs-literal">null</span> ]
+            })])
+        }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">parallel</span>) </span>{
+            <span class="hljs-keyword">if</span> (parallel == <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">async</span>.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">program</span>) </span>{
+                    queues.program.enqueue(program, <span class="hljs-keyword">async</span>())
+                })(envelope.body)
+            } <span class="hljs-keyword">else</span> {
+</pre></div></div>
 
         </li>
 
@@ -232,77 +247,92 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Happens often enough that we shouldn’t freak out.</p>
+              <p>TODO Add this to the Turnstile documentation, you use the
+implicit loop here to populate the explicit loop, because it
+is going take memory anyway.</p>
 
             </div>
 
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> operation = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, envelope</span>) </span>{
-        <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-            <span class="hljs-keyword">async</span>.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">program</span>) </span>{
-                <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                    shebang(process.platform, program, [], <span class="hljs-keyword">async</span>())
-                }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">_program, parameters</span>) </span>{
-                    <span class="hljs-keyword">var</span> executable = spawn(_program, parameters, {})
-
-                    <span class="hljs-keyword">var</span> timer = <span class="hljs-literal">null</span>
-
-                    emit(<span class="hljs-string">'run'</span>)
-
-                    <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-                        <span class="hljs-keyword">var</span> delta = <span class="hljs-keyword">new</span> Delta(<span class="hljs-keyword">async</span>()), bailed = <span class="hljs-literal">false</span>, planned = <span class="hljs-literal">false</span>, plan
-
-                        byline.createStream(executable.stderr).on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">line</span>) </span>{
-                            emit(<span class="hljs-string">'err'</span>, line)
-                        })
-
-                        byline.createStream(executable.stdout).on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">line</span>) </span>{
-                            <span class="hljs-keyword">if</span> (bailed) {
-                                emit(<span class="hljs-string">'out'</span>, line)
-                            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (tap.assertion(line)) {
-                                emit(<span class="hljs-string">'test'</span>, line)
-                            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!planned &amp;&amp; (plan = tap.plan(line))) {
-                                planned = <span class="hljs-literal">true</span>
-                                emit(<span class="hljs-string">'plan'</span>, plan.expected)
-                            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (tap.bailout(line)) {
-                                bailed = <span class="hljs-literal">true</span>
-                                emit(<span class="hljs-string">'bail'</span>, line)
-                            } <span class="hljs-keyword">else</span> {
-                                emit(<span class="hljs-string">'out'</span>, line)
-                            }
-                        })
-
-                        delta.ee(executable.stdout)
-                             .ee(executable.stderr)
-                             .ee(executable).on(<span class="hljs-string">'close'</span>)
-                    }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">code, signal</span>) </span>{
-                        emit(<span class="hljs-string">'exit'</span>, (code == <span class="hljs-literal">null</span> ? <span class="hljs-string">'null'</span> : code) + <span class="hljs-string">' '</span> + (signal == <span class="hljs-literal">null</span> ? <span class="hljs-string">'null'</span> : signal))
-                        clearTimeout(timer)
-                    })
-
-                    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">emit</span> (<span class="hljs-params">type, message</span>) </span>{
-                        <span class="hljs-keyword">if</span> (timer) {
-                            clearTimeout(timer)
-                        }
-                        timer = setTimeout(kill, params.timeout ? params.timeout * <span class="hljs-number">1000</span> : <span class="hljs-number">30000</span>)
-                        stamp(program, type, message)
-                    }
-
-                    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">kill</span> (<span class="hljs-params"></span>) </span>{
-                        timer = <span class="hljs-literal">null</span>
-                        executable.kill()
-                    }
+            <div class="content"><div class='highlight'><pre>                envelope.body.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">program</span>) </span>{
+                    queues.program.enqueue(program, <span class="hljs-keyword">async</span>())
                 })
-            })(envelope.body)
+            }
         })
     })
 
-    <span class="hljs-keyword">var</span> turnstile = <span class="hljs-keyword">new</span> Turnstile(operation)
+    <span class="hljs-keyword">var</span> run = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, envelope</span>) </span>{
+        <span class="hljs-keyword">var</span> program = envelope.body
+        <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+            shebang(process.platform, program, [], <span class="hljs-keyword">async</span>())
+        }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">_program, parameters</span>) </span>{
+            <span class="hljs-keyword">var</span> executable = children.spawn(_program, parameters, { <span class="hljs-attr">detached</span>: <span class="hljs-literal">true</span> })
+
+            <span class="hljs-keyword">var</span> timer = <span class="hljs-literal">null</span>
+
+            emit(<span class="hljs-string">'run'</span>)
+
+            <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">var</span> delta = <span class="hljs-keyword">new</span> Delta(<span class="hljs-keyword">async</span>()), bailed = <span class="hljs-literal">false</span>, planned = <span class="hljs-literal">false</span>, plan
+
+                byline.createStream(executable.stderr).on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">line</span>) </span>{
+                    emit(<span class="hljs-string">'err'</span>, line)
+                })
+
+                byline.createStream(executable.stdout).on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">line</span>) </span>{
+                    <span class="hljs-keyword">if</span> (bailed) {
+                        emit(<span class="hljs-string">'out'</span>, line)
+                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (tap.assertion(line)) {
+                        emit(<span class="hljs-string">'test'</span>, line)
+                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!planned &amp;&amp; (plan = tap.plan(line))) {
+                        planned = <span class="hljs-literal">true</span>
+                        emit(<span class="hljs-string">'plan'</span>, plan.expected)
+                    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (tap.bailout(line)) {
+                        bailed = <span class="hljs-literal">true</span>
+                        emit(<span class="hljs-string">'bail'</span>, line)
+                    } <span class="hljs-keyword">else</span> {
+                        emit(<span class="hljs-string">'out'</span>, line)
+                    }
+                })
+
+                delta.ee(executable.stdout)
+                     .ee(executable.stderr)
+                     .ee(executable).on(<span class="hljs-string">'close'</span>)
+            }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">code, signal</span>) </span>{
+                emit(<span class="hljs-string">'exit'</span>, (code == <span class="hljs-literal">null</span> ? <span class="hljs-string">'null'</span> : code) + <span class="hljs-string">' '</span> + (signal == <span class="hljs-literal">null</span> ? <span class="hljs-string">'null'</span> : signal))
+                clearTimeout(timer)
+                <span class="hljs-keyword">return</span> []
+            })
+
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">emit</span> (<span class="hljs-params">type, message</span>) </span>{
+                <span class="hljs-keyword">if</span> (timer) {
+                    clearTimeout(timer)
+                }
+                timer = setTimeout(shutdown, params.timeout ? params.timeout * <span class="hljs-number">1000</span> : <span class="hljs-number">30000</span>)
+                stamp(program, type, message)
+            }
+
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">shutdown</span> (<span class="hljs-params"></span>) </span>{
+                timer = <span class="hljs-literal">null</span>
+                kill(process, executable.pid, <span class="hljs-string">'SIGTERM'</span>)
+            }
+        })
+    })
+
+
+    <span class="hljs-keyword">var</span> turnstiles = {
+        <span class="hljs-attr">directories</span>: <span class="hljs-keyword">new</span> Turnstile({ <span class="hljs-attr">turnstiles</span>: <span class="hljs-number">1</span> }),
+        <span class="hljs-attr">programs</span>: <span class="hljs-keyword">new</span> Turnstile({ <span class="hljs-attr">turnstiles</span>: <span class="hljs-literal">Infinity</span> })
+    }
+    <span class="hljs-keyword">var</span> queues = {
+        <span class="hljs-attr">directory</span>: <span class="hljs-keyword">new</span> Turnstile.Queue(directory, turnstiles.directories),
+        <span class="hljs-attr">program</span>: <span class="hljs-keyword">new</span> Turnstile.Queue(run, turnstiles.programs)
+    }
 
     <span class="hljs-keyword">async</span>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
         <span class="hljs-built_in">Object</span>.keys(directories).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">directory</span>) </span>{
-            turnstile.push(directories[directory])
+            queues.directory.push(directories[directory])
         })
-        turnstile.enqueue([], <span class="hljs-keyword">async</span>())
+        queues.directory.wait(<span class="hljs-keyword">async</span>())
     }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
         stamp(<span class="hljs-string">'*'</span>, <span class="hljs-string">'eof'</span>)
         <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
@@ -315,7 +345,7 @@
     }
 })
 
-exports.run = run</pre></div></div>
+</pre></div></div>
 
         </li>
 

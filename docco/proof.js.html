@@ -30,21 +30,6 @@
                 </a>
 
 
-                <a class="source" href="convert.js.html">
-                  convert.js
-                </a>
-
-
-                <a class="source" href="die.js.html">
-                  die.js
-                </a>
-
-
-                <a class="source" href="epipe.js.html">
-                  epipe.js
-                </a>
-
-
                 <a class="source" href="errors.js.html">
                   errors.js
                 </a>
@@ -77,6 +62,11 @@
 
                 <a class="source" href="json.js.html">
                   json.js
+                </a>
+
+
+                <a class="source" href="kill.js.html">
+                  kill.js
                 </a>
 
 
@@ -195,7 +185,6 @@
 <span class="hljs-keyword">var</span> test = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./test'</span>)
 <span class="hljs-keyword">var</span> spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawn
 <span class="hljs-keyword">var</span> arguable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'arguable'</span>)
-<span class="hljs-keyword">var</span> expandable = <span class="hljs-built_in">require</span>(<span class="hljs-string">'expandable'</span>)
 <span class="hljs-keyword">var</span> cadence = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cadence'</span>)
 <span class="hljs-keyword">var</span> candidate = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./candidate'</span>)
 <span class="hljs-keyword">var</span> shebang = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./shebang'</span>)
@@ -210,7 +199,9 @@
 <span class="hljs-keyword">var</span> _progress = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./progress'</span>)
 <span class="hljs-keyword">var</span> _errors = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./errors'</span>)
 <span class="hljs-keyword">var</span> run = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./run'</span>).run
-<span class="hljs-keyword">var</span> platform = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./platform'</span>).platform</pre></div></div>
+<span class="hljs-keyword">var</span> platform = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./platform'</span>).platform
+
+</pre></div></div>
 
         </li>
 
@@ -253,7 +244,9 @@ exports.main = cadence(<span class="hljs-function"><span class="hljs-keyword">fu
     })[program.command.command.name]
 
     command(program, <span class="hljs-keyword">async</span>())
-})</pre></div></div>
+})
+
+</pre></div></div>
 
         </li>
 

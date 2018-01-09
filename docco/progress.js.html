@@ -30,21 +30,6 @@
                 </a>
 
 
-                <a class="source" href="convert.js.html">
-                  convert.js
-                </a>
-
-
-                <a class="source" href="die.js.html">
-                  die.js
-                </a>
-
-
-                <a class="source" href="epipe.js.html">
-                  epipe.js
-                </a>
-
-
                 <a class="source" href="errors.js.html">
                   errors.js
                 </a>
@@ -77,6 +62,11 @@
 
                 <a class="source" href="json.js.html">
                   json.js
+                </a>
+
+
+                <a class="source" href="kill.js.html">
+                  kill.js
                 </a>
 
 
@@ -190,6 +180,7 @@
 
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> colorization = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./colorization'</span>)
 <span class="hljs-keyword">var</span> extend = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./extend'</span>)
+<span class="hljs-keyword">var</span> coalesce = <span class="hljs-built_in">require</span>(<span class="hljs-string">'extant'</span>)
 
 <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">options</span>) </span>{
     <span class="hljs-keyword">var</span> params = options.ultimate
@@ -248,8 +239,9 @@
         <span class="hljs-keyword">return</span> <span class="hljs-string">' '</span> + color(icon) + <span class="hljs-string">' '</span> + file + <span class="hljs-string">' '</span> + dots + <span class="hljs-string">' '</span> + summary + <span class="hljs-string">' '</span> + color(status) + terminal
     }
 
+    <span class="hljs-keyword">var</span> tty = coalesce(params.tty, process.stdout.isTTY, <span class="hljs-literal">false</span>)
     <span class="hljs-keyword">if</span> (!params.width) {
-        <span class="hljs-keyword">if</span> (process.stdout.isTTY) {
+        <span class="hljs-keyword">if</span> (tty) {
             params.width = <span class="hljs-built_in">Math</span>.min(process.stdout.columns - <span class="hljs-number">1</span>, <span class="hljs-number">119</span>)
         } <span class="hljs-keyword">else</span> {
             params.width = <span class="hljs-number">76</span>
@@ -263,8 +255,6 @@
     <span class="hljs-keyword">if</span> (params.digits &gt; <span class="hljs-number">10</span>) {
         params.digits = <span class="hljs-number">10</span>
     }
-
-    <span class="hljs-keyword">var</span> tty = params.tty || process.stdout.isTTY
 
     <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event, state</span>) </span>{
         <span class="hljs-keyword">var</span> program, status, summary, tests, array = [], array = []
@@ -387,7 +377,9 @@
         }
         <span class="hljs-keyword">return</span> array
     }
-}</pre></div></div>
+}
+
+</pre></div></div>
 
         </li>
 

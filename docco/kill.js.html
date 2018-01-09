@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>json.js</title>
+  <title>kill.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -163,7 +163,7 @@
 
           <li id="title">
               <div class="annotation">
-                  <h1>json.js</h1>
+                  <h1>kill.js</h1>
               </div>
           </li>
 
@@ -178,48 +178,11 @@
 
             </div>
 
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> printer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./printer'</span>)
-<span class="hljs-keyword">var</span> extend = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./extend'</span>)
-
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">var</span> object = {}
-    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event</span>) </span>{
-        <span class="hljs-keyword">var</span> arr = []
-        <span class="hljs-keyword">var</span> comment, file, message, passed, skip, time, todo
-        <span class="hljs-keyword">switch</span> (event.type) {
-            <span class="hljs-keyword">case</span> <span class="hljs-string">'run'</span>:
-                object[event.file] = {
-                    <span class="hljs-attr">time</span>: event.time,
-                    <span class="hljs-attr">expected</span>: event.expected,
-                    <span class="hljs-attr">tests</span>: []
-                }
-                <span class="hljs-keyword">break</span>
-            <span class="hljs-keyword">case</span> <span class="hljs-string">'plan'</span>:
-                object[event.file].expected = event.expected
-                <span class="hljs-keyword">break</span>
-            <span class="hljs-keyword">case</span> <span class="hljs-string">'test'</span>:
-                object[event.file].tests.push({
-                    <span class="hljs-attr">message</span>: event.message,
-                    <span class="hljs-attr">time</span>: event.time,
-                    <span class="hljs-attr">passed</span>: event.passed,
-                    <span class="hljs-attr">skip</span>: event.skip,
-                    <span class="hljs-attr">todo</span>: event.todo,
-                    <span class="hljs-attr">comment</span>: event.comment
-                })
-                <span class="hljs-keyword">break</span>
-            <span class="hljs-keyword">case</span> <span class="hljs-string">'exit'</span>:
-                extend(object[event.file], {
-                    <span class="hljs-attr">actual</span>: event.actual,
-                    <span class="hljs-attr">duration</span>: event.time - event.start,
-                    <span class="hljs-attr">code</span>: event.code
-                })
-                <span class="hljs-keyword">break</span>
-            <span class="hljs-keyword">case</span> <span class="hljs-string">'eof'</span>:
-                arr.push(<span class="hljs-built_in">JSON</span>.stringify(object, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>))
-                arr.push(<span class="hljs-string">'\n'</span>)
-                <span class="hljs-keyword">break</span>
-        }
-        <span class="hljs-keyword">return</span> arr
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">process, pid, signal</span>) </span>{
+    <span class="hljs-keyword">if</span> (process.platform == <span class="hljs-string">'win32'</span>) {
+        process.kill(pid, signal)
+    } <span class="hljs-keyword">else</span> {
+        process.kill(-pid, signal)
     }
 }
 

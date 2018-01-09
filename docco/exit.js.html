@@ -30,21 +30,6 @@
                 </a>
 
 
-                <a class="source" href="convert.js.html">
-                  convert.js
-                </a>
-
-
-                <a class="source" href="die.js.html">
-                  die.js
-                </a>
-
-
-                <a class="source" href="epipe.js.html">
-                  epipe.js
-                </a>
-
-
                 <a class="source" href="errors.js.html">
                   errors.js
                 </a>
@@ -77,6 +62,11 @@
 
                 <a class="source" href="json.js.html">
                   json.js
+                </a>
+
+
+                <a class="source" href="kill.js.html">
+                  kill.js
                 </a>
 
 
@@ -189,10 +179,48 @@
             </div>
 
             <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">process</span>) </span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-regexp">/^v0\.10\./</span>.test(process.version)
-         ? <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">exitCode</span>) </span>{ process.exit(exitCode) }
-         : <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">exitCode</span>) </span>{ process.exitCode = exitCode }
-}</pre></div></div>
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error, exitCode</span>) </span>{
+        <span class="hljs-keyword">if</span> (error) {
+</pre></div></div>
+
+        </li>
+
+
+        <li id="section-2">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>This is line formatted for it’s display by <code>node</code>.</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">throw</span> error <span class="hljs-comment">/*\*-* Proof framework rewthrowing test generated error. See below. *-*\*/</span>
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^v0\.10\./</span>.test(process.version)) {
+</pre></div></div>
+
+        </li>
+
+
+        <li id="section-3">
+            <div class="annotation">
+
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>TODO Maybe bring your arguable exit code hack over here?</p>
+
+            </div>
+
+            <div class="content"><div class='highlight'><pre>            process.exit(exitCode)
+        } <span class="hljs-keyword">else</span> {
+            process.exitCode = exitCode
+        }
+    }
+}
+
+</pre></div></div>
 
         </li>
 

@@ -30,21 +30,6 @@
                 </a>
 
 
-                <a class="source" href="convert.js.html">
-                  convert.js
-                </a>
-
-
-                <a class="source" href="die.js.html">
-                  die.js
-                </a>
-
-
-                <a class="source" href="epipe.js.html">
-                  epipe.js
-                </a>
-
-
                 <a class="source" href="errors.js.html">
                   errors.js
                 </a>
@@ -77,6 +62,11 @@
 
                 <a class="source" href="json.js.html">
                   json.js
+                </a>
+
+
+                <a class="source" href="kill.js.html">
+                  kill.js
                 </a>
 
 
@@ -196,7 +186,7 @@
 <span class="hljs-keyword">var</span> progress = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./proof.progress.js'</span>)
 
 <span class="hljs-keyword">var</span> test = cadence(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">async, program</span>) </span>{
-    <span class="hljs-keyword">if</span> (program.ultimate.help) program.help()
+    program.helpIf(program.ultimate.help)
     <span class="hljs-keyword">var</span> parameters = { <span class="hljs-attr">progress</span>: {}, <span class="hljs-attr">run</span>: {}  }
     program.parameters.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">parameter</span>) </span>{
         <span class="hljs-keyword">var</span> program = <span class="hljs-regexp">/^(monochrome|width|digits)$/</span>.test(parameter.name) ? <span class="hljs-string">'progress'</span> : <span class="hljs-string">'run'</span>
@@ -217,7 +207,9 @@
     programs.run.stdout.pipe(programs.progress.stdin)
 })
 
-<span class="hljs-built_in">module</span>.exports = test</pre></div></div>
+<span class="hljs-built_in">module</span>.exports = test
+
+</pre></div></div>
 
         </li>
 
