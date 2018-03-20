@@ -13,7 +13,7 @@ var prove = cadence(function (async, assert) {
     }, [function () {
         proof([ 'platform', '-h' ], {}, async())
     }, function (error) {
-        assert(error.interrupt, 'bigeasy.arguable#help', 'help')
+        assert(error.qualified, 'bigeasy.arguable#help', 'help')
     }])
 })
 
