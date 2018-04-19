@@ -29,7 +29,7 @@
                             "expandable":                   "0.1.x",
                             "extant":                       "1.0.x",
                             "rescue":                       "3.2.x",
-                            "staccato":                     "6.0.x",
+                            "staccato":                     "6.1.x",
                             "turnstile":                    "4.1.x"
     },
     "devDependencies":
