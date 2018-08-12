@@ -3,7 +3,7 @@ var glob = require('expandable')
 var path = require('path')
 var shebang = require('./shebang')
 var fs = require('fs')
-var rescue = require('rescue')
+var rescue = require('rescue/redux')
 var children = require('child_process')
 var Delta = require('delta')
 var byline = require('byline')
@@ -47,7 +47,7 @@ exports.run = cadence(function (async, program, process) {
             var proof = path.join(name, 'parallel.proof')
             async([function () {
                 fs.readFile(proof, 'utf8', async())
-            }, rescue(/^code:ENOENT$/, function () {
+            }, rescue([ /^code:ENOENT$/, 'only' ], function () {
                 return [ async.break, null ]
             })])
         }, function (parallel) {
