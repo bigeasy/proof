@@ -9,7 +9,7 @@ var Delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
 var kill = require('./kill')
-var Turnstile = require('turnstile')
+var Turnstile = require('turnstile/redux')
 Turnstile.Queue = require('turnstile/queue')
 
 exports.run = cadence(function (async, program, process) {
