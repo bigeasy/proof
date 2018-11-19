@@ -20,7 +20,7 @@
     },
     "dependencies":
     {
-                            "arguable":                     "6.8.x",
+                            "arguable":                     "6.9.x",
                             "byline":                       "5.0.0",
                             "cadence":                      "1.0.x",
                             "deep-equal":                   "1.0.1",
