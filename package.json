@@ -37,7 +37,7 @@
     },
     "bin":
     {
-                            "proof":                        "proof.bin.js"
+                            "proof":                        "3.0.37"
     },
     "scripts":
     {
