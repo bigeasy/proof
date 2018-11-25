@@ -22,7 +22,7 @@ module.exports = function (count, test) {
             return lines.join('\n')
         }
 
-        function assert () {
+        function okay () {
             var vargs = slice.call(arguments), ok, message, detail = null
             if (vargs.length == 3) {
                 detail = departure.compare(vargs[0], vargs[1])
@@ -46,23 +46,23 @@ module.exports = function (count, test) {
             }
         }
 
-        assert.die = function () {
+        okay.die = function () {
             throw { isBailout: BAILOUT, vargs: slice.call(arguments) }
         }
 
-        assert.inspect = function (value, depth) {
+        okay.inspect = function (value, depth) {
             stream.write(comment(util.inspect(value, { depth: depth || null })))
         }
 
-        assert.say = function () {
+        okay.say = function () {
             stream.write(comment(util.format.apply(util.format, slice.call(arguments))))
         }
 
-        assert.inc = function (count) {
+        okay.inc = function (count) {
             expected += count
         }
 
-        assert.leak = function () {
+        okay.leak = function () {
             globals.push.apply(globals, arguments)
         }
 
@@ -82,8 +82,8 @@ module.exports = function (count, test) {
         // http://stackoverflow.com/questions/13746831/how-can-i-get-the-line-number-of-a-syntaxerror-thrown-by-requireid-in-node-js
         // So, I'm removing a try/catch block here.
         async([function () {
-            if (test.length == 1) test.call(null, assert)
-            else test.call(null, assert, async())
+            if (test.length == 1) test.call(null, okay)
+            else test.call(null, okay, async())
         }, function (error) {
             if (error.isBailout === BAILOUT) {
                 var message = typeof error.vargs[0] == 'string'
@@ -91,14 +91,14 @@ module.exports = function (count, test) {
                             : ''
                 stream.write('Bail out!' + message + '\n')
                 if (error.vargs.length != 0) {
-                    assert.inspect(error.vargs.shift())
+                    okay.inspect(error.vargs.shift())
                 }
             } else {
                 stream.write('Bail out!\n')
                 if (error.stack) {
                     throw error
                 } else {
-                    assert.inspect(error)
+                    okay.inspect(error)
                 }
             }
             return [ async.break, 1 ]
@@ -111,7 +111,7 @@ module.exports = function (count, test) {
             })
             if (leaked.length) {
                 stream.write('Bail out! Variables leaked into global namespace.\n')
-                assert.inspect(leaked)
+                okay.inspect(leaked)
                 return 1
             } else {
                 var failed = actual - passed
