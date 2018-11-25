@@ -30,7 +30,7 @@
                             "extant":                       "1.0.x",
                             "rescue":                       "4.2.x",
                             "staccato":                     "6.5.x",
-                            "turnstile":                    "4.8.x"
+                            "turnstile":                    "4.9.x"
     },
     "devDependencies":
     {
