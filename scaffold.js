@@ -28,9 +28,12 @@ module.exports = function (count, test) {
                 detail = departure.compare(vargs[0], vargs[1])
                 ok = detail == null
                 message = ' ' + vargs[2]
-            } else {
+            } else if (vargs.length == 2) {
                 ok = !! vargs[0]
-                message = vargs.length == 2 ? (' ' + vargs[1]) : ''
+                message = ' ' + vargs[1]
+            } else {
+                ok = true
+                message = ' ' + vargs[0]
             }
             if (ok) {
                 passed++

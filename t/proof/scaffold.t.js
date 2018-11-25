@@ -26,8 +26,8 @@ function prove (assert) {
         assert(globals[globals.length - 1], 'hello', 'leak')
         _assert(true, 'truth')
         assert(out.read().toString(), 'ok 1 truth\n', 'boolean test passed')
-        _assert(true)
-        assert(out.read().toString(), 'ok 2\n', 'boolean test passed no message')
+        _assert('passed')
+        assert(out.read().toString(), 'ok 2 passed\n', 'boolean test no message always good')
         _assert({ a: 1 }, { a: 1 }, 'equal')
         assert(out.read().toString(), 'ok 3 equal\n', 'equal test passed')
     })(globals, out, function (error, code) {
