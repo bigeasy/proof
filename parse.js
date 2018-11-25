@@ -1,5 +1,4 @@
 var byline = require('byline')
-var Delta = require('delta')
 var extend = require('./extend')
 var tap = require('./tap')
 var cadence = require('cadence')

@@ -1,7 +1,6 @@
 var cadence = require('cadence')
 var spawn = require('child_process').spawn
 var path = require('path')
-var Delta = require('delta')
 var run = require('./proof.run.js')
 var progress = require('./proof.progress.js')
 

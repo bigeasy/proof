@@ -5,7 +5,7 @@ var shebang = require('./shebang')
 var fs = require('fs')
 var rescue = require('rescue/redux')
 var children = require('child_process')
-var Delta = require('delta')
+var delta = require('delta')
 var byline = require('byline')
 var tap = require('./tap')
 var kill = require('./kill')
@@ -78,7 +78,7 @@ exports.run = cadence(function (async, program, process) {
             emit('run')
 
             async(function () {
-                var delta = new Delta(async()), bailed = false, planned = false, plan
+                var bailed = false, planned = false, plan
 
                 byline.createStream(executable.stderr).on('data', function (line) {
                     emit('err', line)
@@ -100,9 +100,9 @@ exports.run = cadence(function (async, program, process) {
                     }
                 })
 
-                delta.ee(executable.stdout)
-                     .ee(executable.stderr)
-                     .ee(executable).on('close')
+                delta(async()).ee(executable.stdout)
+                              .ee(executable.stderr)
+                              .ee(executable).on('close')
             }, function (code, signal) {
                 emit('exit', (code == null ? 'null' : code) + ' ' + (signal == null ? 'null' : signal))
                 clearTimeout(timer)
