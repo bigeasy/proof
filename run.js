@@ -48,13 +48,13 @@ exports.run = cadence(function (async, program, process) {
             async([function () {
                 fs.readFile(proof, 'utf8', async())
             }, rescue([ /^code:ENOENT$/, 'only' ], function () {
-                return [ async.break, null ]
+                return [ async.return, null ]
             })])
         }, function (parallel) {
             if (parallel == null) {
-                async.forEach(function (program) {
+                async.forEach([ envelope.body ], function (program) {
                     queues.program.enqueue(program, async())
-                })(envelope.body)
+                })
             } else {
                 // TODO Add this to the Turnstile documentation, you use the
                 // implicit loop here to populate the explicit loop, because it

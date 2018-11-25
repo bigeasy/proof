@@ -11,19 +11,19 @@ var parse = cadence(function (async, program, consumer) {
         var stream = byline.createStream(program.stdin, { encoding: 'utf8' })
         stream.on('end', function () { stream.emit('readable') })
         var staccato = new Staccato.Readable(stream)
-        var loop = async(function () {
+        async.loop([], function () {
             async(function () {
                 staccato.read(async())
             }, function (line) {
                 if (line == null) {
-                    return [ loop.break ]
+                    return [ async.break ]
                 }
                 consume(line)
                 if (eof) {
-                    return [ loop.break ]
+                    return [ async.break ]
                 }
             })
-        })()
+        })
     }, function () {
         if (state.code != null) return state.code
         return (!count || eof) ? 0 : 1

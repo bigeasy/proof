@@ -10,18 +10,18 @@ module.exports = cadence(function (async, PATH, executable) {
         files.push(path.resolve(part, executable + '.exe'))
         files.push(path.resolve(part, executable))
     })
-    var file = async(function () {
-        if (!files.length) return [ file.break ]
+    async.loop([], function () {
+        if (!files.length) return [ async.break ]
     }, [function () {
         fs.stat(files[0], async())
     }, /^ENOENT$/, function () {
         files.shift()
-        return [ file.continue ]
+        return [ async.continue ]
     }], function (stat) {
         if (stat.isFile()) {
-            return [ file.break, files[0] ]
+            return [ async.break, files[0] ]
         } else {
             files.shift()
         }
-    })()
+    })
 })
