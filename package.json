@@ -22,7 +22,7 @@
     {
                             "arguable":                     "6.10.x",
                             "byline":                       "5.0.0",
-                            "cadence":                      "2.0.x",
+                            "cadence":                      "3.0.x",
                             "deep-equal":                   "1.0.1",
                             "delta":                        "3.0.x",
                             "departure":                    "0.0.x",
