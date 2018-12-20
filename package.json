@@ -28,7 +28,7 @@
                             "departure":                    "0.0.x",
                             "expandable":                   "0.1.x",
                             "extant":                       "1.0.x",
-                            "rescue":                       "4.2.x",
+                            "rescue":                       "5.0.x",
                             "staccato":                     "7.0.x",
                             "turnstile":                    "5.0.x"
     },
