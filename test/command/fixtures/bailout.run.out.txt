@@ -1,0 +1,7 @@
+1442817559027 run  test/command/fixtures/bailout
+1442817559061 plan test/command/fixtures/bailout 2
+1442817559062 test test/command/fixtures/bailout ok 1 test
+1442817559062 bail test/command/fixtures/bailout Bail out! bailed
+1442817559062 out  test/command/fixtures/bailout ok 2 test
+1442817559064 exit test/command/fixtures/bailout 0 null
+1442817559064 eof  *

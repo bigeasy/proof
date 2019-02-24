@@ -1,0 +1,3 @@
+1442812874630 run  test/command/fixtures/timeout
+1442812875640 exit test/command/fixtures/timeout null SIGTERM
+1442812875641 eof  *

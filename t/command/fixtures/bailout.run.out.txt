@@ -1,7 +1,0 @@
-1442817559027 run  t/command/fixtures/bailout
-1442817559061 plan t/command/fixtures/bailout 2
-1442817559062 test t/command/fixtures/bailout ok 1 test
-1442817559062 bail t/command/fixtures/bailout Bail out! bailed
-1442817559062 out  t/command/fixtures/bailout ok 2 test
-1442817559064 exit t/command/fixtures/bailout 0 null
-1442817559064 eof  *

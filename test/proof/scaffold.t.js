@@ -30,6 +30,8 @@ function prove (assert) {
         assert(out.read().toString(), 'ok 2 passed\n', 'boolean test no message always good')
         _assert({ a: 1 }, { a: 1 }, 'equal')
         assert(out.read().toString(), 'ok 3 equal\n', 'equal test passed')
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 0, 'exit 0')
@@ -40,6 +42,8 @@ function prove (assert) {
         assert(out.read(), null, 'defered')
         _assert.inc(1)
         _assert(true, 'truth')
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 0, 'exit 0 delayed')
@@ -52,6 +56,8 @@ function prove (assert) {
         assert(out.read().toString(), 'not ok 1 truth\n', 'boolean test failed')
         _assert(1, '1', 'equal')
         assert(out.read().toString(), 'not ok 2 equal\n# ACTUAL 1\n# EXPECTED \'1\'\n# DIFF [ { kind: \'E\', lhs: 1, rhs: \'1\' } ]\n', 'equal test failed')
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 1, 'exit 1 not ok summary')
@@ -60,6 +66,8 @@ function prove (assert) {
 
     scaffold(0, function (_assert) {
         _assert.die('goodbye')
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 1, 'exit 1 die')
@@ -68,6 +76,8 @@ function prove (assert) {
 
     scaffold(0, function (_assert) {
         _assert.die()
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 1, 'exit 1 die no message')
@@ -76,6 +86,8 @@ function prove (assert) {
 
     scaffold(0, function (_assert) {
         _assert.die('goodbye', { a: 1 })
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 1, 'exit 1 bail out inspect')
@@ -86,6 +98,8 @@ function prove (assert) {
 
     var shifted = globals.shift()
     scaffold(0, function (_assert) {
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         assert(code, 1, 'exit 1 leaked')
         globals.unshift(shifted)
@@ -97,6 +111,8 @@ function prove (assert) {
 
     scaffold(0, function (_assert) {
         throw 1
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         assert(code, 1, 'exit 1 throw integer')
         assert(out.read().toString(), 'Bail out!\n# 1\n', 'throw integer')
@@ -104,12 +120,16 @@ function prove (assert) {
 
     scaffold(0, function (_assert) {
         throw new Error('hello')
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error) {
         assert(error.message, 'hello', 'throw error')
         assert(out.read().toString(), 'Bail out!\n', 'throw error bail out')
     })
 
     scaffold(1, function (_assert) {
+    }, {
+        NYC_CONFIG: [ '__coverage__' ]
     })(globals, out, function (error, code) {
         if (error) throw error
         assert(code, 1, 'exit 1 missing tests')
@@ -119,8 +139,14 @@ function prove (assert) {
 
     var expected = { exitCode: 1, message: 'exit 1 unexpected tests' }
 
+    process.env.PROOF_TEST_GLOBALS_HIT = '1'
+
     scaffold(0, function (assert) {
         assert(true, 'truth')
+    }, {
+        NYC_CONFIG: [ '__coverage__' ],
+        PROOF_TEST_GLOBALS_HIT: [ 'a' ],
+        PROOF_TEST_GLOBALS_MISS: [ 'b' ]
     })(globals, out, function (error, code) {
         assert(code, 1, 'exit 1 unexpected tests')
         assert(out.read().toString(), 'ok 1 truth\n1..0\n# expected   0\n# passed     1\n# unexpected 1\n', 'unexpected summary')

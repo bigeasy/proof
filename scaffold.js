@@ -12,10 +12,12 @@ function pad (number, width) {
     return (new Array(width + 1).join(' ') + number).substr(-Math.max(width, number.length))
 }
 
-module.exports = function (count, test) {
+module.exports = function (count, test, detector) {
     return cadence(function (async, globals, stream) {
-        if ('NYC_CONFIG' in process.env) {
-            globals.push('__coverage__')
+        for (var variable in detector) {
+            if (variable in process.env) {
+                globals.push.apply(globals, detector[variable])
+            }
         }
         var expected = Math.abs(count), passed = 0, actual = 0, delayed
 

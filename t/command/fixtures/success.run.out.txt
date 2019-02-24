@@ -1,5 +1,0 @@
-1442553011060 run  t/command/fixtures/success
-1442553011066 plan t/command/fixtures/success 1
-1442553011066 test t/command/fixtures/success ok 1 success
-1442553011070 exit t/command/fixtures/success 0 null
-1442553011070 eof  *

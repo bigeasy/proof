@@ -1,0 +1,5 @@
+1442553011060 run  test/command/fixtures/success
+1442553011066 plan test/command/fixtures/success 1
+1442553011066 test test/command/fixtures/success ok 1 success
+1442553011070 exit test/command/fixtures/success 0 null
+1442553011070 eof  *

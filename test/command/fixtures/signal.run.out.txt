@@ -1,0 +1,5 @@
+1442819839904 run  test/command/fixtures/signal
+1442819839908 plan test/command/fixtures/signal 1
+1442819839908 test test/command/fixtures/signal ok 1 ok
+1442819839910 exit test/command/fixtures/signal null SIGINT
+1442819839910 eof  *

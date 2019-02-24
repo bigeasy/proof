@@ -1,5 +1,5 @@
 var output = '\
- ✓ t/command/fixtures/ok ............................... (1/1) 0.XXX Success\n\
+ ✓ test/command/fixtures/ok ............................ (1/1) 0.XXX Success\n\
                                   tests (1/1) assertions (1/1) 0.XXX Success\n'
 var cadence = require('cadence')
 
@@ -10,7 +10,7 @@ var prove = cadence(function (async, assert) {
     var stdin = new stream.PassThrough
     var stderr = new stream.PassThrough
     async(function () {
-        proof([ 'test', '-p', '1', '-M', 't/command/fixtures/ok' ], {
+        proof([ 'test', '-p', '1', '-M', 'test/command/fixtures/ok' ], {
             stdin: stdin,
             stderr: stderr,
             stdout: stdout

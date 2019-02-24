@@ -1,3 +1,0 @@
-1442812874630 run  t/command/fixtures/timeout
-1442812875640 exit t/command/fixtures/timeout null SIGTERM
-1442812875641 eof  *

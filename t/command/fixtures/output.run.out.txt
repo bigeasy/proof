@@ -1,7 +1,0 @@
-1442817630882 run  t/command/fixtures/output
-1442817630886 plan t/command/fixtures/output 1
-1442817630886 test t/command/fixtures/output ok 1 success
-1442817630886 out  t/command/fixtures/output out
-1442817630886 err  t/command/fixtures/output err
-1442817630888 exit t/command/fixtures/output 0 null
-1442817630888 eof  *

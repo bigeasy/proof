@@ -11,7 +11,7 @@ var prove = cadence(function (async, assert) {
         var stdout = new stream.PassThrough
         var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.' + qualifier + '.out.txt'), 'utf8')
         async(function () {
-            proof([ 'run' ].concat(argv || []).concat('t/command/fixtures/' + name), { stdout: stdout, stderr: stderr }, async())
+            proof([ 'run' ].concat(argv || []).concat('test/command/fixtures/' + name), { stdout: stdout, stderr: stderr }, async())
         }, function (code) {
             assert(stdout.read().toString().replace(/^\d+/gm, 'x'), output.replace(/^\d+/gm, 'x'), name)
             assert(code, exit, name + ' exit')
@@ -23,13 +23,13 @@ var prove = cadence(function (async, assert) {
     }, function (error) {
         assert(error.stderr, 'error: program names cannot contain spaces: space separated', 'spaces')
     }], [function () {
-        proof([ 'run', 't/command/fixtures/success', 't/command/fixtures/success' ], {}, async())
+        proof([ 'run', 'test/command/fixtures/success', 'test/command/fixtures/success' ], {}, async())
     }, function (error) {
-        assert(error.stderr, 'error: a program must only run once in a test run: t/command/fixtures/success', 'duplicates')
+        assert(error.stderr, 'error: a program must only run once in a test run: test/command/fixtures/success', 'duplicates')
     }], function () {
         var stdout = new stream.PassThrough
         async(function () {
-            proof([ 'run', 't/command/fixtures/parallel/*.js' ], {
+            proof([ 'run', 'test/command/fixtures/parallel/*.js' ], {
                 stdout: stdout
             }, async())
         }, function () {

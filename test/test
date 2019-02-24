@@ -4,7 +4,7 @@ set -e
 
 echo ""
 
-(node proof.bin.js run t/*/*.t.js | tee .proof.out | node proof.bin.js progress) \
+(node proof.bin.js run test/*/*.t.js | tee .proof.out | node proof.bin.js progress) \
     || (node proof.bin.js errors < .proof.out) \
     || exit 1
 

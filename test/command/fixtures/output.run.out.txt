@@ -1,0 +1,7 @@
+1442817630882 run  test/command/fixtures/output
+1442817630886 plan test/command/fixtures/output 1
+1442817630886 test test/command/fixtures/output ok 1 success
+1442817630886 out  test/command/fixtures/output out
+1442817630886 err  test/command/fixtures/output err
+1442817630888 exit test/command/fixtures/output 0 null
+1442817630888 eof  *
