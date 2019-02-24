@@ -17,4 +17,5 @@ install:
   - npm install -g nyc
 
 script:
-  - t/cover
+  - echo custom script
+  - nyc npm test
