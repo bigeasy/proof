@@ -14,6 +14,9 @@ function pad (number, width) {
 
 module.exports = function (count, test) {
     return cadence(function (async, globals, stream) {
+        if ('NYC_CONFIG' in process.env) {
+            globals.push('__coverage__')
+        }
         var expected = Math.abs(count), passed = 0, actual = 0, delayed
 
         function comment (lines) {
