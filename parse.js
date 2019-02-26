@@ -4,10 +4,11 @@ var tap = require('./tap')
 var cadence = require('cadence')
 var Staccato = require('staccato')
 
-var parse = cadence(function (async, program, consumer) {
+var parse = cadence(function (async, stdin, stderr, consumer) {
+    require('assert')(arguments.length == 4)
     var count = 0, eof = false, programs = {}, failed = false, stream, state = {}
     async(function () {
-        var stream = byline.createStream(program.stdin, { encoding: 'utf8' })
+        var stream = byline.createStream(stdin, { encoding: 'utf8' })
         stream.on('end', function () { stream.emit('readable') })
         var staccato = new Staccato.Readable(stream)
         async.loop([], function () {
@@ -30,8 +31,8 @@ var parse = cadence(function (async, program, consumer) {
 
     function abend (message) {
         consumer({ type: 'error' }, state)
-        program.stderr.write(message)
-        program.stderr.write('\n')
+        stderr.write(message)
+        stderr.write('\n')
     }
 
     function consume (line) {

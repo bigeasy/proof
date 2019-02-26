@@ -41,5 +41,5 @@ require('arguable')(module, require('cadence')(function (async, program) {
     program.helpIf(program.ultimate.help)
 
     var formatterRedux = formatterRedux(_progress(program))
-    parse(program, printer(formatterRedux, program.stdout, program.stderr), async())
+    parse(program.stdin, program.stderr, printer(formatterRedux, program.stdout, program.stderr), async())
 }))

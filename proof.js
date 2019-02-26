@@ -24,17 +24,17 @@ var platform = require('./platform').platform
 // Moved exports.json to its own file.
 function json (program, callback) {
     var formatterRedux = formatter(jsonRedux())
-    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
+    parse(program.stdin, program.stderr, printer(formatterRedux, program.stdout, program.stderr), callback)
 }
 
 function progress (program, callback) {
     var formatterRedux = formatter(_progress(program))
-    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
+    parse(program.stdin, program.stderr, printer(formatterRedux, program.stdout, program.stderr), callback)
 }
 
 function errors (program, callback) {
     var formatterRedux = formatter(_errors(program))
-    parse(program, printer(formatterRedux, program.stdout, program.stderr), callback)
+    parse(program.stdin, program.stderr, printer(formatterRedux, program.stdout, program.stderr), callback)
 }
 
 exports.main = cadence(function (async, program) {
