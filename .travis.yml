@@ -17,4 +17,4 @@ install:
   - npm install -g nyc
 
 script:
-  - nyc --exclude 't/**' npm test
+  - t/cover
