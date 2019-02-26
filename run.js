@@ -141,6 +141,7 @@ exports.run = cadence(function (async, program, process) {
         queues.directory.wait(async())
     }, function () {
         stamp('*', 'eof')
+        program.stdout.end()
         return 0
     })
 

@@ -41,6 +41,6 @@
     },
     "scripts":
     {
-                            "test":                         "test/test"
+                            "test":                         "node proof.bin.js test test/*/*.t.js"
     }
 }
