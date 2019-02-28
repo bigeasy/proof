@@ -21,7 +21,7 @@ var test = cadence(function (async, program) {
         run: run([parameters.run, program.argv], {
             stdin: program.stdin,
             stderr: program.stderr,
-            process: program
+            env: program.env
         }, async()),
         progress: null
     }
@@ -29,7 +29,7 @@ var test = cadence(function (async, program) {
         programs.progress = progress([parameters.progress], {
             stderr: program.stderr,
             stdout: program.stdout,
-            process: program
+            env: program.env
         }, async())
     }, function (code) {
         programs.code = code
@@ -47,7 +47,7 @@ var test = cadence(function (async, program) {
             programs.errors = errors([], {
                 stderr: program.stderr,
                 stdout: program.stdout,
-                process: program
+                env: program.env
             }, async())
             tee.pipe(programs.errors.stdin)
         }
