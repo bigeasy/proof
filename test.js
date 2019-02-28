@@ -35,7 +35,9 @@ var test = cadence(function (async, program) {
         programs.code = code
         return code
     })(async())
-    var tee = new stream.PassThrough
+    // TODO Write to file because without a large buffer this will freeze
+    // progress reporting.
+    var tee = new stream.PassThrough({ highWaterMark: 1024 * 1024 * 1024 * 4 })
     programs.run.stdout.pipe(tee)
     programs.run.stdout.pipe(programs.progress.stdin)
     async(function () {
