@@ -15,35 +15,28 @@ var test = cadence(function (async, program) {
         var program = /^(monochrome|width|digits)$/.test(parameter.name) ? 'progress' : 'run'
         parameters[program][parameter.name] = parameter.value
     })
+
     process.stdout.write('\n')
-    var programs = {
-        code: null,
-        run: run([parameters.run, program.argv], {
-            stdin: program.stdin,
-            stderr: program.stderr,
-            env: program.env
-        }, async()),
-        progress: null
-    }
-    cadence(function () {
-        programs.progress = progress([parameters.progress], {
-            stderr: program.stderr,
-            stdout: program.stdout,
-            env: program.env
-        }, async())
-    }, function (code) {
-        programs.code = code
-        return code
-    })(async())
-    // TODO Write to file because without a large buffer this will freeze
-    // progress reporting.
-    var tee = new stream.PassThrough({ highWaterMark: 1024 * 1024 * 1024 * 4 })
-    programs.run.stdout.pipe(tee)
-    programs.run.stdout.pipe(programs.progress.stdin)
+    var programs, tee
     async(function () {
+        programs = {
+            progress: progress([parameters.progress], {
+                stderr: program.stderr,
+                stdout: program.stdout,
+                env: program.env
+            }, async()),
+            run: run([parameters.run, program.argv], {
+                stdin: program.stdin,
+                stderr: program.stderr,
+                env: program.env
+            }, async())
+        }
+        tee = new stream.PassThrough({ highWaterMark: 1024 * 1024 * 1024 * 4 })
+        programs.run.stdout.pipe(tee)
+        programs.run.stdout.pipe(programs.progress.stdin)
         delta(async()).ee(programs.run.stdout).on('end')
-    }, function () {
-        if (programs.code == 0) {
+    }, function (code) {
+        if (code == 0) {
             process.stdout.write('\n')
         } else {
             programs.errors = errors([], {
@@ -53,6 +46,7 @@ var test = cadence(function (async, program) {
             }, async())
             tee.pipe(programs.errors.stdin)
         }
+        return [ code ]
     })
 })
 
