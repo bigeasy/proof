@@ -1,12 +1,15 @@
 var cadence = require('cadence')
 
+// Set this to ensure that these particlar runs of progress print a carriage
+// return to erase the line. This is what has been recorded in the fixtures.
+process.env['TRAVIS'] = 'false'
+
 var prove = cadence(function (async, assert) {
     var proof = require('../../proof.bin.js')
     var fs = require('fs')
     var path = require('path')
     var stream = require('stream')
     var test = cadence(function (async, name, exit, argv, stdout) {
-        process.env['TRAVIS'] = 'false'
         stdout || (stdout = new stream.PassThrough)
         var stdin = new stream.PassThrough
         var stderr = new stream.PassThrough
