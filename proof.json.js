@@ -26,14 +26,15 @@ description:
 ___ . ___
 */
 
-require('arguable')(module, require('cadence')(function (async, program) {
+require('arguable')(module, require('cadence')(function (async, destructible, arguable) {
     var formatterRedux = require('./formatter')
     var jsonRedux = require('./json')
     var parse = require('./parse')
     var printer = require('./printer')
 
-    program.helpIf(program.ultimate.help)
+    arguable.helpIf(arguable.ultimate.help)
 
     var formatterRedux = formatterRedux(jsonRedux())
-    parse(program.stdin, program.stderr, printer(formatterRedux, program.stdout, program.stderr), async())
+    parse(arguable, arguable.stdin, arguable.stderr, printer(formatterRedux, arguable.stdout, arguable.stderr), destructible.durable('json'))
+    return []
 }))

@@ -27,14 +27,15 @@ description:
 
 ___ . ___
 */
-require('arguable')(module, require('cadence')(function (async, program) {
+require('arguable')(module, require('cadence')(function (async, destructible, arguable) {
     var formatterRedux = require('./formatter')
     var _errors = require('./errors')
     var parse = require('./parse')
     var printer = require('./printer')
 
-    program.helpIf(program.ultimate.help)
+    arguable.helpIf(arguable.ultimate.help)
 
-    var formatterRedux = formatterRedux(_errors(program))
-    parse(program.stdin, program.stderr, printer(formatterRedux, program.stdout, program.stderr), async())
+    var formatterRedux = formatterRedux(_errors(arguable))
+    parse(arguable, arguable.stdin, arguable.stderr, printer(formatterRedux, arguable.stdout, arguable.stderr), destructible.durable('errors'))
+    return []
 }))

@@ -26,8 +26,9 @@ description:
 ___ . ___
 */
 
-require('arguable')(module, require('cadence')(function (async, program) {
-    program.helpIf(program.ultimate.help)
+require('arguable')(module, require('cadence')(function (async, destructible, arguable) {
+    arguable.helpIf(arguable.ultimate.help)
     var check = require('./platform')
-    check(program, process, async())
+    check(arguable, process, async())
+    destructible.destroy()
 }))

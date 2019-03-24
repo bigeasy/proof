@@ -40,8 +40,9 @@ ___ $ ___ en_US ___
 ___ . ___
 
 */
-require('arguable')(module, require('cadence')(function (async, program) {
-    program.helpIf(program.ultimate.help)
+require('arguable')(module, require('cadence')(function (async, destructible, arguable) {
+    arguable.helpIf(arguable.ultimate.help)
     var run = require('./run').run
-    run(program, process, async())
+    run(arguable, process, destructible.durable('run'))
+    return []
 }))

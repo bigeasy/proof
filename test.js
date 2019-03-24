@@ -8,45 +8,60 @@ var stream = require('stream')
 var delta = require('delta')
 var byline = require('byline')
 
-var test = cadence(function (async, program) {
-    program.helpIf(program.ultimate.help)
+var test = cadence(function (async, arguable) {
+    arguable.helpIf(arguable.ultimate.help)
     var parameters = { progress: {}, run: {}  }
-    program.parameters.forEach(function (parameter) {
+    arguable.parameters.forEach(function (parameter) {
         var program = /^(monochrome|width|digits)$/.test(parameter.name) ? 'progress' : 'run'
         parameters[program][parameter.name] = parameter.value
     })
 
-    process.stdout.write('\n')
-    var programs, tee
+    arguable.stdout.write('\n')
+    var programs, stdin, tee, exitCode = 0
     async(function () {
-        programs = {
-            progress: progress([parameters.progress], {
-                stderr: program.stderr,
-                stdout: program.stdout,
-                env: program.env
-            }, async()),
-            run: run([parameters.run, program.argv], {
-                stdin: program.stdin,
-                stderr: program.stderr,
-                env: program.env
-            }, async())
-        }
         tee = new stream.PassThrough({ highWaterMark: 1024 * 1024 * 1024 * 4 })
-        programs.run.stdout.pipe(tee)
-        programs.run.stdout.pipe(programs.progress.stdin)
-        delta(async()).ee(programs.run.stdout).on('end')
+        stdin = new stream.PassThrough
+        cadence(function (async) {
+            async(function () {
+                progress([ parameters.progress ], {
+                    $stdin: stdin,
+                    $stdout: arguable.stdout,
+                    $stderr: arguable.stderr
+                }, async())
+            }, function (child) {
+                child.exit(async())
+            })
+        })(async())
+        cadence(function (async) {
+            async(function () {
+                run([ parameters.run, arguable.argv ], {
+                    $stdout: new stream.PassThrough,
+                    $stdin: arguable.stdin,
+                    $stderr: arguable.stderr
+                }, async())
+            }, function (child, options) {
+                child.options.$stdout.pipe(tee)
+                child.options.$stdout.pipe(stdin)
+                child.exit(async())
+            })
+        })(async())
     }, function (code) {
+        arguable.exitCode = code
         if (code == 0) {
-            process.stdout.write('\n')
+            arguable.stdout.write('\n')
         } else {
-            programs.errors = errors([], {
-                stderr: program.stderr,
-                stdout: program.stdout,
-                env: program.env
-            }, async())
-            tee.pipe(programs.errors.stdin)
+            cadence(function (async) {
+                async(function () {
+                    errors([], {
+                        $stdin: tee,
+                        $stdout: arguable.stdout,
+                        $stderr: arguable.stderr
+                    }, async())
+                }, function (child, options) {
+                    child.exit(async())
+                })
+            })(async())
         }
-        return [ code ]
     })
 })
 

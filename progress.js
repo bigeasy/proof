@@ -2,8 +2,8 @@ var colorization = require('./colorization')
 var extend = require('./extend')
 var coalesce = require('extant')
 
-module.exports = function (options) {
-    var params = options.ultimate
+module.exports = function (arguable) {
+    var params = arguable.ultimate
     var colorize = colorization(params)
     var durations = {}
     var programs = {}
@@ -161,21 +161,21 @@ module.exports = function (options) {
             switch (event.type) {
                 case 'run':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
                         overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'plan':
                     programs[event.file].expected = event.expected
-                    if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
                         overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'test':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && tty && options.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
                         overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }

@@ -17,14 +17,14 @@ var colorization = require('./colorization')
 // long running test are interleaved, then we might want to view the tests one
 // at a time by piping the test through `grep`, or piping it through `sort`,
 // before passing it to `proof errors`.
-module.exports = function (options) {
+module.exports = function (arguable) {
     var queue = []
     var failed = {}
     var prefix = ''
     var backlog = {}
     var offset = 2
     var planned
-    var colorize = colorization(options.ultimate)
+    var colorize = colorization(arguable.ultimate)
 
     return function (event, state) {
         var out = []

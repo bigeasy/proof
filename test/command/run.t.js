@@ -11,7 +11,11 @@ var prove = cadence(function (async, assert) {
         var stdout = new stream.PassThrough
         var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.' + qualifier + '.out.txt'), 'utf8')
         async(function () {
-            proof([ 'run' ].concat(argv || []).concat('test/command/fixtures/' + name), { stdout: stdout, stderr: stderr }, async())
+            proof([ 'run' ].concat(argv || []).concat('test/command/fixtures/' + name), {
+                $stdout: stdout, $stderr: stderr, $trap: false
+            }, async())
+        }, function (child) {
+            child.exit(async())
         }, function (code) {
             assert(stdout.read().toString().replace(/^\d+/gm, 'x'), output.replace(/^\d+/gm, 'x'), name)
             assert(code, exit, name + ' exit')
@@ -19,19 +23,32 @@ var prove = cadence(function (async, assert) {
         })
     })
     async([function () {
-        proof([ 'run', 'space separated' ], {}, async())
+        async(function () {
+            proof([ 'run', 'space separated' ], { $trap: false }, async())
+        }, function (child) {
+            child.exit(async())
+        })
     }, function (error) {
         assert(error.stderr, 'error: program names cannot contain spaces: space separated', 'spaces')
     }], [function () {
-        proof([ 'run', 'test/command/fixtures/success', 'test/command/fixtures/success' ], {}, async())
+        async(function () {
+            proof([ 'run', 'test/command/fixtures/success', 'test/command/fixtures/success' ], { $trap: false }, async())
+        }, function (child) {
+            child.exit(async())
+        })
     }, function (error) {
         assert(error.stderr, 'error: a program must only run once in a test run: test/command/fixtures/success', 'duplicates')
     }], function () {
         var stdout = new stream.PassThrough
         async(function () {
-            proof([ 'run', 'test/command/fixtures/parallel/*.js' ], {
-                stdout: stdout
-            }, async())
+            async(function () {
+                proof([ 'run', 'test/command/fixtures/parallel/*.js' ], {
+                    $stdout: stdout,
+                    $trap: false
+                }, async())
+            }, function (child) {
+                child.exit(async())
+            })
         }, function () {
             var types = stdout.read().toString().split('\n').slice(0, 2).map(function (line) {
                 return line.split(' ')[1]

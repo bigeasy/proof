@@ -12,19 +12,19 @@ var kill = require('./kill')
 var Turnstile = require('turnstile')
 Turnstile.Queue = require('turnstile/queue')
 
-exports.run = cadence(function (async, program, process) {
-    var programs = [], params = program.ultimate
+exports.run = cadence(function (async, arguable, process) {
+    var programs = [], params = arguable.ultimate
 
     if (!params.processes) params.processes = 1
 
-    program.argv.forEach(function (pattern) {
+    arguable.argv.forEach(function (pattern) {
         var dirname
         if (/\s+/.test(pattern)) {
-            program.abend('spaces', pattern)
+            arguable.abend('spaces', pattern)
         }
         glob(process.cwd(), [ pattern ])[0].files.forEach(function (_program) {
             if (programs.indexOf(_program) != -1) {
-                program.abend('once', _program)
+                arguable.abend('once', _program)
             }
             programs.push(_program)
         })
@@ -141,13 +141,13 @@ exports.run = cadence(function (async, program, process) {
         queues.directory.wait(async())
     }, function () {
         stamp('*', 'eof')
-        program.stdout.end()
+        arguable.stdout.end()
         return 0
     })
 
     function stamp (_program, type, message) {
         message = message != null ? ' ' + message : ''
         type = ('' + type + '      ').slice(0, 4)
-        program.stdout.write('' + Date.now() + ' ' + type + ' ' + _program + message + '\n')
+        arguable.stdout.write('' + Date.now() + ' ' + type + ' ' + _program + message + '\n')
     }
 })
