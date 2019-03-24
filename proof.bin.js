@@ -6,7 +6,9 @@ usage: proof [command] <arguments> <tests>
 ___ . ___
 
 */
-require('arguable')(module, require('cadence')(function (async, destructible, arguable) {
+require('arguable')(module, {
+    env: process.env
+}, require('cadence')(function (async, destructible, arguable) {
     var coalesce = require('extant')
     arguable.helpIf(arguable.ultimate.help)
     var command = coalesce(arguable.argv[0], 'platform')
@@ -19,7 +21,8 @@ require('arguable')(module, require('cadence')(function (async, destructible, ar
             $trap: false,
             $stdin: arguable.stdin,
             $stdout: arguable.stdout,
-            $stderr: arguable.stderr
+            $stderr: arguable.stderr,
+            env: arguable.options.env
         }, async())
     }, function(child) {
         cadence(function () {

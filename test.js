@@ -26,7 +26,8 @@ var test = cadence(function (async, arguable) {
                 progress([ parameters.progress ], {
                     $stdin: stdin,
                     $stdout: arguable.stdout,
-                    $stderr: arguable.stderr
+                    $stderr: arguable.stderr,
+                    env: arguable.options.env
                 }, async())
             }, function (child) {
                 child.exit(async())

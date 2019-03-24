@@ -1,9 +1,5 @@
 var cadence = require('cadence')
 
-// Set this to ensure that these particlar runs of progress print a carriage
-// return to erase the line. This is what has been recorded in the fixtures.
-process.env['TRAVIS'] = 'false'
-
 var prove = cadence(function (async, assert) {
     var proof = require('../../proof.bin.js')
     var fs = require('fs')
@@ -21,7 +17,8 @@ var prove = cadence(function (async, assert) {
                     $stdin: stdin,
                     $stdout: stdout,
                     $stderr: stderr,
-                    $trap: false
+                    $trap: false,
+                    env: {}
                 }, async())
                 stdin.write(input)
                 stdin.end()

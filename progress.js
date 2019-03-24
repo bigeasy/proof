@@ -161,21 +161,21 @@ module.exports = function (arguable) {
             switch (event.type) {
                 case 'run':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && arguable.options.env['TRAVIS'] != 'true') {
                         overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'plan':
                     programs[event.file].expected = event.expected
-                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && arguable.options.env['TRAVIS'] != 'true') {
                         overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
                     break
                 case 'test':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && tty && process.env['TRAVIS'] != 'true') {
+                    if (event.file === displayed && tty && arguable.options.env['TRAVIS'] != 'true') {
                         overwrite = true
                         array.push(bar(programs[event.file], '\033[0G'))
                     }
