@@ -14,15 +14,13 @@ require('arguable')(module, require('cadence')(function (async, destructible, ar
     var delegate = arguable.delegate(require, './proof.%s', command)
     var cadence = require('cadence')
     async(function () {
-        destructible.ephemeral([ 'run', command ], cadence(function (async, destructible) {
-            delegate(argv, {
-                $destructible: destructible,
-                $trap: false,
-                $stdin: arguable.stdin,
-                $stdout: arguable.stdout,
-                $stderr: arguable.stderr
-            }, async())
-        }), async())
+        delegate(argv, {
+            $destructible: [ command ],
+            $trap: false,
+            $stdin: arguable.stdin,
+            $stdout: arguable.stdout,
+            $stderr: arguable.stderr
+        }, async())
     }, function(child) {
         cadence(function () {
             child.exit(async())
