@@ -6,6 +6,7 @@ var prove = cadence(function (async, assert) {
     var path = require('path')
     var stream = require('stream')
     var test = cadence(function (async, name, exit, argv, stdout) {
+        process.env['TRAVIS'] = 'false'
         stdout || (stdout = new stream.PassThrough)
         var stdin = new stream.PassThrough
         var stderr = new stream.PassThrough
