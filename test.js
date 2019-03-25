@@ -27,6 +27,7 @@ var test = cadence(function (async, arguable) {
                     $stdin: stdin,
                     $stdout: arguable.stdout,
                     $stderr: arguable.stderr,
+                    $trap: false,
                     env: arguable.options.env
                 }, async())
             }, function (child) {
@@ -38,7 +39,8 @@ var test = cadence(function (async, arguable) {
                 run([ parameters.run, arguable.argv ], {
                     $stdout: new stream.PassThrough,
                     $stdin: arguable.stdin,
-                    $stderr: arguable.stderr
+                    $stderr: arguable.stderr,
+                    $trap: false
                 }, async())
             }, function (child, options) {
                 child.options.$stdout.pipe(tee)
@@ -56,7 +58,8 @@ var test = cadence(function (async, arguable) {
                     errors([], {
                         $stdin: tee,
                         $stdout: arguable.stdout,
-                        $stderr: arguable.stderr
+                        $stderr: arguable.stderr,
+                        $trap: false
                     }, async())
                 }, function (child, options) {
                     child.exit(async())

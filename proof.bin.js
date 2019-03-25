@@ -7,7 +7,8 @@ ___ . ___
 
 */
 require('arguable')(module, {
-    env: process.env
+    env: process.env,
+    $trap: false
 }, require('cadence')(function (async, destructible, arguable) {
     var coalesce = require('extant')
     arguable.helpIf(arguable.ultimate.help)
