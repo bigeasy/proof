@@ -28,6 +28,7 @@
                             "departure":                    "1.0.x",
                             "expandable":                   "1.0.x",
                             "extant":                       "1.0.x",
+                            "prospective":                  "^0.1.0-alpha.1",
                             "rescue":                       "5.0.x",
                             "staccato":                     "8.0.x",
                             "turnstile":                    "5.0.x"
@@ -41,6 +42,6 @@
     },
     "scripts":
     {
-                            "test":                         "node proof.bin.js test test/*/*.t.js"
+                            "test": "node proof.bin.js test test/*/*.t.js"
     }
 }
