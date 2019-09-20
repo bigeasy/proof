@@ -2,7 +2,7 @@ var colorization = require('./colorization')
 var extend = require('./extend')
 var coalesce = require('extant')
 
-module.exports = function (arguable) {
+module.exports = function (arguable, state, out) {
     var params = arguable.ultimate
     var colorize = colorization(params)
     var durations = {}
@@ -76,7 +76,7 @@ module.exports = function (arguable) {
         params.digits = 10
     }
 
-    return function (event, state) {
+    return function (event) {
         var program, status, summary, tests, array = [], array = []
 
         if (!displayed) displayed = event.file
@@ -87,7 +87,7 @@ module.exports = function (arguable) {
                 expected: '?',
                 color: colorize.green,
                 file: event.file,
-                start: Number.MAX_VALUE,
+                start: event.time,
                 status: 'Success',
                 time: 0,
                 passed: 0,
@@ -108,7 +108,7 @@ module.exports = function (arguable) {
             tests = { actual: 0, passed: 0 }
             for (file in programs) {
                 program = programs[file]
-                summary.code = program.code
+                summary.code = program.message[0]
                 tests.actual++
                 if (program.expected == program.passed) {
                     tests.passed++
@@ -161,23 +161,27 @@ module.exports = function (arguable) {
             switch (event.type) {
                 case 'run':
                     extend(programs[event.file], event)
-                    if (event.file === displayed && tty && arguable.options.env['TRAVIS'] != 'true') {
+                    if (
+                        event.file === displayed &&
+                        tty
+                        && arguable.options.env['TRAVIS'] != 'true'
+                    ) {
                         overwrite = true
-                        array.push(bar(programs[event.file], '\033[0G'))
+                        array.push(bar(programs[event.file], '\u001b[0G'))
                     }
                     break
                 case 'plan':
-                    programs[event.file].expected = event.expected
+                    programs[event.file].expected = event.message
                     if (event.file === displayed && tty && arguable.options.env['TRAVIS'] != 'true') {
                         overwrite = true
-                        array.push(bar(programs[event.file], '\033[0G'))
+                        array.push(bar(programs[event.file], '\u001b[0G'))
                     }
                     break
                 case 'test':
-                    extend(programs[event.file], event)
+                    extend(programs[event.file], event.message)
                     if (event.file === displayed && tty && arguable.options.env['TRAVIS'] != 'true') {
                         overwrite = true
-                        array.push(bar(programs[event.file], '\033[0G'))
+                        array.push(bar(programs[event.file], '\u001b[0G'))
                     }
                     break
                 case 'bail':
@@ -195,6 +199,6 @@ module.exports = function (arguable) {
                     array.push(bar(program, '\n'))
             }
         }
-        return array
+        out.write(array.join(''))
     }
 }

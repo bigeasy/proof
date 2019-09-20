@@ -7,7 +7,12 @@ function prove (assert) {
 
     var f = progress({ env: {}, ultimate: { monochrome: true, tty: true } })
 
-    var f = progress({ env: {}, ultimate: { monochrome: true, tty: false } })
+    const test = []
+    const out = {
+        write: line => test.push(line)
+    }
+
+    var f = progress({ env: {}, ultimate: { monochrome: true, tty: false } }, {}, out)
 
     var chunks = f({
         type: 'run',
@@ -15,5 +20,5 @@ function prove (assert) {
         time: 0,
         expected: 3
     })
-    assert(chunks, [], 'run')
+    assert(test, [ '' ], 'run')
 }

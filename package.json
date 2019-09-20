@@ -20,14 +20,14 @@
     },
     "dependencies":
     {
-                            "arguable":                     "8.0.x",
+                            "arguable":                     "11.0.0-alpha.2",
                             "byline":                       "5.0.0",
                             "cadence":                      "3.0.x",
                             "deep-equal":                   "1.0.1",
                             "delta":                        "3.0.x",
                             "departure":                    "1.0.x",
-                            "expandable":                   "1.0.x",
                             "extant":                       "1.0.x",
+                            "fracture":                     "^0.2.0",
                             "prospective":                  "^0.1.0-alpha.1",
                             "rescue":                       "5.0.x",
                             "staccato":                     "8.0.x",
@@ -42,6 +42,6 @@
     },
     "scripts":
     {
-                            "test": "node proof.bin.js test test/*/*.t.js"
+                            "test": "node proof.bin.js test/*/*.t.js"
     }
 }
