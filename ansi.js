@@ -5,8 +5,6 @@ const COLOR = {
     gray: '\u001B[38;5;244m'
 }
 
-const ICON = { pass: '\u2713', fail: '\u2718' }
-
 function monochrome (line, icons) {
     return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
         if (match == '::') {
