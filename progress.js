@@ -1,6 +1,7 @@
 const colorization = require('./colorization')
 const extend = require('./extend')
 const coalesce = require('extant')
+const ansi = require('./ansi')
 
 module.exports = function (arguable, state, out) {
     var params = arguable.ultimate
@@ -12,6 +13,12 @@ module.exports = function (arguable, state, out) {
 
     function fill (character, count) {
         return Array(Math.max(count + 1, 0)).join(character)
+    }
+
+    function _fill (character, width, left, right, terminal) {
+        const visible = ansi.ascii(left).length + ansi.ascii(right).length
+        const fill = (new Array(width - visible)).fill(character).join('')
+        return `${ansi.monochrome(left)}${fill}${ansi.monochrome(right)}${terminal}`
     }
 
     function time (program) {
@@ -42,21 +49,18 @@ module.exports = function (arguable, state, out) {
         }
     }
 
+    let count = 0
     function bar (program, terminal) {
         if (failed(program)) {
             extend(program, { status: 'Failure', c: 'red', color: colorize.red, icon: '\u2718' })
         }
 
-        const color = program.color
-        const icon = program.icon
-        const file = program.file
-        const status = program.status
+        const { c, passed, expected, color, icon, file, status } = program
 
-        const progress = `(${program.passed}/${program.expected}) ${time(program)}`
+        const left = ` :${passed ? 'pass' : 'fail'}:. ${file} `
+        const right = ` (${passed}/${expected}) ${time(program)} :${c}:${status}:.`
 
-        const dots = fill('.', params.width - 6 - file.length - progress.length - status.length)
-
-        return ` ${color(icon)} ${file} ${dots} ${progress} ${color(status)}` + terminal
+        return _fill('.', params.width, left, right, terminal)
     }
 
     const tty = coalesce(params.tty, process.stdout.isTTY, false)
@@ -86,6 +90,7 @@ module.exports = function (arguable, state, out) {
                 actual: 0,
                 expected: '?',
                 color: colorize.green,
+                c: 'green',
                 file: event.file,
                 start: event.time,
                 status: 'Success',
