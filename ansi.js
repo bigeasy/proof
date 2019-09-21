@@ -5,19 +5,34 @@ const COLOR = {
     gray: '\u001B[38;5;244m'
 }
 
-exports.monochrome = function (line) {
+const ICON = { pass: '\u2713', fail: '\u2718' }
+
+function monochrome (line, icons) {
     return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
         if (match == '::') {
             return ':'
         }
-        if (name == 'overwrite') {
+        switch (name) {
+        case 'overwrite':
             return ''
-        }
-        if ((name in COLOR) && value) {
-            return value.replace(/::/g, ':')
+        case 'pass':
+        case 'fail':
+            return icons[name]
+        default:
+            if ((name in COLOR) && value) {
+                return value.replace(/::/g, ':')
+            }
         }
         return match
     })
+}
+
+exports.ascii = function (line) {
+    return monochrome(line, { pass: '+', fail: 'x' })
+}
+
+exports.monochrome = function (line) {
+    return monochrome(line, ICON)
 }
 
 exports.color = function (line) {
@@ -25,11 +40,16 @@ exports.color = function (line) {
         if (match == '::') {
             return ':'
         }
-        if (name == 'overwrite') {
+        switch (name) {
+        case 'overwrite':
             return `\u001b[0G`
-        }
-        if ((name in COLOR) && value) {
-            return `${COLOR[name]}${value.replace(/::/g, ':')}\u001b[0m`
+        case 'pass':
+        case 'fail':
+            return ICON[name]
+        default:
+            if ((name in COLOR) && value) {
+                return `${COLOR[name]}${value.replace(/::/g, ':')}\u001b[0m`
+            }
         }
         return match
     })
