@@ -5,6 +5,21 @@ const COLOR = {
     gray: '\u001B[38;5;244m'
 }
 
+exports.monochrome = function (line) {
+    return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
+        if (match == '::') {
+            return ':'
+        }
+        if (name == 'overwrite') {
+            return ''
+        }
+        if ((name in COLOR) && value) {
+            return value.replace(/::/g, ':')
+        }
+        return match
+    })
+}
+
 exports.color = function (line) {
     return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
         if (match == '::') {
