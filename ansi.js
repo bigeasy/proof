@@ -32,10 +32,13 @@ exports.ascii = function (line) {
 }
 
 exports.monochrome = function (line) {
-    return monochrome(line, ICON)
+    return monochrome(line, { pass: '\u2713', fail: '\u2718' })
 }
 
 exports.color = function (line) {
+    const icon = {
+        pass: '\u001b[32m\u2713\u001b[0m', fail: '\u001b[31m\u2718\u001b[0m'
+    }
     return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
         if (match == '::') {
             return ':'
@@ -45,7 +48,7 @@ exports.color = function (line) {
             return `\u001b[0G`
         case 'pass':
         case 'fail':
-            return ICON[name]
+            return icon[name]
         default:
             if ((name in COLOR) && value) {
                 return `${COLOR[name]}${value.replace(/::/g, ':')}\u001b[0m`
