@@ -27,7 +27,7 @@
                             "delta":                        "3.0.x",
                             "departure":                    "1.0.x",
                             "extant":                       "1.0.x",
-                            "fracture":                     "^0.2.0",
+                            "fracture":                     "^0.3.0-alpha.0",
                             "prospective":                  "^0.1.0-alpha.1",
                             "rescue":                       "5.0.x",
                             "staccato":                     "8.0.x",
