@@ -1,9 +1,4 @@
-const COLOR = {
-    red: '\u001B[31m',
-    green: '\u001B[32m',
-    blue: '\u001B[34m',
-    gray: '\u001B[38;5;244m'
-}
+const COLOR = { red: '\u001B[31m', green: '\u001B[32m' }
 
 function monochrome (line, icons) {
     return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
