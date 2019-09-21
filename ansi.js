@@ -5,16 +5,16 @@ const COLOR = {
     gray: '\u001B[38;5;244m'
 }
 
-module.exports = function (line) {
-    return line.replace(/%%|%{(\w+)}((?:[^%]*|%%)+)%\./g, function (match, name, value) {
-        if (match == '%%') {
-            return '%'
+exports.color = function (line) {
+    return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
+        if (match == '::') {
+            return ':'
         }
         if (name == 'overwrite') {
             return `\u001b[0G`
         }
-        if (name in COLOR) {
-            return `${COLOR[name]}${value.replace(/%%/g, '%')}\u001b[0m`
+        if ((name in COLOR) && value) {
+            return `${COLOR[name]}${value.replace(/::/g, ':')}\u001b[0m`
         }
         return match
     })
