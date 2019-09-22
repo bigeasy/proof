@@ -8,8 +8,6 @@ function format (line, delimiter, width, options, terminator) {
             return ':'
         }
         switch (name) {
-        case 'overwrite':
-            return options.overwrite
         case 'pass':
         case 'fail':
             length++
