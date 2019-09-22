@@ -1,5 +1,5 @@
 require('../..')(22, function (okay) {
-    const ansi = require('../../ansi')
+    const ansi = require('../../formatter')
     okay(ansi.color('hello :: world ::'), 'hello : world :', 'escape')
     okay(ansi.color('hello :pass:. :fail:. world'), 'hello \u001b[32m\u2713\u001b[0m \u001b[31m\u2718\u001b[0m world', 'icon')
     okay(ansi.color('hello :red:hello :: world:. world'), 'hello \u001b[31mhello : world\u001b[0m world', 'color')

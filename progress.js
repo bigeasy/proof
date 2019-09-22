@@ -1,7 +1,7 @@
 const colorization = require('./colorization')
 const extend = require('./extend')
 const coalesce = require('extant')
-const ansi = require('./ansi')
+const ansi = require('./formatter')
 
 module.exports = function (arguable, state, out) {
     var params = arguable.ultimate
