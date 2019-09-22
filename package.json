@@ -22,14 +22,11 @@
     {
                             "arguable":                     "11.0.0-alpha.2",
                             "byline":                       "5.0.0",
-                            "cadence":                      "3.0.x",
                             "deep-equal":                   "1.0.1",
-                            "delta":                        "3.0.x",
                             "departure":                    "1.0.x",
                             "extant":                       "1.0.x",
                             "fracture":                     "^0.3.0-alpha.0",
                             "prospective":                  "^0.1.0-alpha.1",
-                            "rescue":                       "5.0.x",
                             "staccato":                     "8.0.x",
                             "turnstile":                    "5.0.x"
     },
