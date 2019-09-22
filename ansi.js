@@ -1,19 +1,17 @@
-const COLOR = { red: '\u001B[31m', green: '\u001B[32m' }
-
-function monochrome (line, icons) {
+function format (line, options) {
     return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
         if (match == '::') {
             return ':'
         }
         switch (name) {
         case 'overwrite':
-            return ''
+            return options.overwrite
         case 'pass':
         case 'fail':
-            return icons[name]
+            return options.icon[name]
         default:
-            if ((name in COLOR) && value) {
-                return value.replace(/::/g, ':')
+            if ((name in options.color) && value) {
+                return `${options.color[name]}${value.replace(/::/g, ':')}${options.reset}`
             }
         }
         return match
@@ -21,32 +19,28 @@ function monochrome (line, icons) {
 }
 
 exports.ascii = function (line) {
-    return monochrome(line, { pass: '+', fail: 'x' })
+    return format(line, {
+        overwrite: '',
+        color: { red: '', green: '' },
+        reset: '',
+        icon: { pass: '+', fail: 'x' }
+    })
 }
 
 exports.monochrome = function (line) {
-    return monochrome(line, { pass: '\u2713', fail: '\u2718' })
+    return format(line, {
+        overwrite: '',
+        color: { red: '', green: '' },
+        reset: '',
+        icon: { pass: '\u2713', fail: '\u2718' }
+    })
 }
 
 exports.color = function (line) {
-    const icon = {
-        pass: '\u001b[32m\u2713\u001b[0m', fail: '\u001b[31m\u2718\u001b[0m'
-    }
-    return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
-        if (match == '::') {
-            return ':'
-        }
-        switch (name) {
-        case 'overwrite':
-            return `\u001b[0G`
-        case 'pass':
-        case 'fail':
-            return icon[name]
-        default:
-            if ((name in COLOR) && value) {
-                return `${COLOR[name]}${value.replace(/::/g, ':')}\u001b[0m`
-            }
-        }
-        return match
+    return format(line, {
+        overwrite: '\u001b[0G',
+        color: { red: '\u001B[31m', green: '\u001B[32m' },
+        reset: '\u001b[0m',
+        icon: { pass: '\u001b[32m\u2713\u001b[0m', fail: '\u001b[31m\u2718\u001b[0m' }
     })
 }
