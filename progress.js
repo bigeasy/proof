@@ -1,7 +1,7 @@
 const colorization = require('./colorization')
 const extend = require('./extend')
 const coalesce = require('extant')
-const ansi = require('./formatter')
+const Formatter = require('./formatter')
 
 module.exports = function (arguable, state, out) {
     var params = arguable.ultimate
@@ -11,15 +11,22 @@ module.exports = function (arguable, state, out) {
     var overwrite = false
     var displayed
 
-    function fill (character, count) {
-        return Array(Math.max(count + 1, 0)).join(character)
+    const tty = coalesce(params.tty, process.stdout.isTTY, false)
+    if (!params.width) {
+        const width = coalesce(process.stdout.width, 77)
+        if (tty) {
+            params.width = Math.min(width - 1, 119)
+        } else {
+            params.width = 76
+        }
     }
 
-    function _fill (character, width, left, right, terminal) {
-        const visible = ansi.ascii(left).length + ansi.ascii(right).length
-        const fill = (new Array(width - visible)).fill(character).join('')
-        return `${ansi.monochrome(left)}${fill}${ansi.monochrome(right)}${terminal}`
-    }
+    const format = new Formatter({
+        color: ! params.monochrome,
+        progress: tty && arguable.options.env.TRAVIS != 'true',
+        width: params.width,
+        delimiter: '\u0000'
+    })
 
     function time (program) {
         var str, fit
@@ -50,26 +57,14 @@ module.exports = function (arguable, state, out) {
     }
 
     let count = 0
-    function bar (program, terminal) {
+    function bar (program) {
         if (failed(program)) {
             extend(program, { status: 'Failure', c: 'red', color: colorize.red, icon: '\u2718' })
         }
 
         const { c, passed, expected, color, icon, file, status } = program
 
-        const left = ` :${passed ? 'pass' : 'fail'}:. ${file} `
-        const right = ` (${passed}/${expected}) ${time(program)} :${c}:${status}:.`
-
-        return _fill('.', params.width, left, right, terminal)
-    }
-
-    const tty = coalesce(params.tty, process.stdout.isTTY, false)
-    if (!params.width) {
-        if (tty) {
-            params.width = Math.min(process.stdout.columns - 1, 119)
-        } else {
-            params.width = 76
-        }
+        return ` :${passed ? 'pass' : 'fail'}:. ${file} :pad:.:.  (${passed}/${expected}) ${time(program)} :${c}:${status}:.`
     }
 
     params.digits || (params.digits = 4)
@@ -136,22 +131,20 @@ module.exports = function (arguable, state, out) {
             extend(summary, !failed(summary) ? {
                 icon: '\u2713',
                 status: 'Success',
-                color: colorize.green
+                color: colorize.green,
+                c: 'green'
             } : {
                 icon: '\u2718',
                 status: 'Failure',
-                color: colorize.red
+                color: colorize.red,
+                c: 'red'
             })
+
+            const { c, icon, file, status } = summary
 
             const stats = `(${summary.passed}/${summary.expected}) ${time(summary)}`
 
-            const color = summary.color
-            const icon = summary.icon
-            const file = summary.file
-            const status = summary.status
-            const dots = fill(' ', params.width - 6 - summary.file.length - stats.length - status.length)
-
-            array.push(` ${color(' ')} ${dots} ${file} ${stats} ${color(status)}\n`)
+            array.push(format.write(`:pad: :.${file} ${stats} :${c}:${status}:.`))
 
             overwrite = false
             if (summary.status == 'Failure') {
@@ -166,35 +159,20 @@ module.exports = function (arguable, state, out) {
             switch (event.type) {
                 case 'run':
                     extend(programs[event.file], event)
-                    if (
-                        event.file === displayed &&
-                        tty &&
-                        arguable.options.env['TRAVIS'] != 'true'
-                    ) {
-                        overwrite = true
-                        array.push(bar(programs[event.file], '\u001b[0G'))
+                    if (event.file === displayed) {
+                        array.push(format.progress(bar(programs[event.file])))
                     }
                     break
                 case 'plan':
                     programs[event.file].expected = event.message
-                    if (
-                        event.file === displayed &&
-                        tty &&
-                        arguable.options.env['TRAVIS'] != 'true'
-                    ) {
-                        overwrite = true
-                        array.push(bar(programs[event.file], '\u001b[0G'))
+                    if (event.file === displayed) {
+                        array.push(format.progress(bar(programs[event.file])))
                     }
                     break
                 case 'test':
                     extend(programs[event.file], event.message)
-                    if (
-                        event.file === displayed &&
-                        tty &&
-                        arguable.options.env['TRAVIS'] != 'true'
-                    ) {
-                        overwrite = true
-                        array.push(bar(programs[event.file], '\u001b[0G'))
+                    if (event.file === displayed) {
+                        array.push(format.progress(bar(programs[event.file])))
                     }
                     break
                 case 'bail':
@@ -209,7 +187,7 @@ module.exports = function (arguable, state, out) {
                     }
                     program = extend(programs[event.file], event)
                     overwrite = false
-                    array.push(bar(program, '\n'))
+                    array.push(format.write(bar(program)))
             }
         }
         out.write(array.join(''))

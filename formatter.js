@@ -1,6 +1,7 @@
-function format (line, delimiter, width, options) {
+function format (line, delimiter, width, options, terminator) {
     let length = line.length
-    const replaced = line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
+    const start = Date.now()
+    const replaced = line.replace(/::|:(\w+)(?::((?:::|[^:])+):\.|:\.)/g, function (match, name, value) {
         length -= match.length
         if (match == '::') {
             length++
@@ -27,35 +28,42 @@ function format (line, delimiter, width, options) {
     })
     const split = replaced.split(delimiter)
     if (split.length == 1) {
-        return replaced
+        return `${replaced}${terminator}`
     }
     const fill = Array(width - length).fill(split[1]).join('')
-    return `${split[0]}${fill}${split[2]}`
+    return `${split[0]}${fill}${split[2]}${terminator}`
 }
 
-exports.ascii = function (line, delimiter, width) {
-    return format(line, delimiter, width, {
-        overwrite: '',
-        color: { red: '', green: '' },
-        reset: '',
-        icon: { pass: '+', fail: 'x' }
-    })
+class Formatter {
+    constructor (options) {
+        this._delimiter = options.delimiter
+        this._width = options.width
+        this._color = options.color
+        this._width = options.width
+        this._progress = options.progress ? '\u001b[0G' : ''
+        this._options = options.color ? {
+            overwrite: '\u001b[0G',
+            color: { red: '\u001b[31m', green: '\u001b[32m' },
+            reset: '\u001b[0m',
+            icon: { pass: '\u001b[32m\u2713\u001b[0m', fail: '\u001b[31m\u2718\u001b[0m' }
+        } : {
+            overwrite: '',
+            color: { red: '', green: '' },
+            reset: '',
+            icon: { pass: '\u2713', fail: '\u2718' }
+        }
+    }
+
+    progress (line) {
+        if (this._progress) {
+            return format(line, this._delimiter, this._width, this._options, this._progress)
+        }
+        return ''
+    }
+
+    write (line) {
+        return format(line, this._delimiter, this._width, this._options, '\n')
+    }
 }
 
-exports.monochrome = function (line, delimiter, width) {
-    return format(line, delimiter, width, {
-        overwrite: '',
-        color: { red: '', green: '' },
-        reset: '',
-        icon: { pass: '\u2713', fail: '\u2718' }
-    })
-}
-
-exports.color = function (line, delimiter, width) {
-    return format(line, delimiter, width, {
-        overwrite: '\u001b[0G',
-        color: { red: '\u001B[31m', green: '\u001B[32m' },
-        reset: '\u001b[0m',
-        icon: { pass: '\u001b[32m\u2713\u001b[0m', fail: '\u001b[31m\u2718\u001b[0m' }
-    })
-}
+module.exports = Formatter
