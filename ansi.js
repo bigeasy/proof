@@ -1,6 +1,9 @@
-function format (line, options) {
-    return line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
+function format (line, delimiter, width, options) {
+    let length = line.length
+    const replaced = line.replace(/::|:(\w+)(?::\.|:((?:[^:]*|::)+):\.)/g, function (match, name, value) {
+        length -= match.length
         if (match == '::') {
+            length++
             return ':'
         }
         switch (name) {
@@ -8,18 +11,30 @@ function format (line, options) {
             return options.overwrite
         case 'pass':
         case 'fail':
+            length++
             return options.icon[name]
+        case 'pad':
+            return `${delimiter}${value}${delimiter}`
         default:
             if ((name in options.color) && value) {
-                return `${options.color[name]}${value.replace(/::/g, ':')}${options.reset}`
+                const escaped = value.replace(/::/g, ':')
+                length += escaped.length
+                return `${options.color[name]}${escaped}${options.reset}`
             }
         }
+        length += match.length
         return match
     })
+    const split = replaced.split(delimiter)
+    if (split.length == 1) {
+        return replaced
+    }
+    const fill = Array(width - length).fill(split[1]).join('')
+    return `${split[0]}${fill}${split[2]}`
 }
 
-exports.ascii = function (line) {
-    return format(line, {
+exports.ascii = function (line, delimiter, width) {
+    return format(line, delimiter, width, {
         overwrite: '',
         color: { red: '', green: '' },
         reset: '',
@@ -27,8 +42,8 @@ exports.ascii = function (line) {
     })
 }
 
-exports.monochrome = function (line) {
-    return format(line, {
+exports.monochrome = function (line, delimiter, width) {
+    return format(line, delimiter, width, {
         overwrite: '',
         color: { red: '', green: '' },
         reset: '',
@@ -36,8 +51,8 @@ exports.monochrome = function (line) {
     })
 }
 
-exports.color = function (line) {
-    return format(line, {
+exports.color = function (line, delimiter, width) {
+    return format(line, delimiter, width, {
         overwrite: '\u001b[0G',
         color: { red: '\u001B[31m', green: '\u001B[32m' },
         reset: '\u001b[0m',

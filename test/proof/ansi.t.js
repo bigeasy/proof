@@ -1,4 +1,4 @@
-require('../..')(21, function (okay) {
+require('../..')(22, function (okay) {
     const ansi = require('../../ansi')
     okay(ansi.color('hello :: world ::'), 'hello : world :', 'escape')
     okay(ansi.color('hello :pass:. :fail:. world'), 'hello \u001b[32m\u2713\u001b[0m \u001b[31m\u2718\u001b[0m world', 'icon')
@@ -21,4 +21,5 @@ require('../..')(21, function (okay) {
     okay(ansi.ascii(':red:hello world:.::'), 'hello world:', 'ambiguity')
     okay(ansi.ascii(':red:.'), ':red:.', 'missing value')
     okay(ansi.ascii(':mauve:hello world:.'), ':mauve:hello world:.', 'false match')
+    okay(ansi.ascii(':red:hello:. :pad:-:. ::', '\u0000', 12), 'hello ---- :', 'pad')
 })
