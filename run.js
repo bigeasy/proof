@@ -91,5 +91,5 @@ exports.run = async function (destructible, arguable, queue) {
 
     await destructible.promise
 
-    queue.push({ when: Date.now(), type: 'eof', message: null })
+    queue.push({ time: Date.now(), type: 'eof', message: null })
 }

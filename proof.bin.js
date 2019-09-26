@@ -16,6 +16,7 @@ options:
     -i,   --stdin                 read from standard in
     -P,   --progress              display progress default true
     -m,   --monochrome
+    -o,   --stdout
 
 invocation:
 
@@ -64,6 +65,11 @@ require('arguable')(module, {
     }
     if (arguable.ultimate.errors) {
         runners.push(require('./errors')(arguable, state, arguable.stderr))
+    }
+    if (arguable.ultimate.stdout) {
+        runners.push(function (line) {
+            arguable.stdout.write(JSON.stringify(line) + '\n')
+        })
     }
     if (runners.length > 0) {
         const accumulator = []
