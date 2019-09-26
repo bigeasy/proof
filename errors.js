@@ -17,18 +17,20 @@ var colorization = require('./colorization')
 // long running test are interleaved, then we might want to view the tests one
 // at a time by piping the test through `grep`, or piping it through `sort`,
 // before passing it to `proof errors`.
-module.exports = function (arguable) {
+module.exports = function (arguable, state, writable) {
     var queue = []
     var failed = {}
+    var program = {}
     var prefix = ''
     var backlog = {}
     var offset = 2
     var planned
     var colorize = colorization(arguable.ultimate)
 
-    return function (event, state) {
+    return function (event) {
         var out = []
         if (event.type === 'run') {
+            program[event.file] = { actual: 0, expected: 0 }
             planned = false
             backlog[event.file] = [
                 {
@@ -43,12 +45,21 @@ module.exports = function (arguable) {
                 }
             ]
         }
+        if (event.type == 'exit') {
+            program[event.file].code = event.message.code
+        }
+        if (event.type == 'test') {
+            program[event.file].actual++
+        }
         if (failed[event.file]) {
             failed[event.file].events.push(event)
-            if (event.type === 'test' && event.ok) delete failed[event.file]
+            if (event.type === 'test' && event.message.ok) {
+                delete failed[event.file]
+            }
         } else if ((event.type === 'bail') ||
-                   (event.type === 'test' && !(event.ok)) ||
-                   (event.type === 'exit' && (event.code || !planned || (event.expected != event.actual)))) {
+                   (event.type === 'test' && !(event.message.ok)) ||
+                   (event.type === 'exit' && (event.code || !planned ||
+                   (program[event.file].expected != program[event.file].actual)))) {
             queue.push(failed[event.file] = {
                 events: backlog[event.file].concat([event])
             })
@@ -58,6 +69,7 @@ module.exports = function (arguable) {
                 delete backlog[event.file]
             }
         } else if (event.type === 'plan') {
+            program[event.file].expected = event.message
             planned = true
         } else if (event.type === 'test') {
             backlog[event.file].length = 3
@@ -83,10 +95,10 @@ module.exports = function (arguable) {
                         process.stdout.write('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': no plan given: ' + event.message + '\n')
                         planned = true
                     } else */
-                    if (event.ok) {
+                    if (event.message.ok) {
                         queue.shift()
                     } else {
-                        out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': ' + event.message + '\n')
+                        out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': ' + event.message.message + '\n')
                     }
                     break
                 case 'err':
@@ -95,15 +107,17 @@ module.exports = function (arguable) {
                     prefix = ''
                     break
                 case 'exit':
-                    if (event.code || !planned || (event.actual != event.expected)) {
+                    if (event.code || !planned || (program[event.file].actual != program[event.file].expected)) {
                         var line = []
                         line.push('> ' + (colorize.red('\u2718')) + ' ' + event.file)
                         if (!planned) {
                             line.push(': no plan given')
-                        } else if (event.actual != event.expected) {
-                            line.push(': expected ' + event.expected + ' test' + (event.expected == 1 ? '' : 's')  + ' but got ' + event.actual)
+                        } else if (program[event.file].actual != program[event.file].expected) {
+                            line.push(': expected ' +
+                            program[event.file].expected + ' test' +
+                            (program[event.file].expected == 1 ? '' : 's')  + ' but got ' + program[event.file].actual)
                         }
-                        line.push(': exited with code ' + event.code)
+                        line.push(': exited with code ' + program[event.file].code)
                         out.push(line.join('') +  '\n')
                         prefix = '\n\n'
                     }
@@ -111,6 +125,8 @@ module.exports = function (arguable) {
                     break
             }
         }
-        return out
+        for (const line of out) {
+            writable.write(line)
+        }
     }
 }

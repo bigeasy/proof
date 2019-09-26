@@ -1,4 +1,28 @@
-var cadence = require('cadence')
+require('../..')(1, async (okay) => {
+    const proof = require('../../proof.bin.js')
+    const fs = require('fs').promises
+    const path = require('path')
+    const stream = require('stream')
+
+    async function test (name, stderr = new stream.PassThrough) {
+        const stdin = new stream.PassThrough
+        const input = await fs.readFile(path.resolve(__dirname, 'fixtures', name + '.in.jsons'), 'utf8')
+        const jsons = input.split('\n').filter(line => line).map(JSON.parse)
+        const output = await fs.readFile(path.resolve(__dirname, 'fixtures', name + '.errors.out.txt'), 'utf8')
+
+        // TODO Does ar
+        const child = proof({ monochrome: true, stdin: true, errors: true, progress: false }, { $stdin: stdin, $stderr: stderr })
+        await new Promise(resolve => setImmediate(resolve))
+        child.options.$stdin.end(input)
+        await child.promise
+        okay(stderr.read().toString(), output, name)
+        console.log('passed?')
+    }
+
+    await test('abundant')
+})
+
+return
 
 var prove = cadence(function (async, assert) {
     var proof = require('../../proof.bin.js')

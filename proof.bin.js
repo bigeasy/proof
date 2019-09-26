@@ -12,6 +12,10 @@ options:
     -p,   --processes <count>     number of processes to run
     -t,   --timeout <count>       when to stop waiting for process output,
                                   default 30 seconds
+    -e,   --errors                report errors
+    -i,   --stdin                 read from standard in
+    -P,   --progress              display progress default true
+    -m,   --monochrome
 
 invocation:
 
@@ -42,17 +46,52 @@ ___ $ ___ en_US ___
 ___ . ___
 
 */
-require('arguable')(module, { env: process.env, $trap: false }, async arguable => {
+require('arguable')(module, {
+    env: process.env,
+    $trap: false
+}, async arguable => {
     arguable.helpIf(arguable.ultimate.help)
     const coalesce = require('extant')
     const Destructible = require('destructible')
     const destructible = new Destructible('proof.bin')
     const run = require('./run').run
+    const events = require('events')
+    const ee = new events.EventEmitter
     const state = { code: 0 }
-    const progress = require('./progress')(arguable, state, process.stdout)
-    run(destructible.durable('run'), arguable, {
-        push: json => progress(json)
-    })
+    const runners = []
+    if (coalesce(arguable.ultimate.progress, true)) {
+        runners.push(require('./progress')(arguable, state, arguable.stderr))
+    }
+    if (arguable.ultimate.errors) {
+        runners.push(require('./errors')(arguable, state, arguable.stderr))
+    }
+    if (runners.length > 0) {
+        const accumulator = []
+        const primary = runners.shift()
+        ee.on('data', json => primary(json))
+        if (runners.length > 0) {
+            ee.on('data', json => accumulator.push(json))
+        }
+        if (arguable.ultimate.stdin) {
+            const once = require('prospective/once')
+            const byline = require('byline')
+            const stdin = byline(arguable.options.$stdin)
+            stdin.on('data', line => {
+                ee.emit('data', JSON.parse(line.toString()))
+            })
+            destructible.durable('stdin', once(stdin, 'end').promise)
+        } else {
+            run(destructible.durable('run'), arguable, {
+                push: json => ee.emit('data', json)
+            })
+        }
+        while (runners.length != 0) {
+            const runner = runners.shift()
+            for (const json of accumulator) {
+                runner(json)
+            }
+        }
+    }
     await destructible.promise
     return state.code
 })

@@ -1,0 +1,7 @@
+{"when":1441757903686,"type":"run","file":"t/executable/abundant"}
+{"when":1441757903729,"type":"plan","file":"t/executable/abundant","message":1}
+{"when":1441757903731,"type":"test","file":"t/executable/abundant","message":{"ok":true,"message":"one","comment":null,"skip":false,"todo":false}}
+{"when":1441757903731,"type":"test","file":"t/executable/abundant","message":{"ok":true,"message":"two","comment":null,"skip":false,"todo":false}}
+{"when":1441757903731,"type":"test","file":"t/executable/abundant","message":{"ok":true,"message":"three","comment":null,"skip":false,"todo":false}}
+{"when":1441757903735,"type":"exit","file":"t/executable/abundant","message":{"code":0,"signal":"null"}}
+{"when":1441757903735,"type":"eof","message":null}
