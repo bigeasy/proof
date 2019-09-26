@@ -3,10 +3,10 @@ const fs = require('fs').promises
 const coalesce = require('extant')
 const children = require('child_process')
 const once = require('prospective/once')
-const byline = require('byline')
 const tap = require('./tap')
 const kill = require('./kill')
 const Fracture = require('fracture')
+const Readline = require('readline')
 
 exports.run = async function (destructible, arguable, queue) {
     const params = arguable.ultimate
@@ -51,12 +51,14 @@ exports.run = async function (destructible, arguable, queue) {
 
         emit('run')
 
-        byline(child.stderr).on('data', function (buffer) {
+        const err =  Readline.createInterface({ input: child.stderr })
+        err.on('line', function (buffer) {
             emit('err', buffer.toString())
         })
 
+        const out =  Readline.createInterface({ input: child.stdout })
         let actual = 0, passed = 0
-        byline(child.stdout).on('data', function (buffer) {
+        out.on('line', function (buffer) {
             const line = buffer.toString()
             let message
             if (bailed) {

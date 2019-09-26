@@ -74,12 +74,12 @@ require('arguable')(module, {
         }
         if (arguable.ultimate.stdin) {
             const once = require('prospective/once')
-            const byline = require('byline')
-            const stdin = byline(arguable.options.$stdin)
-            stdin.on('data', line => {
-                ee.emit('data', JSON.parse(line.toString()))
+            const Readline = require('readline')
+            const input = Readline.createInterface({ input: arguable.stdin })
+            input.on('line', line => {
+                ee.emit('data', JSON.parse(line))
             })
-            destructible.durable('stdin', once(stdin, 'end').promise)
+            destructible.durable('stdin', once(input, 'close').promise)
         } else {
             run(destructible.durable('run'), arguable, {
                 push: json => ee.emit('data', json)
