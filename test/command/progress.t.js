@@ -10,7 +10,6 @@ require('../..')(1, async (okay) => {
         const input = await fs.readFile(path.resolve(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
         const output = await fs.readFile(path.resolve(__dirname, 'fixtures', `${name}.progress.out.txt`), 'utf8')
 
-        // TODO Does ar
         const child = proof({ tty: true, monochrome: true, stdin: true }, { $stdin: stdin, $stderr: stderr })
         await new Promise(resolve => setImmediate(resolve))
         child.options.$stdin.end(input.split('\n').map(jsonify).join('\n'))

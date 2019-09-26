@@ -46,7 +46,7 @@ module.exports = function (arguable, state, writable) {
             ]
         }
         if (event.type == 'exit') {
-            program[event.file].code = event.message.code
+            program[event.file].code = event.message[0]
         }
         if (event.type == 'test') {
             program[event.file].actual++

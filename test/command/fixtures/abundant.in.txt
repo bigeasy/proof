@@ -1,0 +1,7 @@
+1441757903686 run t/executable/abundant
+1441757903729 plan t/executable/abundant 1
+1441757903731 test t/executable/abundant ok 1 one
+1441757903731 test t/executable/abundant ok 2 two
+1441757903731 test t/executable/abundant ok 3 three
+1441757903735 exit t/executable/abundant 0 null
+1441757903735 eof *

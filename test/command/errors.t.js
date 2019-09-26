@@ -3,19 +3,18 @@ require('../..')(1, async (okay) => {
     const fs = require('fs').promises
     const path = require('path')
     const stream = require('stream')
+    const jsonify = require('./jsonify')
 
     async function test (name, stderr = new stream.PassThrough) {
         const stdin = new stream.PassThrough
-        const input = await fs.readFile(path.resolve(__dirname, 'fixtures', name + '.in.jsons'), 'utf8')
-        const jsons = input.split('\n').filter(line => line).map(JSON.parse)
+        const input = await fs.readFile(path.resolve(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
         const output = await fs.readFile(path.resolve(__dirname, 'fixtures', name + '.errors.out.txt'), 'utf8')
 
-        // TODO Does ar
         const child = proof({ monochrome: true, stdin: true, errors: true, progress: false }, { $stdin: stdin, $stderr: stderr })
         await new Promise(resolve => setImmediate(resolve))
-        child.options.$stdin.end(input)
+        child.options.$stdin.end(input.split('\n').map(jsonify).join('\n'))
         await child.promise
-        okay(stderr.read().toString(), output, name)
+        okay(stderr.read().toString().split('\n'), output.split('\n'), name)
         console.log('passed?')
     }
 
