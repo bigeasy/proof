@@ -10,6 +10,7 @@ options:
 
     -h,   --help                  display this usage information
     -p,   --processes <count>     number of processes to run
+    -T,   --tty
     -t,   --timeout <count>       when to stop waiting for process output,
                                   default 30 seconds
     -e,   --errors                report errors

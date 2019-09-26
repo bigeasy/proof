@@ -59,12 +59,12 @@ module.exports = function (arguable, state, out) {
     let count = 0
     function bar (program) {
         if (failed(program)) {
-            extend(program, { status: 'Failure', c: 'red', color: colorize.red, icon: '\u2718' })
+            extend(program, { pass: false, status: 'Failure', color: 'red' })
         }
 
-        const { c, passed, expected, color, icon, file, status } = program
+        const { pass, passed, expected, color, icon, file, status } = program
 
-        return ` :${passed ? 'pass' : 'fail'}:. ${file} :pad:.:.  (${passed}/${expected}) ${time(program)} :${c}:${status}:.`
+        return ` :${pass ? 'pass' : 'fail'}:. ${file} :pad:.:. (${passed}/${expected}) ${time(program)} :${color}:${status}:.`
     }
 
     params.digits || (params.digits = 4)
@@ -85,13 +85,13 @@ module.exports = function (arguable, state, out) {
                 actual: 0,
                 expected: '?',
                 color: colorize.green,
-                c: 'green',
+                color: 'green',
                 file: event.file,
                 start: event.time,
                 status: 'Success',
                 time: 0,
-                passed: 0,
-                icon: '\u2713'
+                pass: true,
+                passed: 0
             }
         }
 
@@ -108,7 +108,7 @@ module.exports = function (arguable, state, out) {
             tests = { actual: 0, passed: 0 }
             for (const file in programs) {
                 program = programs[file]
-                summary.code = program.message[0]
+                summary.code = program.code
                 tests.actual++
                 if (program.expected == program.passed) {
                     tests.passed++
@@ -129,22 +129,20 @@ module.exports = function (arguable, state, out) {
             }
             summary.file = `tests (${tests.passed}/${tests.actual}) assertions`
             extend(summary, !failed(summary) ? {
-                icon: '\u2713',
                 status: 'Success',
                 color: colorize.green,
-                c: 'green'
+                color: 'green'
             } : {
-                icon: '\u2718',
                 status: 'Failure',
                 color: colorize.red,
-                c: 'red'
+                color: 'red'
             })
 
-            const { c, icon, file, status } = summary
+            const { color, icon, file, status } = summary
 
             const stats = `(${summary.passed}/${summary.expected}) ${time(summary)}`
 
-            array.push(format.write(`:pad: :.${file} ${stats} :${c}:${status}:.`))
+            array.push(format.write(`:pad: :.${file} ${stats} :${color}:${status}:.`))
 
             overwrite = false
             if (summary.status == 'Failure') {
@@ -170,7 +168,11 @@ module.exports = function (arguable, state, out) {
                     }
                     break
                 case 'test':
-                    extend(programs[event.file], event.message)
+                    programs[event.file].time = event.time
+                    programs[event.file].actual++
+                    if (event.message.ok) {
+                        programs[event.file].passed++
+                    }
                     if (event.file === displayed) {
                         array.push(format.progress(bar(programs[event.file])))
                     }
@@ -186,6 +188,8 @@ module.exports = function (arguable, state, out) {
                         displayed = null
                     }
                     program = extend(programs[event.file], event)
+                    program.message = event.message
+                    program.code = event.message[0]
                     overwrite = false
                     array.push(format.write(bar(program)))
             }
