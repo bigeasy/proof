@@ -38,14 +38,15 @@ exports.run = async function (destructible, arguable, queue) {
         let timer = null
         function shutdown () {
             timer = null
-            process.kill(process, child.pid, 'SIGTERM')
+            // **TODO** Raise an exception if this doesn't do it.
+            process.kill(child.pid, 'SIGTERM')
         }
 
         function emit (method, message = null) {
             if (timer) {
                 clearTimeout(timer)
             }
-            timer = setTimeout(shutdown, params.timeout ? params.timeout * 1000 : 30000)
+            timer = setTimeout(shutdown, coalesce(params.timeout, 5000))
             queue.push({ time: Date.now(), file: name, type: method, message })
         }
 
@@ -57,18 +58,13 @@ exports.run = async function (destructible, arguable, queue) {
         })
 
         const out =  Readline.createInterface({ input: child.stdout })
-        let actual = 0, passed = 0
         out.on('line', function (buffer) {
             const line = buffer.toString()
             let message
             if (bailed) {
                 emit('out', line)
             } else if (message = tap.assertion(line)) {
-                actual++
-                if (message.ok) {
-                    passed++
-                }
-                emit('test', { actual, passed, ...message })
+                emit('test', { ...message })
             } else if (!planned && (plan = tap.plan(line))) {
                 planned = true
                 emit('plan', plan.expected)
