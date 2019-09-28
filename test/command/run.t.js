@@ -1,4 +1,4 @@
-require('../..')(6, async (okay) => {
+require('../..')(5, async (okay) => {
     const assert = require('assert')
     const proof = require('../../proof.bin.js')
     const stream = require('stream')
@@ -66,9 +66,7 @@ require('../..')(6, async (okay) => {
 
         return [ stderr ]
     }
-    await test('output', 'run', 0)
     await test('success', 'run', 0, [ '-p', 1 ])
-    counts = {}
     await test('output', 'run', 0)
     await test('bailout', 'run', 0)
     await test('signal', 'run', 0)
