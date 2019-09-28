@@ -38,6 +38,6 @@
     },
     "scripts":
     {
-                            "test": "node proof.bin.js test/*/*.t.js"
+                            "test": "node test/command/progress.t.js && node proof.bin.js test/*/*.t.js"
     }
 }
