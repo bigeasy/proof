@@ -1,6 +1,6 @@
 1441774250328 run  t/executable/bailout
 1441774250370 plan t/executable/bailout 1
 1441774250372 test t/executable/bailout ok 1 test
-1441774250372 bail t/executable/bailout Bail out! bailed
+1441774250372 bail t/executable/bailout bailed
 1441774250376 exit t/executable/bailout 0 null
 1441774250377 eof  *

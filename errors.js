@@ -35,13 +35,13 @@ module.exports = function (arguable, state, writable) {
             backlog[event.file] = [
                 {
                     type: 'out',
-                    line: ''
+                    message: ''
                 }, {
                     type: 'out',
-                    line: '>--'
+                    message: '>--'
                 }, {
                     type: 'out',
-                    line: ''
+                    message: ''
                 }
             ]
         }
@@ -58,7 +58,7 @@ module.exports = function (arguable, state, writable) {
             }
         } else if ((event.type === 'bail') ||
                    (event.type === 'test' && !(event.message.ok)) ||
-                   (event.type === 'exit' && (event.code || !planned ||
+                   (event.type === 'exit' && (event.message[0] || !planned ||
                    (program[event.file].expected != program[event.file].actual)))) {
             queue.push(failed[event.file] = {
                 events: backlog[event.file].concat([event])
@@ -88,7 +88,7 @@ module.exports = function (arguable, state, writable) {
             }
             switch (event.type) {
                 case 'bail':
-                    out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': Bail Out! ' + event.message + '\n')
+                    out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': Bail out! ' + event.message + '\n')
                     break
                 case 'test':
 /*                    if (!planned) {
@@ -103,11 +103,11 @@ module.exports = function (arguable, state, writable) {
                     break
                 case 'err':
                 case 'out':
-                    out.push('' + event.line + '\n')
+                    out.push('' + event.message + '\n')
                     prefix = ''
                     break
                 case 'exit':
-                    if (event.code || !planned || (program[event.file].actual != program[event.file].expected)) {
+                    if (event.message[0] || !planned || (program[event.file].actual != program[event.file].expected)) {
                         var line = []
                         line.push('> ' + (colorize.red('\u2718')) + ' ' + event.file)
                         if (!planned) {

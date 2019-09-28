@@ -1,4 +1,4 @@
-require('../..')(1, async (okay) => {
+require('../..')(6, async (okay) => {
     const proof = require('../../proof.bin.js')
     const fs = require('fs').promises
     const path = require('path')
@@ -15,68 +15,13 @@ require('../..')(1, async (okay) => {
         child.options.$stdin.end(input.split('\n').map(jsonify).join('\n'))
         await child.promise
         okay(stderr.read().toString().split('\n'), output.split('\n'), name)
-        console.log('passed?')
     }
 
     await test('abundant')
+    await test('missing')
+    await test('bailout')
+    await test('planless')
+    await test('exit')
+    await test('failures')
+    return
 })
-
-return
-
-var prove = cadence(function (async, assert) {
-    var proof = require('../../proof.bin.js')
-    var fs = require('fs')
-    var path = require('path')
-    var stream = require('stream')
-    var test = cadence(function (async, name, stdout) {
-        stdout || (stdout = new stream.PassThrough)
-        var stdin = new stream.PassThrough
-        var input = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.in.txt'), 'utf8')
-        var output = fs.readFileSync(path.join(__dirname, 'fixtures', name + '.errors.out.txt'), 'utf8')
-        async(function () {
-            async(function () {
-                proof([ 'errors', '-M' ], {
-                    $stdin: stdin, $stdout: stdout, $trap: false
-                }, async())
-                stdin.write(input)
-                stdin.end()
-            }, function (child) {
-                child.exit(async())
-            })
-        }, function (code) {
-            assert(stdout.read().toString(), output, name)
-            assert(code, 1, name + ' exit')
-        })
-    })
-    async(function () {
-        test('abundant', async())
-    }, function () {
-        test('missing', async())
-    }, function () {
-        test('bailout', async())
-    }, function () {
-        test('planless', async())
-    }, function () {
-        test('exit', async())
-    }, function () {
-        test('failures', async())
-    }, function () {
-        var stdin = new stream.PassThrough
-        var stdout = new stream.PassThrough
-        var input = fs.readFileSync(path.join(__dirname, 'fixtures', 'success.in.txt'), 'utf8')
-        async(function () {
-            async(function () {
-                proof([ 'errors', '-M' ], { $stdin: stdin, $stdout: stdout, $trap: false }, async())
-                stdin.write(input)
-                stdin.end()
-            }, function (child) {
-                child.exit(async())
-            })
-        }, function (code) {
-            assert(stdout.read(), null, 'success')
-            assert(code, 0, 'success exit')
-        })
-    })
-})
-
-require('../..')(14, prove)

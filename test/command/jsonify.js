@@ -29,7 +29,7 @@ module.exports = function (line) {
             time: +parts[0],
             type: parts[1],
             file: parts[2],
-            message: parts.slice(3).join(' ')
+            message: /^\S+\s+\S+\s+\S+ (.*)/.exec(line)[1]
         })
         break
     case 'test':
