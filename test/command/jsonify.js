@@ -22,6 +22,16 @@ module.exports = function (line) {
             message: +parts[3]
         })
         break
+    case 'bail':
+    case 'out':
+    case 'err':
+        return JSON.stringify({
+            time: +parts[0],
+            type: parts[1],
+            file: parts[2],
+            message: parts.slice(3).join(' ')
+        })
+        break
     case 'test':
         return JSON.stringify({
             time: +parts[0],
