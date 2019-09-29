@@ -1,4 +1,4 @@
-require('../..')(2, prove)
+require('proof')(2, prove)
 
 function prove (assert) {
     var kill = require('../../kill')

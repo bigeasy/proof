@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../..')(5, function (assert) {
+require('proof')(5, function (assert) {
     var json = require('../../json')
     var stream = require('stream')
 

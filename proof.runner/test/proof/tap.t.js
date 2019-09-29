@@ -1,4 +1,4 @@
-require('../..')(11, prove)
+require('proof')(11, prove)
 
 function prove (assert) {
     var tap = require('../../tap')

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../..')(1, prove)
+require('proof')(1, prove)
 
 function prove (assert) {
     var progress = require('../../progress')

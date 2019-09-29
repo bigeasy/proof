@@ -1,4 +1,4 @@
-require('../..')(6, async (okay) => {
+require('proof')(6, async (okay) => {
     const proof = require('../../proof.bin.js')
     const fs = require('fs').promises
     const path = require('path')

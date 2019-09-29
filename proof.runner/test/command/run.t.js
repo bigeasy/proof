@@ -1,4 +1,4 @@
-require('../..')(5, async (okay) => {
+require('proof')(5, async (okay) => {
     const assert = require('assert')
     const proof = require('../../proof.bin.js')
     const stream = require('stream')

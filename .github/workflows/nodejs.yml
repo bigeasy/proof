@@ -18,18 +18,18 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: npm install
-      run: cd proof.runner && npm install --no-package-lock
+      run: for dir in proof.*; do (cd $dir && npm install --no-package-lock); done
     - name: npm ls
       run: npm ls
-    - name: npm install nyc, mocha, codecov
-      run:  npm install -g nyc mocha codecov
+    - name: npm install nyc, prove, codecov
+      run:  npm install -g nyc prove codecov
     - name: npm test
-      run: cd proof.runner && nyc npm test
+      run: nyc --exclude test.js --exclude '*/test/**' node test
       env:
         CI: true
     - name: generate codecov report
-      run: cd proof.runner && nyc report --reporter=text-lcov > coverage.lcov
+      run: nyc report --reporter=text-lcov > coverage.lcov
     - name: ship coverage to codecov
-      run: cd proof.runner && codecov --branch=${GITHUB_REF##*/}
+      run: codecov --branch=${GITHUB_REF##*/}
       env:
         CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}

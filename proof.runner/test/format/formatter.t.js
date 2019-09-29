@@ -1,4 +1,4 @@
-require('../..')(16, function (okay) {
+require('proof')(16, function (okay) {
     const Formatter = require('../../formatter')
     const color = new Formatter({
         color: true,

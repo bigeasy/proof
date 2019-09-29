@@ -1,4 +1,4 @@
-require('../..')(5, function (assert) {
+require('proof')(5, function (assert) {
     var executable = require('../../executable')
 
     var groups = [ 100, 33, 19, 11 ]

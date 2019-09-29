@@ -31,7 +31,6 @@
     },
     "devDependencies":
     {
-                            "proof":                        "^8.0.0-alpha.0"
     },
     "bin":
     {
@@ -39,6 +38,6 @@
     },
     "scripts":
     {
-                            "test": "node proof.bin.js test/*/*.t.js"
+                            "test": "proof test/*/*.t.js"
     }
 }

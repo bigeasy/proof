@@ -1,4 +1,4 @@
-require('proof')(1, (okay) => {
+require('../..')(1, (okay) => {
     const events = require('events')
     const ee = new events.EventEmitter
     require('../../reject')(ee)

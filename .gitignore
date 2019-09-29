@@ -1,5 +1,6 @@
 /.wiseguy
 /docs
+/coverage
 /*.*/coverage
 /*.*/node_modules
 .proof.out

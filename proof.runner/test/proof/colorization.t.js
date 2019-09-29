@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../..')(8, function (assert) {
+require('proof')(8, function (assert) {
     var colorization = require('../../colorization')
 
     var colors = colorization({ monochrome: true })
