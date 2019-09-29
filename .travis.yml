@@ -13,8 +13,9 @@ branches:
     - travis-ci
 
 install:
-  - cd proof.runner && npm install --no-package-lock --no-save
+  - ls
+  - (cd proof.runner && npm install --no-package-lock --no-save)
   - npm install -g nyc
 
 script:
-  - cd proof.runner && nyc npm test
+  - (cd proof.runner && nyc npm test)
