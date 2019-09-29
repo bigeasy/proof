@@ -23,6 +23,11 @@ jobs:
       run: npm ls
     - name: npm install nyc, prove, codecov
       run:  npm install -g nyc prove codecov
+    - name: where is stuff?
+      run: |
+        which nyc
+        which codecov
+        which proof
     - name: npm test
       run: nyc --exclude test.js --exclude '*/test/**' node test
       env:
