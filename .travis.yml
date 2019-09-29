@@ -15,7 +15,7 @@ branches:
 install:
   - ls
   - for dir in proof.*; do (cd proof.runner && npm install --no-package-lock --no-save); done
-  - npm install -g nyc
+  - npm install -g nyc prove
 
 script:
   - nyc --exclude test.js --exclude '*/test/**' node test
