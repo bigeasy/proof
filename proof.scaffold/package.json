@@ -32,10 +32,6 @@
     "devDependencies":
     {
     },
-    "bin":
-    {
-                            "proof":                        "proof.bin.js"
-    },
     "scripts":
     {
                             "test": "proof test/*/*.t.js"
