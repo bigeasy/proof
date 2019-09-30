@@ -1,0 +1,8 @@
+/.*
+/*.md
+/coverage
+/*.*/coverage
+/docs
+/*.*/node_modules
+/*.*/test
+/proof.runner/broken
