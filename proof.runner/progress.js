@@ -13,7 +13,7 @@ module.exports = function (arguable, state, out) {
 
     const tty = coalesce(params.tty, process.stdout.isTTY, false)
     if (!params.width) {
-        const width = coalesce(process.stdout.width, 77)
+        const width = coalesce(process.stdout.columns, 77)
         if (tty) {
             params.width = Math.min(width - 1, 119)
         } else {
