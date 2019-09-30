@@ -40,5 +40,10 @@
     "scripts":
     {
                             "test": "node proof.bin.js test/*/*.t.js"
+    },
+    "dots":
+    {
+                            "prefix":                       "prove",
+                            "title":                        "Prove"
     }
 }
