@@ -38,6 +38,7 @@
     },
     "dots":
     {
-                            "prefix":                       "proof"
+                            "prefix":                       "proof",
+                            "path":                         "proof/proof.scaffold"
     }
 }
