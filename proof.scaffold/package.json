@@ -20,7 +20,7 @@
     },
     "dependencies":
     {
-                            "departure":                    "1.0.x"
+                            "departure":                    "^2.0.0-alpha.0"
     },
     "devDependencies":
     {
