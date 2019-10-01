@@ -1,6 +1,5 @@
 const BAILOUT = {}
 const util = require('util')
-const callback = require('prospective/callback')
 
 // A strict implementation of deep equal  that will print a diff statement when
 // comparisons fail.
@@ -87,7 +86,15 @@ module.exports = function (count, test, detector) {
         // So, I'm removing a try/catch block here.
         try {
             if (test.length == 2) {
-                await callback(callback => test(okay, callback))
+                await new Promise((resolve, reject) => {
+                    test(okay, function (error) {
+                        if (error == null) {
+                            resolve()
+                        } else {
+                            reject(error)
+                        }
+                    })
+                })
             } else {
                 await test(okay)
             }

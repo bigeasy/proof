@@ -1,6 +1,6 @@
 var globals = Object.keys(global).concat([ 'errno' ])
 
-require('../..')(32, prove)
+require('../..')(34, prove)
 
 async function prove (assert) {
     var scaffold = require('../../scaffold')
@@ -48,6 +48,17 @@ async function prove (assert) {
 
     assert(code, 0, 'exit 0 delayed')
     assert(out.read().toString(), 'ok 1 truth\n1..1\n# expected   1\n# passed     1\n', 'delayed summary')
+
+    try {
+        await scaffold(0, function (_okay, callback) {
+            callback(new Error('failed'))
+        }, {
+            NYC_CONFIG: [ '__coverage__' ]
+        })(globals, out)
+    } catch (error) {
+        assert(error.message, 'failed', 'callback thrown')
+        assert(out.read().toString(), 'Bail out!\n', 'callback failed')
+    }
 
     code = await scaffold(0, function (_assert) {
         _assert.inc(2)
