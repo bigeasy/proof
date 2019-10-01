@@ -21,13 +21,9 @@
     "dependencies":
     {
                             "arguable":                     "^11.0.0-alpha.3",
-                            "deep-equal":                   "1.0.1",
-                            "departure":                    "1.0.x",
-                            "extant":                       "1.0.x",
+                            "extant":                       "^1.0.13",
                             "fracture":                     "^0.3.0-alpha.0",
-                            "prospective":                  "^0.1.0-alpha.1",
-                            "staccato":                     "8.0.x",
-                            "turnstile":                    "5.0.x"
+                            "prospective":                  "^0.1.0-alpha.1"
     },
     "devDependencies":
     {
