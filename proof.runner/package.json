@@ -44,6 +44,7 @@
     "dots":
     {
                             "prefix":                       "prove",
-                            "title":                        "Prove"
+                            "title":                        "Prove",
+                            "path":                         "proof/proof.runner"
     }
 }
