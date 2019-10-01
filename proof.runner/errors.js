@@ -1,4 +1,4 @@
-var colorization = require('./colorization')
+const Formatter = require('./formatter')
 // Problem with errors is that output can be interleaved, so we need to gather
 // up the lines of output after a failed assertion, or else the output of other
 // assertions get interleaved.
@@ -25,7 +25,13 @@ module.exports = function (arguable, state, writable) {
     var backlog = {}
     var offset = 2
     var planned
-    var colorize = colorization(arguable.ultimate)
+
+    const format = new Formatter({
+        color: ! arguable.ultimate.monochrome,
+        progress: false,
+        width: arguable.ultimate.width,
+        delimiter: '\u0000'
+    })
 
     return function (event) {
         var out = []
@@ -88,7 +94,7 @@ module.exports = function (arguable, state, writable) {
             }
             switch (event.type) {
                 case 'bail':
-                    out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': Bail out! ' + event.message + '\n')
+                    out.push(format.write(`> :fail:. ${event.file}: Bail out! ${event.message}`))
                     break
                 case 'test':
 /*                    if (!planned) {
@@ -98,7 +104,7 @@ module.exports = function (arguable, state, writable) {
                     if (event.message.ok) {
                         queue.shift()
                     } else {
-                        out.push('> ' + (colorize.red('\u2718')) + ' ' + event.file + ': ' + event.message.message + '\n')
+                        out.push(format.write(`> :fail:. ${event.file}: ${event.message.message}`))
                     }
                     break
                 case 'err':
@@ -109,7 +115,7 @@ module.exports = function (arguable, state, writable) {
                 case 'exit':
                     if (event.message[0] || !planned || (program[event.file].actual != program[event.file].expected)) {
                         var line = []
-                        line.push('> ' + (colorize.red('\u2718')) + ' ' + event.file)
+                        line.push(`> :fail:. ${event.file}`)
                         if (!planned) {
                             line.push(': no plan given')
                         } else if (program[event.file].actual != program[event.file].expected) {
@@ -118,7 +124,7 @@ module.exports = function (arguable, state, writable) {
                             (program[event.file].expected == 1 ? '' : 's')  + ' but got ' + program[event.file].actual)
                         }
                         line.push(': exited with code ' + program[event.file].code)
-                        out.push(line.join('') +  '\n')
+                        out.push(format.write(line.join('')))
                         prefix = '\n\n'
                     }
                     queue.shift()

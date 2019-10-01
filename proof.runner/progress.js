@@ -1,11 +1,9 @@
-const colorization = require('./colorization')
 const extend = require('./extend')
 const coalesce = require('extant')
 const Formatter = require('./formatter')
 
 module.exports = function (arguable, state, out) {
     var params = arguable.ultimate
-    var colorize = colorization(params)
     var durations = {}
     var programs = {}
     var overwrite = false
@@ -84,7 +82,6 @@ module.exports = function (arguable, state, out) {
             programs[event.file] = {
                 actual: 0,
                 expected: '?',
-                color: colorize.green,
                 color: 'green',
                 file: event.file,
                 start: event.time,
@@ -130,11 +127,9 @@ module.exports = function (arguable, state, out) {
             summary.file = `tests (${tests.passed}/${tests.actual}) assertions`
             extend(summary, !failed(summary) ? {
                 status: 'Success',
-                color: colorize.green,
                 color: 'green'
             } : {
                 status: 'Failure',
-                color: colorize.red,
                 color: 'red'
             })
 
