@@ -17,13 +17,12 @@ const Formatter = require('./formatter')
 // long running test are interleaved, then we might want to view the tests one
 // at a time by piping the test through `grep`, or piping it through `sort`,
 // before passing it to `proof errors`.
-module.exports = function (arguable, state, writable) {
+module.exports = function (arguable, state, runner, writable) {
     var queue = []
     var failed = {}
     var program = {}
-    var prefix = ''
+    var offset = runner != 0 || ! writable.npm ? 2 : 3
     var backlog = {}
-    var offset = 2
     var planned
 
     const format = new Formatter({
@@ -84,7 +83,6 @@ module.exports = function (arguable, state, writable) {
         } else if (event.type !== 'eof') {
             backlog[event.file].push(event)
         } else if (offset !== 2) {
-            out.push('\n')
             state.code = 1
         }
         while (queue.length && queue[0].events.length) {
@@ -110,7 +108,6 @@ module.exports = function (arguable, state, writable) {
                 case 'err':
                 case 'out':
                     out.push('' + event.message + '\n')
-                    prefix = ''
                     break
                 case 'exit':
                     if (event.message[0] || !planned || (program[event.file].actual != program[event.file].expected)) {
@@ -125,7 +122,6 @@ module.exports = function (arguable, state, writable) {
                         }
                         line.push(': exited with code ' + program[event.file].code)
                         out.push(format.write(line.join('')))
-                        prefix = '\n\n'
                     }
                     queue.shift()
                     break

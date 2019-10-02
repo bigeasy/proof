@@ -73,12 +73,16 @@ module.exports = function (arguable, state, out) {
         params.digits = 10
     }
 
+    let prefix = out.npm ? '' : '\n'
+
     return function (event) {
         var program, status, summary, tests, array = [], array = []
 
         if (!displayed) displayed = event.file
 
         if (event.type == 'run') {
+            array.push(prefix)
+            prefix = ''
             programs[event.file] = {
                 actual: 0,
                 expected: '?',

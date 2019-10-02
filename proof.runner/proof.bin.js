@@ -62,11 +62,19 @@ require('arguable')(module, {
     const state = { code: 0 }
     const runners = []
     const once = require('prospective/once')
+    const writer = {
+        wrote: false,
+        npm: ('npm_execpath' in arguable.options.env),
+        write: function (text) {
+            this.wrote = true
+            arguable.stderr.write(text)
+        }
+    }
     if (coalesce(arguable.ultimate.progress, true)) {
-        runners.push(require('./progress')(arguable, state, arguable.stderr))
+        runners.push(require('./progress')(arguable, state, writer))
     }
     if (coalesce(arguable.ultimate.errors, true)) {
-        runners.push(require('./errors')(arguable, state, arguable.stderr))
+        runners.push(require('./errors')(arguable, state, runners.length, writer))
     }
     if (arguable.ultimate.stdout) {
         runners.push(function (line) {
@@ -100,13 +108,14 @@ require('arguable')(module, {
                 }
             })
         })
-        if (runners.length == 0) {
-            console.error('')
-        } else while (runners.length != 0) {
+        while (runners.length != 0) {
             const runner = runners.shift()
             for (const json of accumulator) {
                 runner(json)
             }
+        }
+        if (writer.wrote) {
+            writer.write('\n')
         }
     }
     await destructible.promise
