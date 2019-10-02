@@ -32,6 +32,7 @@
     "dots":
     {
                             "prefix":                       "proof",
+                            "title":                        "Proof",
                             "path":                         "proof/proof.scaffold"
     }
 }
