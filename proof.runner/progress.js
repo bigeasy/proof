@@ -1,10 +1,56 @@
-const extend = require('./extend')
 const coalesce = require('extant')
 const Formatter = require('./formatter')
 
+class Progress {
+    constructor () {
+        this.tests = {}
+    }
+
+    update (event) {
+        let test = this.tests[event.file]
+        switch (event.type) {
+        case 'run':
+            test = this.tests[event.file] = {
+                actual: 0,
+                expected: '?',
+                file: event.file,
+                start: event.time,
+                duration: 0,
+                time: 0,
+                passed: 0
+            }
+            test.time = event.time
+            break
+        case 'plan':
+            test.expected = event.message
+            break
+        case 'test':
+            test.time = event.time
+            test.duration = event.time - test.start
+            test.actual++
+            if (event.message.ok) {
+                test.passed++
+            }
+            break
+        case 'bail':
+            test.time = event.time
+            test.duration = event.time - test.start
+            test.bailed = true
+            break
+        case 'exit':
+            test.time = event.time
+            test.duration = event.time - test.start
+            test.code = event.message[0]
+            break
+        }
+        if (event.type != 'eof') {
+            return test
+        }
+    }
+}
+
 module.exports = function (arguable, state, out) {
     var params = arguable.ultimate
-    var durations = {}
     var programs = {}
     var overwrite = false
     var displayed
@@ -28,7 +74,7 @@ module.exports = function (arguable, state, out) {
 
     function time (program) {
         var str, fit
-        str = String(program.time - program.start)
+        str = String(program.duration)
         if (str.length < 4) {
             str = ('000' + str).slice(-4)
         }
@@ -56,11 +102,13 @@ module.exports = function (arguable, state, out) {
 
     let count = 0
     function bar (program) {
-        if (failed(program)) {
-            extend(program, { pass: false, status: 'Failure', color: 'red' })
+        const { pass, status, color, icon } = failed(program) ? {
+            pass: false, status: 'Failure', color: 'red', icon: 'fail'
+        } : {
+            pass: true, status: 'Success', color: 'green', icon: 'pass'
         }
 
-        const { pass, passed, expected, color, icon, file, status } = program
+        const { passed, expected, file } = program
 
         return ` :${pass ? 'pass' : 'fail'}:. ${file} :pad:.:. (${passed}/${expected}) ${time(program)} :${color}:${status}:.`
     }
@@ -75,29 +123,22 @@ module.exports = function (arguable, state, out) {
 
     let prefix = out.npm ? '' : '\n'
 
+    const progress = new Progress
+
     return function (event) {
-        var program, status, summary, tests, array = [], array = []
+        const array = []
 
         if (!displayed) displayed = event.file
+
+        const program = progress.update(event)
 
         if (event.type == 'run') {
             array.push(prefix)
             prefix = ''
-            programs[event.file] = {
-                actual: 0,
-                expected: '?',
-                color: 'green',
-                file: event.file,
-                start: event.time,
-                status: 'Success',
-                time: 0,
-                pass: true,
-                passed: 0
-            }
         }
 
         if (event.type == 'eof') {
-            summary = {
+            const summary = {
                 actual: 0,
                 passed: 0,
                 expected: 0,
@@ -106,9 +147,9 @@ module.exports = function (arguable, state, out) {
                 count: 0,
                 code: 0
             }
-            tests = { actual: 0, passed: 0 }
-            for (const file in programs) {
-                program = programs[file]
+            const tests = { actual: 0, passed: 0 }
+            for (const file in progress.tests) {
+                const program = progress.tests[file]
                 summary.code = program.code
                 tests.actual++
                 if (program.expected == program.passed) {
@@ -128,16 +169,19 @@ module.exports = function (arguable, state, out) {
                 summary.start = Math.min(summary.start, program.start)
                 summary.time = Math.max(summary.time, program.time)
             }
+            summary.duration = summary.time - summary.start
             summary.file = `tests (${tests.passed}/${tests.actual}) assertions`
-            extend(summary, !failed(summary) ? {
+            const { icon, color, status } = (!failed(summary) ? {
                 status: 'Success',
-                color: 'green'
+                color: 'green',
+                icon: 'pass'
             } : {
                 status: 'Failure',
-                color: 'red'
+                color: 'red',
+                icon: 'fail'
             })
 
-            const { color, icon, file, status } = summary
+            const { file } = summary
 
             const stats = `(${summary.passed}/${summary.expected}) ${time(summary)}`
 
@@ -152,43 +196,31 @@ module.exports = function (arguable, state, out) {
                 array.push('\n')
             }
         } else {
-            programs[event.file].duration = event.time - event.start
             switch (event.type) {
                 case 'run':
-                    extend(programs[event.file], event)
                     if (event.file === displayed) {
-                        array.push(format.progress(bar(programs[event.file])))
+                        array.push(format.progress(bar(program)))
                     }
                     break
                 case 'plan':
-                    programs[event.file].expected = event.message
                     if (event.file === displayed) {
-                        array.push(format.progress(bar(programs[event.file])))
+                        array.push(format.progress(bar(program)))
                     }
                     break
                 case 'test':
-                    programs[event.file].time = event.time
-                    programs[event.file].actual++
-                    if (event.message.ok) {
-                        programs[event.file].passed++
-                    }
                     if (event.file === displayed) {
-                        array.push(format.progress(bar(programs[event.file])))
+                        array.push(format.progress(bar(program)))
                     }
                     break
                 case 'bail':
                     if (event.file === displayed) {
                         displayed = null
                     }
-                    programs[event.file].bailed = true
                     break
                 case 'exit':
                     if (event.file === displayed) {
                         displayed = null
                     }
-                    program = extend(programs[event.file], event)
-                    program.message = event.message
-                    program.code = event.message[0]
                     overwrite = false
                     array.push(format.write(bar(program)))
             }
