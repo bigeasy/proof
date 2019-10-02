@@ -61,6 +61,7 @@ require('arguable')(module, {
     const ee = new events.EventEmitter
     const state = { code: 0 }
     const runners = []
+    const once = require('prospective/once')
     if (coalesce(arguable.ultimate.progress, true)) {
         runners.push(require('./progress')(arguable, state, arguable.stderr))
     }
@@ -92,7 +93,16 @@ require('arguable')(module, {
                 push: json => ee.emit('data', json)
             })
         }
-        while (runners.length != 0) {
+        await new Promise(resolve => {
+            ee.on('data', data => {
+                if (data.type == 'eof') {
+                    resolve()
+                }
+            })
+        })
+        if (runners.length == 0) {
+            console.error('')
+        } else while (runners.length != 0) {
             const runner = runners.shift()
             for (const json of accumulator) {
                 runner(json)
