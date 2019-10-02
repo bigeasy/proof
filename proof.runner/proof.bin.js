@@ -65,7 +65,7 @@ require('arguable')(module, {
     if (coalesce(arguable.ultimate.progress, true)) {
         runners.push(require('./progress')(arguable, state, arguable.stderr))
     }
-    if (arguable.ultimate.errors) {
+    if (coalesce(arguable.ultimate.errors, true)) {
         runners.push(require('./errors')(arguable, state, arguable.stderr))
     }
     if (arguable.ultimate.stdout) {
