@@ -5,10 +5,11 @@ require('proof')(1, prove)
 function prove (assert) {
     var progress = require('../../progress')
 
-    var f = progress({ options: { env: {} }, ultimate: { monochrome: true, tty: true } })
+    var f = progress({ options: { env: {} }, ultimate: { monochrome: true, tty: true } }, {}, {})
 
     const test = []
     const out = {
+        npm: true,
         write: line => test.push(line)
     }
 
