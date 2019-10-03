@@ -1,4 +1,6 @@
 const Formatter = require('./formatter')
+const Tracker = require('./tracker')
+
 // Problem with errors is that output can be interleaved, so we need to gather
 // up the lines of output after a failed assertion, or else the output of other
 // assertions get interleaved.
@@ -20,7 +22,7 @@ const Formatter = require('./formatter')
 module.exports = function (arguable, state, runner, writable) {
     var queue = []
     var failed = {}
-    var program = {}
+    var programs = {}
     var offset = runner != 0 || ! writable.npm ? 2 : 3
     var backlog = {}
     var planned
@@ -32,10 +34,11 @@ module.exports = function (arguable, state, runner, writable) {
         delimiter: '\u0000'
     })
 
+    const tracker = new Tracker
+
     return function (event) {
         var out = []
         if (event.type === 'run') {
-            program[event.file] = { actual: 0, expected: 0 }
             planned = false
             backlog[event.file] = [
                 {
@@ -50,12 +53,7 @@ module.exports = function (arguable, state, runner, writable) {
                 }
             ]
         }
-        if (event.type == 'exit') {
-            program[event.file].code = event.message[0]
-        }
-        if (event.type == 'test') {
-            program[event.file].actual++
-        }
+        let program = tracker.update(event)
         if (failed[event.file]) {
             failed[event.file].events.push(event)
             if (event.type === 'test' && event.message.ok) {
@@ -64,7 +62,7 @@ module.exports = function (arguable, state, runner, writable) {
         } else if ((event.type === 'bail') ||
                    (event.type === 'test' && !(event.message.ok)) ||
                    (event.type === 'exit' && (event.message[0] || !planned ||
-                   (program[event.file].expected != program[event.file].actual)))) {
+                   (program.expected != program.actual)))) {
             queue.push(failed[event.file] = {
                 events: backlog[event.file].concat([event])
             })
@@ -74,7 +72,6 @@ module.exports = function (arguable, state, runner, writable) {
                 delete backlog[event.file]
             }
         } else if (event.type === 'plan') {
-            program[event.file].expected = event.message
             planned = true
         } else if (event.type === 'test') {
             backlog[event.file].length = 3
@@ -110,17 +107,17 @@ module.exports = function (arguable, state, runner, writable) {
                     out.push('' + event.message + '\n')
                     break
                 case 'exit':
-                    if (event.message[0] || !planned || (program[event.file].actual != program[event.file].expected)) {
+                    if (event.message[0] || !planned || (program.actual != program.expected)) {
                         var line = []
                         line.push(`> :fail:. ${event.file}`)
                         if (!planned) {
                             line.push(': no plan given')
-                        } else if (program[event.file].actual != program[event.file].expected) {
+                        } else if (program.actual != program.expected) {
                             line.push(': expected ' +
-                            program[event.file].expected + ' test' +
-                            (program[event.file].expected == 1 ? '' : 's')  + ' but got ' + program[event.file].actual)
+                            program.expected + ' test' +
+                            (program.expected == 1 ? '' : 's')  + ' but got ' + program.actual)
                         }
-                        line.push(': exited with code ' + program[event.file].code)
+                        line.push(': exited with code ' + program.code)
                         out.push(format.write(line.join('')))
                     }
                     queue.shift()
