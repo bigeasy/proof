@@ -1,6 +1,6 @@
 const coalesce = require('extant')
 const Formatter = require('./formatter')
-const Progress = require('./tracker')
+const Tracker = require('./tracker')
 
 module.exports = function (arguable, state, out) {
     var params = arguable.ultimate
@@ -76,14 +76,14 @@ module.exports = function (arguable, state, out) {
 
     let prefix = out.npm ? '' : '\n'
 
-    const progress = new Progress
+    const tracker = new Tracker
 
     return function (event) {
         const array = []
 
         if (!displayed) displayed = event.file
 
-        const program = progress.update(event)
+        const program = tracker.update(event)
 
         if (event.type == 'run') {
             array.push(prefix)
@@ -101,8 +101,8 @@ module.exports = function (arguable, state, out) {
                 code: 0
             }
             const tests = { actual: 0, passed: 0 }
-            for (const file in progress.tests) {
-                const program = progress.tests[file]
+            for (const file in tracker.tests) {
+                const program = tracker.tests[file]
                 summary.code = program.code
                 tests.actual++
                 if (program.expected == program.passed) {
