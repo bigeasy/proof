@@ -1,6 +1,6 @@
 {
     "name":                 "proof",
-    "version":              "8.0.0-alpha.7",
+    "version":              "8.0.0-alpha.8",
     "description":
 
       "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
