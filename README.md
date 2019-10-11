@@ -2,7 +2,7 @@
 [![codecov](https://codecov.io/gh/bigeasy/proof/branch/master/graph/badge.svg)](https://codecov.io/gh/bigeasy/proof)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A comparator function builder.
+A cross-platform UNIX way test non-framework for JavaScript.
 
 | What          | Where                                     |
 | --- | --- |
