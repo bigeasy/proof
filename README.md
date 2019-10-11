@@ -1,17 +1,20 @@
-Proof
+[![Actions Status](https://github.com/bigeasy/proof/workflows/Node%20CI/badge.svg)](https://github.com/bigeasy/proof/actions)
+[![codecov](https://codecov.io/gh/bigeasy/proof/branch/master/graph/badge.svg)](https://codecov.io/gh/bigeasy/proof)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A cross-platform UNIX way test non-framework for JavaScript.
+A comparator function builder.
 
-    Discussion:     http://gitub.com/bigeasy/proof/issues/96
+| What          | Where                                     |
+| --- | --- |
+| Discussion    | https://github.com/bigeasy/proof/issues/1 |
+| Documentation | https://bigeasy.github.io/proof           |
+| Source        | https://github.com/bigeasy/proof          |
+| Issues        | https://github.com/bigeasy/proof/issues   |
+| CI            | https://travis-ci.org/bigeasy/proof       |
+| Coverage:     | https://codecov.io/gh/bigeasy/proof       |
+| License:      | MIT                                       |
 
-    Documentation:  http://bigeasy.github.io/proof
-    Source:         http://github.io/bigeasy/proof
-    Issues:         http://github.com/bigeasy/proof/issues
 
-    Install:        `npm install proof`
-
-    License:        MIT
-
-To learn everything you want to know about Proof start here:
-
-    http://bigeasy.github.io/proof
+```
+npm install proof
+```
