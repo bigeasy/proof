@@ -1,6 +1,6 @@
 {
     "name":                 "proof",
-    "version":              "8.0.0-alpha.8",
+    "version":              "8.0.0-alpha.9",
     "description":
 
       "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
@@ -28,11 +28,5 @@
     "scripts":
     {
                             "test": "proof test/*/*.t.js"
-    },
-    "dots":
-    {
-                            "prefix":                       "proof",
-                            "title":                        "Proof",
-                            "path":                         "proof/proof.scaffold"
     }
 }
