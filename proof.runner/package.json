@@ -22,7 +22,7 @@
     {
                             "arguable":                     "^11.0.0-alpha.3",
                             "extant":                       "^1.0.13",
-                            "fracture":                     "^0.3.0-alpha.0",
+                            "fracture":                     "0.3.0-alpha.0",
                             "prospective":                  "^0.1.0-alpha.1"
     },
     "devDependencies":
