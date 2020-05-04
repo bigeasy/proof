@@ -14,7 +14,7 @@ branches:
 
 install:
   - ls
-  - for dir in proof.*; do (cd proof.runner && npm install --no-package-lock --no-save); done
+  - for dir in proof.*; do (cd $dir && npm install --no-package-lock --no-save); done
   - npm install -g nyc prove
 
 script:
