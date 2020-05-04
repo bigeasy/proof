@@ -28,5 +28,8 @@
     "scripts":
     {
                             "test": "proof test/*/*.t.js"
+    },
+    "dots": {
+                            "path": "proof/proof.scaffold"
     }
 }
