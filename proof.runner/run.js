@@ -10,6 +10,7 @@ const Readline = require('readline')
 
 exports.run = async function (destructible, arguable, queue) {
     const params = arguable.ultimate
+    const switches = arguable.arrayed.node
 
     if (!params.processes) params.processes = 1
 
@@ -31,7 +32,7 @@ exports.run = async function (destructible, arguable, queue) {
         const stat = await fs.stat(value.program)
         const argv = executable(process, await fs.stat(value.program))
                    ? [ value.program ]
-                   : [ 'node', value.program ]
+                   : [ 'node' ].concat(switches, value.program)
         const child = children.spawn(argv.shift(), argv, { detached: true })
         let bailed = false, planned = false, plan
         const name = value.program

@@ -16,6 +16,7 @@ options:
     -e,   --errors                report errors
     -i,   --stdin                 read from standard in
     -P,   --progress              display progress default true
+    -n,   --node <string>         node.js command line argument
     -m,   --monochrome
     -o,   --stdout
 
