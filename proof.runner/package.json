@@ -1,6 +1,6 @@
 {
     "name":                 "prove",
-    "version":              "8.0.0",
+    "version":              "8.0.1",
     "description":
 
       "A UNIX way test non-framework for the meticulous programmer who is also very lazy.",
@@ -33,12 +33,12 @@
     {
                             "proof":                        "proof.bin.js"
     },
-    "dots":
-    {
-                            "title":                        "Prove"
-    },
     "scripts":
     {
                             "test": "node proof.bin.js -n --allow-natives-syntax test/*/*.t.js"
+    },
+    "dots":
+    {
+                            "title":                        "Prove"
     }
 }
