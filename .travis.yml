@@ -3,8 +3,10 @@ sudo: false
 language: node_js
 
 node_js:
-  - '12'
   - '10'
+  - '12'
+  - '14'
+  - '15'
 
 branches:
   only:
