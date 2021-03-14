@@ -62,7 +62,7 @@ require('arguable')(module, {
     const ee = new events.EventEmitter
     const state = { code: 0 }
     const runners = []
-    const once = require('prospective/once')
+    const once = require('eject')
     const writer = {
         wrote: false,
         npm: ('npm_execpath' in arguable.options.env),
@@ -90,7 +90,6 @@ require('arguable')(module, {
             ee.on('data', json => accumulator.push(json))
         }
         if (arguable.ultimate.stdin) {
-            const once = require('prospective/once')
             const Readline = require('readline')
             const input = Readline.createInterface({ input: arguable.stdin })
             input.on('line', line => {
