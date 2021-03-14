@@ -20,7 +20,7 @@
     },
     "dependencies":
     {
-                            "arguable":                     "^11.0.0-alpha.3",
+                            "arguable":                     "^13.0.0-alpha.1",
                             "extant":                       "^2.0.0-alpha.0",
                             "fracture":                     "0.3.0-alpha.0",
                             "eject":                  "0.2.3"

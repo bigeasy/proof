@@ -54,7 +54,7 @@ require('arguable')(module, {
     $trap: false
 }, async arguable => {
     arguable.helpIf(arguable.ultimate.help)
-    const coalesce = require('extant')
+    const { coalesce } = require('extant')
     const Destructible = require('destructible')
     const destructible = new Destructible('proof.bin')
     const run = require('./run').run

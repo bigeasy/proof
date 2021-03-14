@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs').promises
-const coalesce = require('extant')
+const { coalesce } = require('extant')
 const children = require('child_process')
 const once = require('eject')
 const tap = require('./tap')

@@ -1,4 +1,4 @@
-const coalesce = require('extant')
+const { coalesce } = require('extant')
 const Formatter = require('./formatter')
 const Tracker = require('./tracker')
 
