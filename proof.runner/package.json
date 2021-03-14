@@ -33,7 +33,7 @@
     },
     "bin":
     {
-                            "proof":                        "proof.bin"
+                            "proof":                        "proof.bin.js"
     },
     "scripts":
     {
