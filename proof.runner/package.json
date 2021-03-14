@@ -28,11 +28,11 @@
     },
     "devDependencies":
     {
-                            "proof":                        "^8.0.0-alpha.0"
+                            "proof":                        "^9.0.3"
     },
     "bin":
     {
-                            "proof":                        "proof.bin.js"
+                            "proof":                        "^9.0.3"
     },
     "scripts":
     {
