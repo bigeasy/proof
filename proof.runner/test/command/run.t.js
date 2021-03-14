@@ -50,13 +50,12 @@ require('proof')(5, async (okay) => {
         const input = path.join(__dirname, 'fixtures', name + '.' + qualifier + '.out.txt')
         const expected = (await fs.readFile(input, 'utf8')).replace(/^\d+ /mg, '')
 
-        // TODO Does ar
         const child = proof([
             { stdout: true, progress: false },
             argv, path.join('test', 'command', 'fixtures', name)
         ], { $stdin: stdin, $stdout: stdout, $stderr: stderr })
 
-        await child.promise
+        await child.exit
 
         const actual = stdout.read().toString()
                              .split('\n')

@@ -20,11 +20,12 @@
     },
     "dependencies":
     {
-                            "arguable":                     "^13.0.0-alpha.1",
+                            "arguable":                     "13.0.0-alpha.1",
                             "destructible":                 "7.0.0-alpha.57",
-                            "extant":                       "^2.0.0-alpha.0",
+                            "eject":                        "0.2.3",
+                            "extant":                       "2.0.0-alpha.0",
                             "fracture":                     "0.3.0-alpha.59",
-                            "eject":                  "0.2.3"
+                            "turnstile":                    "6.0.0-alpha.70"
     },
     "devDependencies":
     {
@@ -32,7 +33,7 @@
     },
     "bin":
     {
-                            "proof":                        "^9.0.3"
+                            "proof":                        "proof.bin"
     },
     "scripts":
     {

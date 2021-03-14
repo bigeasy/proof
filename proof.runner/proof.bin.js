@@ -71,6 +71,7 @@ require('arguable')(module, {
             arguable.stderr.write(text)
         }
     }
+    destructible.ephemeral('proof', async () => {
     if (coalesce(arguable.ultimate.progress, true)) {
         runners.push(require('./progress')(arguable, state, writer))
     }
@@ -97,7 +98,7 @@ require('arguable')(module, {
             })
             destructible.durable('stdin', once(input, 'close').promise)
         } else {
-            run(destructible.durable('run'), arguable, {
+            run(destructible.ephemeral('run'), arguable, {
                 push: json => ee.emit('data', json)
             })
         }
@@ -105,6 +106,7 @@ require('arguable')(module, {
             ee.on('data', data => {
                 if (data.type == 'eof') {
                     resolve()
+                    destructible.destroy()
                 }
             })
         })
@@ -118,6 +120,7 @@ require('arguable')(module, {
             writer.write('\n')
         }
     }
+    })
     await destructible.promise
     return state.code
 })
