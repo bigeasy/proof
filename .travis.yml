@@ -17,7 +17,7 @@ branches:
 install:
   - ls
   - for dir in proof.*; do (cd $dir && [[ -e package.json && ! -e skip ]] && npm install --no-save --no-package-lock || true); done && git checkout .
-  - npm install -g nyc prove@8.0.2
+  - npm install -g nyc prove@8.0.3
 
 script:
   - nyc --exclude test.js --exclude '*/test/**' node test
