@@ -41,7 +41,7 @@
     },
     "dots":
     {
-                            "path":                         "proof/proof.scaffold",
+                            "path":                         "proof/proof.runner",
                             "prefix":                       "prove",
                             "title":                        "Prove"
     }
