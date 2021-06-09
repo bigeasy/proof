@@ -28,7 +28,7 @@ function format (line, delimiter, width, options, terminator) {
     if (split.length == 1) {
         return `${replaced}${terminator}`
     }
-    const fill = Array(width - length).fill(split[1]).join('')
+    const fill = Array(Math.max(width - length, 0)).fill(split[1]).join('')
     return `${split[0]}${fill}${split[2]}${terminator}`
 }
 
