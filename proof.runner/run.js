@@ -12,6 +12,7 @@ const Readline = require('readline')
 exports.run = async function (destructible, arguable, queue) {
     const params = arguable.ultimate
     const switches = arguable.arrayed.node
+    const noop = require('nop')
 
     if (!params.processes) params.processes = 1
 
@@ -90,7 +91,7 @@ exports.run = async function (destructible, arguable, queue) {
     }
 
     for (const promise of promises) {
-        await promise
+        await Promise.resolve(promise).catch(noop)
     }
 
     queue.push({ time: Date.now(), type: 'eof', message: null })

@@ -25,6 +25,7 @@
                             "eject":                        "0.2.3",
                             "extant":                       "2.0.0-alpha.0",
                             "fracture":                     "0.3.0-alpha.65",
+                            "nop":                          "1.0.0",
                             "turnstile":                    "6.0.0-alpha.76"
     },
     "devDependencies":
